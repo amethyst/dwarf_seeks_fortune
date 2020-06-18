@@ -97,7 +97,11 @@ fn make_game() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
     let display_config_path = app_root.join("assets/config/display.ron");
 
-    let mut world = World::new();
+    let assets_dir = app_root.join("assets/");
+    let mut app_builder = Application::build(assets_dir, LoadingState::default())?;
+    let mut world = &mut app_builder.world;
+
+    // let mut world = World::new();
     let game_data = CustomGameDataBuilder::default()
         // .with_base(
         //     PrefabLoaderSystem::<MyPrefabData>::default(),
@@ -141,8 +145,8 @@ fn make_game() -> amethyst::Result<()> {
                 .with_plugin(RenderUi::default()),
         )?;
 
-    let assets_dir = app_root.join("assets/");
-    let mut game = Application::new(assets_dir, LoadingState::default(), game_data)?;
+    // let mut game = Application::new(assets_dir, LoadingState::default(), game_data)?;
+    let mut game = app_builder.build(game_data)?;
     game.run();
     Ok(())
 }
