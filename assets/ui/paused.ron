@@ -1,0 +1,38 @@
+#![enable(implicit_some)]
+Container(
+    transform: (
+        id: "background",
+        anchor: Middle,
+        stretch: XY( x_margin: 0., y_margin: 0., keep_aspect_ratio: false),
+        width: 20.,
+        height: 20.,
+    ),
+    // background: SolidColor(1.0, 1.0, 1.0, 1.0),
+    children: [
+        // Complex Button
+        Button(
+            transform: (
+                id: "complex_button",
+                y: -32.,
+                width: 128.,
+                height: 64.,
+                tab_order: 9,
+                anchor: TopMiddle,
+                mouse_reactive: true,
+            ),
+            button: (
+                text: "ComplexBtn",
+                font: File("font/square.ttf", ("TTF", ())),
+                font_size: 20.,
+                normal_text_color: (0.2, 0.2, 1.0, 1.0),
+                hover_text_color: (0.4, 0.4, 1.0, 1.0),
+                press_text_color: (0.6, 0.6, 1.0, 1.0),
+                normal_image: SolidColor(0., 1., 0., 1.),
+                hover_image: SolidColor(0.3, 1., 0.3, 1.),
+                press_image: SolidColor(0.15, 1., 0.15, 1.),
+                hover_sound: File("audio/boop.ogg", ("OGG", ())),
+                press_sound: File("audio/confirm.ogg", ("OGG", ())),
+            )
+        ),
+    ],
+)

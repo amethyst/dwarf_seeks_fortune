@@ -1,0 +1,9 @@
+/*!
+    @import /amethyst_window/src/config.rs#DisplayConfig
+    DisplayConfig
+*/
+
+(
+  title: "Rusty Auralux Clone",
+  dimensions: Some((1920, 1080)),
+)
