@@ -1,50 +1,19 @@
 use crate::game_data::CustomGameData;
 use crate::states::DemoState;
 use amethyst::audio::output::init_output;
-use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
-use amethyst::renderer::rendy::texture::image::ImageTextureConfig;
 use amethyst::ui::UiCreator;
 use amethyst::ui::UiLoader;
 use amethyst::ui::UiPrefab;
-use amethyst::utils::fps_counter::FpsCounterBundle;
-use amethyst::EmptyState;
-use amethyst::EmptyTrans;
 use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
-    animation::{
-        get_animation_set, AnimationBundle, AnimationCommand, AnimationControlSet, AnimationSet,
-        AnimationSetPrefab, EndControl,
-    },
-    assets::{
-        AssetStorage, Completion, Handle, Loader, Prefab, PrefabData, PrefabLoader,
-        PrefabLoaderSystem, Progress, ProgressCounter, RonFormat,
-    },
-    core::transform::{Transform, TransformBundle},
-    derive::PrefabData,
-    ecs::{prelude::Entity, Entities, Join, ReadStorage, WriteStorage},
-    error::Error,
-    input::{
-        get_key, is_close_requested, is_key_down, InputBundle, StringBindings, VirtualKeyCode,
-    },
-    prelude::{Builder, World},
-    renderer::{
-        plugins::{RenderFlat2D, RenderToWindow},
-        sprite::{prefab::SpriteScenePrefab, SpriteRender},
-        types::DefaultBackend,
-        Camera, ImageFormat, RenderingBundle, SpriteSheet, SpriteSheetFormat, Texture,
-    },
-    ui::{Anchor, RenderUi, TtfFormat, UiBundle, UiText, UiTransform},
-    utils::application_root_dir,
-    window::ScreenDimensions,
-    Application, GameData, GameDataBuilder, LogLevelFilter, LoggerConfig, SimpleState, SimpleTrans,
-    StateData, StdoutLog, Trans,
+    assets::{Completion, Handle, Prefab, PrefabLoader, ProgressCounter, RonFormat},
+    ecs::prelude::Entity,
+    input::{is_close_requested, is_key_down, VirtualKeyCode},
+    StateData, Trans,
 };
-use log::info;
-use precompile::AnimationId;
 use precompile::MyPrefabData;
-use serde::{Deserialize, Serialize};
 
 #[derive(Default)]
 pub struct LoadingState {

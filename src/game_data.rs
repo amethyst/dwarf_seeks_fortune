@@ -61,6 +61,7 @@ impl<'a, 'b> CustomGameDataBuilder<'a, 'b> {
         self
     }
 
+    #[allow(dead_code)]
     pub fn with_running<S>(mut self, system: S, name: &str, dependencies: &[&str]) -> Self
     where
         for<'c> S: System<'c> + Send + 'a,
@@ -101,77 +102,3 @@ impl<'a, 'b> DataDispose for CustomGameData<'a, 'b> {
         }
     }
 }
-
-// impl DataDispose for CustomGameData<'_, '_> {
-//     fn dispose(&mut self, world: &mut World) {
-//         self.dispose(world);
-//     }
-// }
-//
-// pub struct CustomGameDataBuilder<'a, 'b> {
-//     pub base: DispatcherBuilder<'a, 'b>,
-//     pub running: DispatcherBuilder<'a, 'b>,
-// }
-//
-// impl<'a, 'b> Default for CustomGameDataBuilder<'a, 'b> {
-//     fn default() -> Self {
-//         CustomGameDataBuilder::new()
-//     }
-// }
-//
-// impl<'a, 'b> CustomGameDataBuilder<'a, 'b> {
-//     pub fn new() -> Self {
-//         CustomGameDataBuilder {
-//             base: DispatcherBuilder::new(),
-//             running: DispatcherBuilder::new(),
-//         }
-//     }
-//
-//     pub fn with_base<S>(mut self, system: S, name: &str, dependencies: &[&str]) -> Self
-//     where
-//         for<'c> S: System<'c> + Send + 'a,
-//     {
-//         self.base.add(system, name, dependencies);
-//         self
-//     }
-//
-//     pub fn with_base_bundle<B>(mut self, world: &mut World, bundle: B) -> Result<Self, Error>
-//     where
-//         B: SystemBundle<'a, 'b>,
-//     {
-//         bundle.build(world, &mut self.base)?;
-//         Ok(self)
-//     }
-//
-//     pub fn with_running<S>(mut self, system: S, name: &str, dependencies: &[&str]) -> Self
-//     where
-//         for<'c> S: System<'c> + Send + 'a,
-//     {
-//         self.running.add(system, name, dependencies);
-//         self
-//     }
-// }
-//
-// impl<'a, 'b> DataInit<CustomGameData<'a, 'b>> for CustomGameDataBuilder<'a, 'b> {
-//     fn build(self, world: &mut World) -> CustomGameData<'a, 'b> {
-//         #[cfg(not(no_threading))]
-//         let pool = world.read_resource::<ArcThreadPool>().clone();
-//
-//         #[cfg(not(no_threading))]
-//         let mut base = self.base.with_pool(pool.clone()).build();
-//         #[cfg(no_threading)]
-//         let mut base = self.base.build();
-//         base.setup(&mut world);
-//
-//         #[cfg(not(no_threading))]
-//         let mut running = self.running.with_pool(pool.clone()).build();
-//         #[cfg(no_threading)]
-//         let mut running = self.running.build();
-//         running.setup(&mut world);
-//
-//         CustomGameData {
-//             base: Some(base),
-//             running: Some(running),
-//         }
-//     }
-// }

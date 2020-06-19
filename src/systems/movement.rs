@@ -1,9 +1,8 @@
 use crate::components::Player;
-use crate::components::Velocity;
 use amethyst::{
     core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, WriteStorage},
+    ecs::prelude::{Join, Read, ReadExpect, System, WriteStorage},
     input::{InputHandler, StringBindings},
     window::ScreenDimensions,
 };
@@ -25,7 +24,6 @@ impl<'s> System<'s> for MovementSystem {
         Read<'s, InputHandler<StringBindings>>,
         ReadExpect<'s, ScreenDimensions>,
     );
-
 
     fn run(&mut self, (mut transforms, mut players, time, input, screen_dimens): Self::SystemData) {
         for (player, transform) in (&mut players, &mut transforms).join() {

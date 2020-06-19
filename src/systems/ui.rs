@@ -1,13 +1,9 @@
 use amethyst::{
-    core::{
-        math::{UnitQuaternion, Vector3},
-        Time, Transform,
-    },
+    core::Time,
     ecs::{
-        prelude::{Entity, Join, Read, ReadStorage, System, WriteExpect, WriteStorage},
+        prelude::{Entity, Read, System, WriteStorage},
         ReaderId, Write,
     },
-    renderer::{camera::Camera, light::Light},
     shrev::EventChannel,
     ui::{UiEvent, UiFinder, UiText},
     utils::fps_counter::FpsCounter,

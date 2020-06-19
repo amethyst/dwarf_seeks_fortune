@@ -4,48 +4,25 @@ use crate::game_data::CustomGameData;
 use crate::states::PausedState;
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
-use amethyst::renderer::rendy::texture::image::ImageTextureConfig;
-use amethyst::ui::UiCreator;
 use amethyst::ui::UiPrefab;
-use amethyst::utils::fps_counter::FpsCounterBundle;
 use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
     animation::{
-        get_animation_set, AnimationBundle, AnimationCommand, AnimationControlSet, AnimationSet,
-        AnimationSetPrefab, EndControl,
+        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
     },
-    assets::{
-        AssetStorage, Handle, Loader, Prefab, PrefabData, PrefabLoader, PrefabLoaderSystem,
-        Progress, ProgressCounter, RonFormat,
-    },
-    core::transform::{Transform, TransformBundle},
-    derive::PrefabData,
-    ecs::{
-        prelude::{Entity, World},
-        Entities, Join, ReadStorage, WriteStorage,
-    },
-    error::Error,
-    input::{
-        get_key, is_close_requested, is_key_down, InputBundle, StringBindings, VirtualKeyCode,
-    },
+    assets::{Handle, Prefab},
+    core::transform::Transform,
+    ecs::{prelude::World, Entities, Join, ReadStorage, WriteStorage},
+    input::{get_key, is_close_requested, is_key_down, VirtualKeyCode},
     prelude::Builder,
-    renderer::{
-        plugins::{RenderFlat2D, RenderToWindow},
-        sprite::{prefab::SpriteScenePrefab, SpriteRender},
-        types::DefaultBackend,
-        Camera, ImageFormat, RenderingBundle, SpriteSheet, SpriteSheetFormat, Texture,
-    },
-    ui::{Anchor, RenderUi, TtfFormat, UiBundle, UiText, UiTransform},
-    utils::application_root_dir,
+    renderer::{sprite::SpriteRender, Camera},
     window::ScreenDimensions,
-    Application, GameData, GameDataBuilder, LogLevelFilter, LoggerConfig, SimpleState, SimpleTrans,
-    StateData, StdoutLog, Trans,
+    StateData, Trans,
 };
 use log::info;
 use precompile::AnimationId;
 use precompile::MyPrefabData;
-use serde::{Deserialize, Serialize};
 
 // #[derive(Default)]
 pub struct DemoState {
@@ -60,9 +37,9 @@ impl DemoState {
         paused_ui: Handle<UiPrefab>,
     ) -> DemoState {
         DemoState {
-            mob_prefab: mob_prefab,
-            fps_ui: fps_ui,
-            paused_ui: paused_ui,
+            mob_prefab,
+            fps_ui,
+            paused_ui,
         }
     }
 }
@@ -116,7 +93,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
 
     fn handle_event(
         &mut self,
-        mut data: StateData<'_, CustomGameData<'_, '_>>,
+        data: StateData<'_, CustomGameData<'_, '_>>,
         event: StateEvent,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
         if let StateEvent::Window(event) = &event {
