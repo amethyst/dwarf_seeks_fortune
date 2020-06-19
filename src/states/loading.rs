@@ -42,6 +42,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         self.mob_prefab = Some(data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
             loader.load("prefab/sprite_animation.ron", RonFormat, &mut self.progress)
         }));
+        data.world.insert(self.mob_prefab.as_ref().unwrap().clone());
     }
 
     fn handle_event(

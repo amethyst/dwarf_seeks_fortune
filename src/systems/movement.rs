@@ -1,4 +1,5 @@
 use crate::components::Player;
+use crate::components::Velocity;
 use amethyst::{
     core::timing::Time,
     core::transform::Transform,
@@ -19,13 +20,29 @@ pub struct MovementSystem;
 impl<'s> System<'s> for MovementSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
+        WriteStorage<'s, Velocity>,
         WriteStorage<'s, Player>,
         Read<'s, Time>,
         Read<'s, InputHandler<StringBindings>>,
         ReadExpect<'s, ScreenDimensions>,
     );
 
-    fn run(&mut self, (mut transforms, mut players, time, input, screen_dimens): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut velocities, mut players, time, input, screen_dimens): Self::SystemData) {
+        for(transform, velocity) in (&mut transforms, &mut velocities) .join() {
+            transform.set_translation_x(
+                (transform.translation().x
+                    + time.delta_seconds() * velocity.x * CONSTANT)
+                    .min(screen_dimens.width() - MOB_RADIUS * 0.5)
+                    .max(MOB_RADIUS * 0.5),
+            );
+            transform.set_translation_y(
+                (transform.translation().y
+                    + time.delta_seconds() * velocity.y * CONSTANT)
+                    .min(screen_dimens.height() - MOB_RADIUS * 0.5)
+                    .max(MOB_RADIUS * 0.5),
+            );
+        }
+
         for (player, transform) in (&mut players, &mut transforms).join() {
             // if let Some((pos_x, pos_y)) = input.mouse_position() {
             //     println!("mouse movement: x={}, y={}", pos_x, pos_y);

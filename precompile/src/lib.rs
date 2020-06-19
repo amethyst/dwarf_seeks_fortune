@@ -5,10 +5,13 @@ use amethyst::{
     assets::{PrefabData, ProgressCounter},
     core::{transform::TransformBundle, SystemBundle},
     derive::PrefabData,
-    ecs::{prelude::Entity, DispatcherBuilder},
+    ecs::{
+        prelude::{Component, Entity},
+        DenseVecStorage, DispatcherBuilder, WriteStorage,
+    },
     error::Error,
     input::{InputBundle, StringBindings},
-    prelude::{World},
+    prelude::World,
     renderer::{
         plugins::{RenderFlat2D, RenderToWindow},
         sprite::{prefab::SpriteScenePrefab, SpriteRender},
@@ -93,4 +96,8 @@ pub struct MyPrefabData {
     sprite_scene: SpriteScenePrefab,
     /// Аll animations that can be run on the entity
     animation_set: AnimationSetPrefab<AnimationId, SpriteRender>,
+}
+
+impl Component for MyPrefabData {
+    type Storage = DenseVecStorage<Self>;
 }

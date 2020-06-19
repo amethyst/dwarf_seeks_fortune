@@ -1,10 +1,10 @@
 #![allow(
     dead_code,
-    // unused_must_use,
-    // unused_imports,
-    // unused_variables,
-    // unused_parens,
-    // unused_mut
+    unused_must_use,
+    unused_imports,
+    unused_variables,
+    unused_parens,
+    unused_mut
 )]
 
 mod components;
@@ -67,6 +67,7 @@ fn make_game() -> amethyst::Result<()> {
             "movement_system",
             &["input_system"],
         )
+        .with_core(systems::SpawnSystem::new(), "spawn_system", &[])
         .with_base_bundle(
             world,
             PrecompiledRenderBundle {
