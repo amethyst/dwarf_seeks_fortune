@@ -4,6 +4,6 @@
 */
 
 (
-  title: "Rusty Auralux Clone",
-  dimensions: Some((1920, 1080)),
+  title: "Towerdef",
+  dimensions: Some((1200, 800)),
 )

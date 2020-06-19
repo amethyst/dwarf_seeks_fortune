@@ -105,6 +105,11 @@ fn make_game() -> amethyst::Result<()> {
             &[],
         )
         .with_core(systems::UiSystem::default(), "ui_system", &[])
+        .with_core(
+            systems::MovementSystem,
+            "movement_system",
+            &["input_system"],
+        )
         .with_base_bundle(
             world,
             PrecompiledRenderBundle {

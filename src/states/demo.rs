@@ -1,3 +1,5 @@
+use crate::components::Player;
+use crate::components::Velocity;
 use crate::game_data::CustomGameData;
 use crate::states::PausedState;
 use amethyst::core::math::Vector3;
@@ -47,29 +49,37 @@ use serde::{Deserialize, Serialize};
 
 // #[derive(Default)]
 pub struct DemoState {
-    // mob_prefab: Handle<Prefab<MyPrefabData>>,
+    mob_prefab: Handle<Prefab<MyPrefabData>>,
     fps_ui: Handle<UiPrefab>,
     paused_ui: Handle<UiPrefab>,
 }
 impl DemoState {
-    pub fn new(fps_ui: Handle<UiPrefab>, paused_ui: Handle<UiPrefab>) -> DemoState {
-        DemoState { fps_ui, paused_ui }
+    pub fn new(
+        mob_prefab: Handle<Prefab<MyPrefabData>>,
+        fps_ui: Handle<UiPrefab>,
+        paused_ui: Handle<UiPrefab>,
+    ) -> DemoState {
+        DemoState {
+            mob_prefab: mob_prefab,
+            fps_ui: fps_ui,
+            paused_ui: paused_ui,
+        }
     }
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
-        // let mut transform = Transform::default();
-        // transform.set_scale(Vector3::new(10.0, 10.0, 10.0));
-        // world
-        //     .create_entity()
-        //     .with(self.mob_prefab.clone())
-        //     .with(transform)
-        //     .with(Player {
-        //         velocity: Velocity { x: 5.0, y: 5.0 },
-        //     })
-        //     .build();
+        let mut transform = Transform::default();
+        transform.set_scale(Vector3::new(10.0, 10.0, 10.0));
+        world
+            .create_entity()
+            .with(self.mob_prefab.clone())
+            .with(transform)
+            .with(Player {
+                velocity: Velocity { x: 5.0, y: 5.0 },
+            })
+            .build();
         initialise_camera(world);
     }
 
@@ -85,19 +95,19 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
                 ReadStorage<AnimationSet<AnimationId, SpriteRender>>,
                 WriteStorage<AnimationControlSet<AnimationId, SpriteRender>>,
             )| {
-                // // For each entity that has AnimationSet
-                // for (entity, animation_set) in (&entities, &animation_sets).join() {
-                //     // Creates a new AnimationControlSet for the entity
-                //     let control_set = get_animation_set(&mut control_sets, entity).unwrap();
-                //     // Adds the `Fly` animation to AnimationControlSet and loops infinitely
-                //     control_set.add_animation(
-                //         AnimationId::Fly,
-                //         &animation_set.get(&AnimationId::Fly).unwrap(),
-                //         EndControl::Loop(None),
-                //         1.0,
-                //         AnimationCommand::Start,
-                //     );
-                // }
+                // For each entity that has AnimationSet
+                for (entity, animation_set) in (&entities, &animation_sets).join() {
+                    // Creates a new AnimationControlSet for the entity
+                    let control_set = get_animation_set(&mut control_sets, entity).unwrap();
+                    // Adds the `Fly` animation to AnimationControlSet and loops infinitely
+                    control_set.add_animation(
+                        AnimationId::Fly,
+                        &animation_set.get(&AnimationId::Fly).unwrap(),
+                        EndControl::Loop(None),
+                        1.0,
+                        AnimationCommand::Start,
+                    );
+                }
             },
         );
         data.data.update(&world, true);
