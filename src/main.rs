@@ -27,8 +27,6 @@ use amethyst::ecs::System;
 use amethyst::ecs::Write;
 use amethyst::shrev::EventChannel;
 use amethyst::ui::UiEvent;
-use states::DemoState;
-use states::LoadingState;
 
 use amethyst::prelude::WorldExt;
 use amethyst::utils::fps_counter::FpsCounterBundle;
@@ -62,46 +60,24 @@ use amethyst::{
 use log::info;
 use serde::{Deserialize, Serialize};
 
-/// Animation ids used in a AnimationSet
-#[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
-pub enum AnimationId {
-    Fly,
-}
-
-/// Loading data for one entity
-#[derive(Debug, Clone, Deserialize, PrefabData)]
-pub struct MyPrefabData {
-    /// Information for rendering a scene with sprites
-    sprite_scene: SpriteScenePrefab,
-    /// Аll animations that can be run on the entity
-    animation_set: AnimationSetPrefab<AnimationId, SpriteRender>,
-}
-
 fn main() {
-    make_game();
+    let result = make_game();
+    if let Err(e) = result {
+        println!("Error starting game: {:?}", e);
+    }
 }
 
 fn make_game() -> amethyst::Result<()> {
-    amethyst::Logger::from_config(Default::default())
-        // .level_for("gfx_device_gl", amethyst::LogLevelFilter::Warn)
-        // .level_for("gfx_glyph", amethyst::LogLevelFilter::Error)
-        .start();
-
-    // amethyst::start_logger(LoggerConfig {
-    //     stdout: StdoutLog::Colored,
-    //     level_filter: LogLevelFilter::Info,
-    //     log_file: None,
-    //     allow_env_override: true,
-    //     log_gfx_rendy_level: Some(LogLevelFilter::Warn),
-    // });
+    amethyst::Logger::from_config(Default::default()).start();
     let app_root = application_root_dir()?;
-    let display_config_path = app_root.join("assets/config/display.ron");
-
     let assets_dir = app_root.join("assets/");
-    let mut app_builder = Application::build(assets_dir, LoadingState::default())?;
+    let config_dir = assets_dir.join("config/");
+    let display_config_path = config_dir.join("display.ron");
+    let bindings_config_path = config_dir.join("bindings.ron");
+
+    let mut app_builder = Application::build(assets_dir, states::LoadingState::default())?;
     let mut world = &mut app_builder.world;
 
-    // let mut world = World::new();
     let game_data = CustomGameDataBuilder::default()
         // .with_base(
         //     PrefabLoaderSystem::<MyPrefabData>::default(),
@@ -123,8 +99,7 @@ fn make_game() -> amethyst::Result<()> {
         .with_base_bundle(&mut world, FpsCounterBundle {})?
         .with_base_bundle(
             &mut world,
-            InputBundle::<StringBindings>::new()
-                .with_bindings_from_file(app_root.join("src/config/bindings.ron"))?,
+            InputBundle::<StringBindings>::new().with_bindings_from_file(bindings_config_path)?,
         )?
         .with_base_bundle(&mut world, UiBundle::<StringBindings>::new())?
         .with_core(Processor::<Source>::new(), "source_processor", &[])
@@ -144,8 +119,6 @@ fn make_game() -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default())
                 .with_plugin(RenderUi::default()),
         )?;
-
-    // let mut game = Application::new(assets_dir, LoadingState::default(), game_data)?;
     let mut game = app_builder.build(game_data)?;
     game.run();
     Ok(())
@@ -176,4 +149,19 @@ impl<'a> System<'a> for UiEventHandlerSystem {
             info!("[SYSTEM] You just interacted with a ui element: {:?}", ev);
         }
     }
+}
+
+/// Animation ids used in a AnimationSet
+#[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
+pub enum AnimationId {
+    Fly,
+}
+
+/// Loading data for one entity
+#[derive(Debug, Clone, Deserialize, PrefabData)]
+pub struct MyPrefabData {
+    /// Information for rendering a scene with sprites
+    sprite_scene: SpriteScenePrefab,
+    /// Аll animations that can be run on the entity
+    animation_set: AnimationSetPrefab<AnimationId, SpriteRender>,
 }

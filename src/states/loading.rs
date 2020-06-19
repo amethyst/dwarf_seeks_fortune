@@ -52,7 +52,7 @@ pub struct LoadingState {
     load_ui: Option<Entity>,
     fps_ui: Option<Handle<UiPrefab>>,
     paused_ui: Option<Handle<UiPrefab>>,
-    mob_prefab: Option<Handle<Prefab<MyPrefabData>>>,
+    // mob_prefab: Option<Handle<Prefab<MyPrefabData>>>,
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
@@ -70,9 +70,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
             data.world
                 .exec(|loader: UiLoader<'_>| loader.load("ui/paused.ron", &mut self.progress)),
         );
-        self.mob_prefab = Some(data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
-            loader.load("prefab/sprite_animation.ron", RonFormat, &mut self.progress)
-        }));
+        // self.mob_prefab = Some(data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
+        //     loader.load("prefab/sprite_animation.ron", RonFormat, &mut self.progress)
+        // }));
     }
 
     fn handle_event(
