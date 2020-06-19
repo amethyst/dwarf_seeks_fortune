@@ -1,0 +1,17 @@
+#![enable(implicit_some)]
+/*!
+    @import /amethyst_assets/src/prefab/mod.rs#Prefab
+    @import ../../src/components.rs#Player
+    Prefab<Player>
+*/
+
+Prefab(
+    entities: [
+        PrefabEntity(
+            data: Player(
+                player: Named(name: "Zero"),
+                position: Position(1.0, 2.0, 3.0),
+            ),
+        ),
+    ],
+)

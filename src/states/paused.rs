@@ -1,6 +1,4 @@
 use crate::game_data::CustomGameData;
-use crate::AnimationId;
-use crate::MyPrefabData;
 use amethyst::audio::output::init_output;
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
@@ -41,6 +39,8 @@ use amethyst::{
     StateData, StdoutLog, Trans,
 };
 use log::info;
+use precompile::AnimationId;
+use precompile::MyPrefabData;
 use serde::{Deserialize, Serialize};
 
 pub struct PausedState {

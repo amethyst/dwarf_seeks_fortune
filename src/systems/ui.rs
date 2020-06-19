@@ -3,11 +3,16 @@ use amethyst::{
         math::{UnitQuaternion, Vector3},
         Time, Transform,
     },
-    ecs::prelude::{Entity, Join, Read, ReadStorage, System, WriteExpect, WriteStorage},
+    ecs::{
+        prelude::{Entity, Join, Read, ReadStorage, System, WriteExpect, WriteStorage},
+        ReaderId, Write,
+    },
     renderer::{camera::Camera, light::Light},
-    ui::{UiFinder, UiText},
+    shrev::EventChannel,
+    ui::{UiEvent, UiFinder, UiText},
     utils::fps_counter::FpsCounter,
 };
+use log::info;
 
 #[derive(Default)]
 pub struct UiSystem {
@@ -35,6 +40,33 @@ impl<'a> System<'a> for UiSystem {
                     fps_display.text = format!("FPS: {:.*}", 2, fps);
                 }
             }
+        }
+    }
+}
+
+/// This shows how to handle UI events.
+#[derive(Default)]
+pub struct UiEventHandlerSystem {
+    reader_id: Option<ReaderId<UiEvent>>,
+}
+
+impl UiEventHandlerSystem {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl<'a> System<'a> for UiEventHandlerSystem {
+    type SystemData = Write<'a, EventChannel<UiEvent>>;
+
+    fn run(&mut self, mut events: Self::SystemData) {
+        let reader_id = self
+            .reader_id
+            .get_or_insert_with(|| events.register_reader());
+
+        // Reader id was just initialized above if empty
+        for ev in events.read(reader_id) {
+            info!("[SYSTEM] You just interacted with a ui element: {:?}", ev);
         }
     }
 }

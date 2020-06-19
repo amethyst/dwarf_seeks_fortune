@@ -1,7 +1,5 @@
 use crate::game_data::CustomGameData;
 use crate::states::PausedState;
-use crate::AnimationId;
-use crate::MyPrefabData;
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
 use amethyst::renderer::rendy::texture::image::ImageTextureConfig;
@@ -43,6 +41,8 @@ use amethyst::{
     StateData, StdoutLog, Trans,
 };
 use log::info;
+use precompile::AnimationId;
+use precompile::MyPrefabData;
 use serde::{Deserialize, Serialize};
 
 // #[derive(Default)]
