@@ -11,6 +11,7 @@ mod components;
 mod game_data;
 mod states;
 mod systems;
+mod resources;
 
 use game_data::CustomGameDataBuilder;
 use precompile::MyPrefabData;
@@ -68,6 +69,8 @@ fn make_game() -> amethyst::Result<()> {
             &["input_system"],
         )
         .with_core(systems::SpawnSystem::new(), "spawn_system", &[])
+        .with_core(systems::DebugSystem, "debug_system", &["input_system"])
+        .with_core(systems::CameraSystem, "camera_system", &[])
         .with_base_bundle(
             world,
             PrecompiledRenderBundle {

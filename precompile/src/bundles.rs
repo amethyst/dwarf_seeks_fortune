@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use crate::structs::AnimationId;
 use amethyst::{
     animation::{AnimationBundle, AnimationSetPrefab},
     assets::{PrefabData, ProgressCounter},
@@ -13,7 +14,7 @@ use amethyst::{
     input::{InputBundle, StringBindings},
     prelude::World,
     renderer::{
-        plugins::{RenderFlat2D, RenderToWindow},
+        plugins::{RenderDebugLines, RenderFlat2D, RenderToWindow},
         sprite::{prefab::SpriteScenePrefab, SpriteRender},
         types::DefaultBackend,
         RenderingBundle,
@@ -22,7 +23,6 @@ use amethyst::{
     utils::fps_counter::FpsCounterBundle,
 };
 use serde::{Deserialize, Serialize};
-use crate::structs::AnimationId;
 
 pub struct PrecompiledRenderBundle<'a> {
     pub display_config_path: &'a PathBuf,
@@ -46,6 +46,7 @@ impl<'a, 'b> SystemBundle<'a, 'b> for PrecompiledRenderBundle<'_> {
             // RenderFlat2D plugin is used to render entities with `SpriteRender` component.
             .with_plugin(RenderFlat2D::default())
             .with_plugin(RenderUi::default())
+            .with_plugin(RenderDebugLines::default())
             .build(world, builder)?;
         Ok(())
     }

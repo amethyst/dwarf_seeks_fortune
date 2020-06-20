@@ -1,6 +1,6 @@
-use crate::components::Player;
-use crate::components::Velocity;
+use crate::components::*;
 use crate::game_data::CustomGameData;
+use crate::resources::setup_debug_lines;
 use crate::states::PausedState;
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
@@ -48,16 +48,22 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
         let mut transform = Transform::default();
-        transform.set_scale(Vector3::new(10.0, 10.0, 10.0));
         world
             .create_entity()
             .with(self.mob_prefab.clone())
             .with(transform)
             .with(Player {
-                velocity: Velocity { x: 5.0, y: 5.0 },
+                velocity: Velocity { x: 0.0, y: 0.0 },
             })
             .build();
+        // world
+        //     .create_entity()
+        //     .with(self.mob_prefab.clone())
+        //     .with(transform)
+        //     .with(DebugOrbTag)
+        //     .build();
         initialise_camera(world);
+        setup_debug_lines(world);
     }
 
     fn update(

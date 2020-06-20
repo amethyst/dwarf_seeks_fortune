@@ -71,10 +71,10 @@ impl<'s> System<'s> for SpawnSystem {
         // let mut rng = rand::thread_rng();
         let mut transform = Transform::default();
         transform.set_translation_xyz(0.0, screen_dimens.height() * 0.5, 0.0);
-        let velocity = Velocity::new(1.0, 0.0);
+        let velocity = Velocity::new(60.0, 0.0);
         entities
             .build_entity()
-            .with(transform.clone(), &mut transforms)
+            .with(transform, &mut transforms)
             .with(mob_prefab.clone(), &mut spriterenders)
             .with(velocity, &mut velocities)
             .with(Health::new(100), &mut healths)

@@ -69,12 +69,12 @@ Prefab(
                         sheet: "mob",
                         sprite_number: 0,
                     ),
-                    // Transform
-                    transform: (
-                        translation: (150.0, 37.5, 0.0),
-                        // scale: (10.0,10.0,10.0),
-                        // translation: (0.0, 0.0, 0.0),
-                    ),
+                    // Transform: Do not use this, it sucks. It completely overwrites the initial transform you give an entity.
+                    // transform: (
+                    //     // translation: (150.0, 37.5, 0.0),
+                    //     // scale: (10.0,10.0,10.0),
+                    //     // translation: (0.0, 0.0, 0.0),
+                    // ),
                 ),
                 // AnimationSetPrefab
                 animation_set: (

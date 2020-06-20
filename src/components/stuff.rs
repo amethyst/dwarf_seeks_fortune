@@ -1,25 +1,10 @@
 use amethyst::{
     assets::{PrefabData, ProgressCounter},
     derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, VecStorage, WriteStorage},
+    ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, VecStorage, WriteStorage},
     error::Error,
 };
 use serde::{Deserialize, Serialize};
-
-// pub struct Ship {
-//     pub velocity: [f32; 2],
-//     pub radius: f32,
-// }
-//
-// impl Ship {
-//     pub fn new(velocity: [f32; 2], radius: f32) -> Ship {
-//         Ship { velocity, radius }
-//     }
-// }
-//
-// impl Component for Ship {
-//     type Storage = DenseVecStorage<Self>;
-// }
 
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
@@ -28,6 +13,7 @@ pub struct Velocity {
     pub x: f32,
     pub y: f32,
 }
+
 impl Velocity {
     pub fn new(x: f32, y: f32) -> Velocity {
         Velocity { x, y }
@@ -41,12 +27,14 @@ pub struct Health {
     hp: u32,
     max_hp: u32,
 }
+
 impl Health {
     pub fn new(max_hp: u32) -> Health {
         Health { hp: max_hp, max_hp }
     }
 }
 
+// Deprecated: Get rid of player in this form.
 #[derive(Debug, Deserialize, Serialize, PrefabData)]
 pub struct Player {
     pub velocity: Velocity,
@@ -54,4 +42,12 @@ pub struct Player {
 
 impl Component for Player {
     type Storage = VecStorage<Self>;
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct DebugOrbTag;
+
+impl Component for DebugOrbTag {
+    type Storage = NullStorage<Self>;
 }
