@@ -51,3 +51,45 @@ pub struct DebugOrbTag;
 impl Component for DebugOrbTag {
     type Storage = NullStorage<Self>;
 }
+
+#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq, Eq)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub struct DiscretePos {
+    pub x: i32,
+    pub y: i32,
+}
+
+#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub struct Steering {
+    pub direction: f32,
+    pub destination: DiscretePos,
+}
+
+impl Steering {
+    pub fn new(destination: DiscretePos) -> Steering {
+        Steering {
+            direction: 0.0,
+            destination,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct PlayerTag;
+
+impl Component for PlayerTag {
+    type Storage = NullStorage<Self>;
+}
+
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct PlayerDebugGhostTag;
+
+impl Component for PlayerDebugGhostTag {
+    type Storage = NullStorage<Self>;
+}

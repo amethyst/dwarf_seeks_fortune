@@ -1,28 +1,29 @@
+use amethyst::{
+    animation::{
+        AnimationCommand, AnimationControlSet, AnimationSet, EndControl, get_animation_set,
+    },
+    assets::{Handle, Prefab},
+    core::{Parent, transform::Transform},
+    ecs::{Entities, Join, Entity, prelude::World, ReadStorage, WriteStorage},
+    input::{get_key, is_close_requested, is_key_down, VirtualKeyCode},
+    prelude::Builder,
+    renderer::{Camera, sprite::SpriteRender},
+    StateData,
+    Trans, window::ScreenDimensions,
+};
+use amethyst::core::math::Vector3;
+use amethyst::prelude::WorldExt;
+use amethyst::State;
+use amethyst::StateEvent;
+use amethyst::ui::UiPrefab;
+use log::info;
+use precompile::AnimationId;
+use precompile::MyPrefabData;
+
 use crate::components::*;
 use crate::game_data::CustomGameData;
 use crate::resources::setup_debug_lines;
 use crate::states::PausedState;
-use amethyst::core::math::Vector3;
-use amethyst::prelude::WorldExt;
-use amethyst::ui::UiPrefab;
-use amethyst::State;
-use amethyst::StateEvent;
-use amethyst::{
-    animation::{
-        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
-    },
-    assets::{Handle, Prefab},
-    core::transform::Transform,
-    ecs::{prelude::World, Entities, Join, ReadStorage, WriteStorage},
-    input::{get_key, is_close_requested, is_key_down, VirtualKeyCode},
-    prelude::Builder,
-    renderer::{sprite::SpriteRender, Camera},
-    window::ScreenDimensions,
-    StateData, Trans,
-};
-use log::info;
-use precompile::AnimationId;
-use precompile::MyPrefabData;
 
 // #[derive(Default)]
 pub struct DemoState {
@@ -30,6 +31,7 @@ pub struct DemoState {
     fps_ui: Handle<UiPrefab>,
     paused_ui: Handle<UiPrefab>,
 }
+
 impl DemoState {
     pub fn new(
         mob_prefab: Handle<Prefab<MyPrefabData>>,
@@ -47,22 +49,27 @@ impl DemoState {
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
+        let discrete_pos = DiscretePos::default();
         let mut transform = Transform::default();
-        world
+        transform.set_translation_xyz((discrete_pos.x * 50 + 50) as f32, (discrete_pos.x * 50 + 50) as f32, 0.0);
+        let scale_factor = 100.0 / 32.0;
+        transform.set_scale(Vector3::new(scale_factor, scale_factor, 1.0));
+        let player = world
             .create_entity()
             .with(self.mob_prefab.clone())
             .with(transform)
-            .with(Player {
-                velocity: Velocity { x: 0.0, y: 0.0 },
-            })
+            .with(discrete_pos)
+            .with(Velocity::default())
+            .with(Steering::new(discrete_pos))
+            .with(PlayerTag)
             .build();
-        // world
-        //     .create_entity()
-        //     .with(self.mob_prefab.clone())
-        //     .with(transform)
-        //     .with(DebugOrbTag)
-        //     .build();
-        initialise_camera(world);
+        let player_debug_ghost = world
+            .create_entity()
+            .with(self.mob_prefab.clone())
+            .with(Transform::default())
+            .with(PlayerDebugGhostTag)
+            .build();
+        initialise_camera(world, player);
         setup_debug_lines(world);
     }
 
@@ -128,17 +135,20 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
 }
 
 /// Initialise the camera.
-fn initialise_camera(world: &mut World) {
+fn initialise_camera(world: &mut World, player: Entity) {
     let (width, height) = {
         let dim = world.fetch::<ScreenDimensions>();
         (dim.width(), dim.height())
     };
     // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left.
     let mut transform = Transform::default();
-    transform.set_translation_xyz(width * 0.5, height * 0.5, 1.0);
+    transform.set_translation_xyz(0.0, 0.0, 1.0);
 
     world
         .create_entity()
+        .with(Parent {
+            entity: player,
+        })
         .with(Camera::standard_2d(width, height))
         .with(transform)
         .build();

@@ -63,7 +63,7 @@ impl<'s> System<'s> for SpawnSystem {
     ) {
         let delta = time.delta_seconds();
         self.cooldown -= delta;
-        if self.cooldown <= 0.0 {
+        if self.cooldown <= 0.0 && false {
             self.cooldown = 1.0;
         } else {
             return;
