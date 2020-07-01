@@ -69,7 +69,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
             .with(Transform::default())
             .with(PlayerDebugGhostTag)
             .build();
-        initialise_camera(world, player);
+        initialise_camera(world);
         setup_debug_lines(world);
     }
 
@@ -135,7 +135,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
 }
 
 /// Initialise the camera.
-fn initialise_camera(world: &mut World, player: Entity) {
+fn initialise_camera(world: &mut World) {
     let (width, height) = {
         let dim = world.fetch::<ScreenDimensions>();
         (dim.width(), dim.height())
@@ -144,12 +144,18 @@ fn initialise_camera(world: &mut World, player: Entity) {
     let mut transform = Transform::default();
     transform.set_translation_xyz(0.0, 0.0, 1.0);
 
+    let camera_frame = world
+        .create_entity()
+        .with(CameraFrameTag)
+        .with(transform)
+        .build();
+
     world
         .create_entity()
         .with(Parent {
-            entity: player,
+            entity: camera_frame,
         })
         .with(Camera::standard_2d(width, height))
-        .with(transform)
+        .with(Transform::default())
         .build();
 }

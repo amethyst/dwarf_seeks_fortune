@@ -2,11 +2,14 @@ mod camera;
 mod movement;
 mod spawn;
 mod ui;
+mod debug;
 
 pub use self::camera::*;
 pub use self::movement::*;
 pub use self::spawn::*;
 pub use self::ui::*;
+pub use self::debug::*;
+
 
 //TODO: Movement & Position
 // Discrete: intervals of 1block

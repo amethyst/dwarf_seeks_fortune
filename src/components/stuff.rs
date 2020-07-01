@@ -93,3 +93,11 @@ pub struct PlayerDebugGhostTag;
 impl Component for PlayerDebugGhostTag {
     type Storage = NullStorage<Self>;
 }
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct CameraFrameTag;
+
+impl Component for CameraFrameTag {
+    type Storage = NullStorage<Self>;
+}
