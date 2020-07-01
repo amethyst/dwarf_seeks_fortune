@@ -49,7 +49,7 @@ impl<'s> System<'s> for PlayerSystem {
         &mut self,
         (mut transforms, mut discrete_positions, mut steerings, mut velocities, player_tags, input, config): Self::SystemData,
     ) {
-        for (_, transform, discrete_pos, steering, velocity) in (&player_tags, &transforms, &mut discrete_positions, &mut steerings, &mut velocities).join() {
+        for (_, transform, discrete_pos, steering, velocity) in (&player_tags, &mut transforms, &mut discrete_positions, &mut steerings, &mut velocities).join() {
             //TODO:
             // 1: Set current discrete position.
             // 2: Set steering based on user input.
@@ -62,17 +62,14 @@ impl<'s> System<'s> for PlayerSystem {
             if input_x.abs() > f32::EPSILON {
                 steering.direction = input_x;
                 let offset_from_discrete_pos = (discrete_pos.x * 50) as f32 - (transform.translation().x - 50.);
-                println!("offset: {:?}", offset_from_discrete_pos);
                 if offset_from_discrete_pos < f32::EPSILON && input_x > f32::EPSILON {
                     steering.destination.x = discrete_pos.x + 1;
-                } else if offset_from_discrete_pos > f32::EPSILON && input_x < f32::EPSILON {
+                } else if offset_from_discrete_pos > -f32::EPSILON && input_x < f32::EPSILON {
                     steering.destination.x = discrete_pos.x - 1;
                 } else if ((steering.destination.x - discrete_pos.x) * input_x as i32).is_negative() {
                     steering.destination.x = discrete_pos.x;
                 }
             }
-
-            //=========================================
 
             let desired_pos = steering.destination.x as f32 * 50.0 + 50.0;
             let delta = desired_pos - transform.translation().x;
@@ -86,6 +83,7 @@ impl<'s> System<'s> for PlayerSystem {
                 velocity.x = delta_signum * config.player_speed;
             } else {
                 velocity.x = 0.0;
+                transform.set_translation_x((discrete_pos.x * 50 + 50) as f32);
             }
         }
     }
