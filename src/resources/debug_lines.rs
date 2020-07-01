@@ -34,21 +34,31 @@ pub fn setup_debug_lines(world: &mut World) {
         (screen_dimensions.width(), screen_dimensions.height())
     };
 
-    for y in (0..(screen_h as u16)).step_by(100).map(f32::from) {
+    for y in (0..(screen_h as u16)).step_by(100).skip(1).map(f32::from) {
         debug_lines_component.add_line(
             [0.0, y, 0.0].into(),
             [screen_w, y, 0.0].into(),
-            Srgba::new(0.3, 0.3, 0.3, 1.0),
+            Srgba::new(0.3, 0.3, 0.3, 0.5),
         );
     }
 
-    for x in (0..(screen_w as u16)).step_by(100).map(f32::from) {
+    for x in (0..(screen_w as u16)).step_by(100).skip(1).map(f32::from) {
         debug_lines_component.add_line(
             [x, 0.0, 0.0].into(),
             [x, screen_h, 0.0].into(),
-            Srgba::new(0.3, 0.3, 0.3, 1.0),
+            Srgba::new(0.3, 0.3, 0.3, 0.5),
         );
     }
+    debug_lines_component.add_line(
+        [-5000., 0.0, 0.0].into(),
+        [5000., 0.0, 0.0].into(),
+        Srgba::new(1.0, 0.0, 0.0, 0.8),
+    );
+    debug_lines_component.add_line(
+        [0.0, -5000., 0.0].into(),
+        [0.0, 5000., 0.0].into(),
+        Srgba::new(1.0, 0.0, 0.0, 0.8),
+    );
 
     world
         .create_entity()

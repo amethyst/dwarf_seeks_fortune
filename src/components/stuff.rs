@@ -88,9 +88,17 @@ impl Component for PlayerTag {
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
-pub struct PlayerDebugGhostTag;
+pub struct DebugPosGhostTag;
 
-impl Component for PlayerDebugGhostTag {
+impl Component for DebugPosGhostTag {
+    type Storage = NullStorage<Self>;
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct DebugSteeringGhostTag;
+
+impl Component for DebugSteeringGhostTag {
     type Storage = NullStorage<Self>;
 }
 

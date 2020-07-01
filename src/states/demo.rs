@@ -24,22 +24,23 @@ use crate::components::*;
 use crate::game_data::CustomGameData;
 use crate::resources::setup_debug_lines;
 use crate::states::PausedState;
+use crate::prefabs::Prefabs;
 
 // #[derive(Default)]
 pub struct DemoState {
-    mob_prefab: Handle<Prefab<MyPrefabData>>,
+    prefabs: Prefabs,
     fps_ui: Handle<UiPrefab>,
     paused_ui: Handle<UiPrefab>,
 }
 
 impl DemoState {
     pub fn new(
-        mob_prefab: Handle<Prefab<MyPrefabData>>,
+        prefabs: Prefabs,
         fps_ui: Handle<UiPrefab>,
         paused_ui: Handle<UiPrefab>,
     ) -> DemoState {
         DemoState {
-            mob_prefab,
+            prefabs,
             fps_ui,
             paused_ui,
         }
@@ -56,18 +57,27 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         transform.set_scale(Vector3::new(scale_factor, scale_factor, 1.0));
         let player = world
             .create_entity()
-            .with(self.mob_prefab.clone())
+            .with(self.prefabs.get_mob())
             .with(transform)
             .with(discrete_pos)
             .with(Velocity::default())
             .with(Steering::new(discrete_pos))
             .with(PlayerTag)
             .build();
-        let player_debug_ghost = world
+
+        let mut ghost_transform = Transform::default();
+        ghost_transform.set_scale(Vector3::new(2.0, 2.0, 1.0));
+        world
             .create_entity()
-            .with(self.mob_prefab.clone())
+            .with(self.prefabs.get_frame())
+            .with(ghost_transform)
+            .with(DebugSteeringGhostTag)
+            .build();
+        world
+            .create_entity()
+            .with(self.prefabs.get_frame())
             .with(Transform::default())
-            .with(PlayerDebugGhostTag)
+            .with(DebugPosGhostTag)
             .build();
         initialise_camera(world);
         setup_debug_lines(world);

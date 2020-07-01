@@ -1,10 +1,10 @@
 #![allow(
-    dead_code,
-    unused_must_use,
-    unused_imports,
-    unused_variables,
-    unused_parens,
-    unused_mut
+dead_code,
+unused_must_use,
+unused_imports,
+unused_variables,
+unused_parens,
+unused_mut
 )]
 
 mod components;
@@ -12,6 +12,7 @@ mod game_data;
 mod states;
 mod systems;
 mod resources;
+mod prefabs;
 
 use game_data::CustomGameDataBuilder;
 use precompile::MyPrefabData;

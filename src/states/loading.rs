@@ -14,6 +14,7 @@ use amethyst::{
     StateData, Trans,
 };
 use precompile::MyPrefabData;
+use crate::prefabs::Prefabs;
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -21,7 +22,7 @@ pub struct LoadingState {
     load_ui: Option<Entity>,
     fps_ui: Option<Handle<UiPrefab>>,
     paused_ui: Option<Handle<UiPrefab>>,
-    mob_prefab: Option<Handle<Prefab<MyPrefabData>>>,
+    prefabs: Option<Prefabs>,
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
@@ -39,10 +40,15 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
             data.world
                 .exec(|loader: UiLoader<'_>| loader.load("ui/paused.ron", &mut self.progress)),
         );
-        self.mob_prefab = Some(data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
+        let mob_prefab = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
             loader.load("prefab/sprite_animation.ron", RonFormat, &mut self.progress)
-        }));
-        data.world.insert(self.mob_prefab.as_ref().unwrap().clone());
+        });
+        let frame_prefab = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
+            loader.load("prefab/frame_animation.ron", RonFormat, &mut self.progress)
+        });
+        data.world.insert(mob_prefab.clone());
+        data.world.insert(frame_prefab.clone());
+        self.prefabs = Some(Prefabs::new(mob_prefab, frame_prefab));
     }
 
     fn handle_event(
@@ -74,7 +80,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                     let _ = data.world.delete_entity(entity);
                 }
                 Trans::Switch(Box::new(DemoState::new(
-                    self.mob_prefab.as_ref().unwrap().clone(),
+                    self.prefabs.as_ref().unwrap().clone(),
                     self.fps_ui.as_ref().unwrap().clone(),
                     self.paused_ui.as_ref().unwrap().clone(),
                 )))
