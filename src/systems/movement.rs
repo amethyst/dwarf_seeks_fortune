@@ -56,22 +56,19 @@ impl<'s> System<'s> for PlayerSystem {
             // 3: Set velocity based on current position and desired position.
             // 4: If necessary, adjust position, snap to grid.
 
-            let actual_pos_x = transform.translation().x as i32;
-            let base_pos = (actual_pos_x - 50).div_euclid(50);// -50 because pos is off by 1 block (player width / 2)
-            let pos_remainder = actual_pos_x.rem_euclid(50);
-            discrete_pos.x = if pos_remainder > 25 {
-                base_pos + 1
-            } else {
-                base_pos
-            };
-            println!("actual_pos={:?} base_pos={:?} remainder: {:?} discrete: {:?}", actual_pos_x, base_pos, pos_remainder, discrete_pos.x);
+            discrete_pos.x = calc_discrete_pos_x(transform);
 
-            let x_axis = input.axis_value("move_x");
-            // let y_axis = input.axis_value("move_y");
-            if let Some(signum) = x_axis {
-                if signum.abs() > f32::EPSILON {
-                    steering.direction = signum;
-                    steering.destination.x = discrete_pos.x + signum as i32;
+            let input_x = input.axis_value("move_x").unwrap_or(0.0);
+            if input_x.abs() > f32::EPSILON {
+                steering.direction = input_x;
+                let offset_from_discrete_pos = (discrete_pos.x * 50) as f32 - (transform.translation().x - 50.);
+                println!("offset: {:?}", offset_from_discrete_pos);
+                if offset_from_discrete_pos < f32::EPSILON && input_x > f32::EPSILON {
+                    steering.destination.x = discrete_pos.x + 1;
+                } else if offset_from_discrete_pos > f32::EPSILON && input_x < f32::EPSILON {
+                    steering.destination.x = discrete_pos.x - 1;
+                } else if ((steering.destination.x - discrete_pos.x) * input_x as i32).is_negative() {
+                    steering.destination.x = discrete_pos.x;
                 }
             }
 
@@ -91,5 +88,17 @@ impl<'s> System<'s> for PlayerSystem {
                 velocity.x = 0.0;
             }
         }
+    }
+}
+
+fn calc_discrete_pos_x(transform: &Transform) -> i32 {
+    let actual_pos_x = transform.translation().x as i32;
+    let base_pos = (actual_pos_x - 50).div_euclid(50);// -50 because pos is off by 1 block (player width / 2)
+    let pos_remainder = actual_pos_x.rem_euclid(50);
+    // println!("actual_pos={:?} base_pos={:?} remainder: {:?} discrete: {:?}", actual_pos_x, base_pos, pos_remainder, discrete_pos.x);
+    if pos_remainder > 25 {
+        base_pos + 1
+    } else {
+        base_pos
     }
 }
