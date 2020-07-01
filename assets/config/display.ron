@@ -1,9 +1,4 @@
-/*!
-    @import /amethyst_window/src/config.rs#DisplayConfig
-    DisplayConfig
-*/
-
 (
-  title: "Towerdef",
+  title: "TowerdefNotReally",
   dimensions: Some((1200, 800)),
 )

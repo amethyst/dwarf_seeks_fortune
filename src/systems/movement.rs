@@ -6,6 +6,7 @@ use amethyst::{
     input::{InputHandler, StringBindings},
     window::ScreenDimensions,
 };
+use crate::config::*;
 
 pub struct MovementSystem;
 
@@ -41,11 +42,12 @@ impl<'s> System<'s> for PlayerSystem {
         WriteStorage<'s, Velocity>,
         ReadStorage<'s, PlayerTag>,
         Read<'s, InputHandler<StringBindings>>,
+        Read<'s, DebugConfig>,
     );
 
     fn run(
         &mut self,
-        (mut transforms, mut discrete_positions, mut steerings, mut velocities, player_tags, input): Self::SystemData,
+        (mut transforms, mut discrete_positions, mut steerings, mut velocities, player_tags, input, config): Self::SystemData,
     ) {
         for (_, transform, discrete_pos, steering, velocity) in (&player_tags, &transforms, &mut discrete_positions, &mut steerings, &mut velocities).join() {
             //TODO:
@@ -57,7 +59,6 @@ impl<'s> System<'s> for PlayerSystem {
             let actual_pos_x = transform.translation().x as i32;
             let base_pos = (actual_pos_x - 50).div_euclid(50);// -50 because pos is off by 1 block (player width / 2)
             let pos_remainder = actual_pos_x.rem_euclid(50);
-            // let pos_remainder = transform.translation().x % 50.0;
             discrete_pos.x = if pos_remainder > 25 {
                 base_pos + 1
             } else {
@@ -85,7 +86,7 @@ impl<'s> System<'s> for PlayerSystem {
                     delta.signum()
                 };
             if (delta_signum * steering.direction).is_sign_positive() {
-                velocity.x = delta_signum * 300.0;
+                velocity.x = delta_signum * config.player_speed;
             } else {
                 velocity.x = 0.0;
             }

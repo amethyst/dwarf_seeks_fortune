@@ -19,7 +19,6 @@ use precompile::MyPrefabData;
 pub struct Prefabs {
     mob: Handle<Prefab<MyPrefabData>>,
     frame: Handle<Prefab<MyPrefabData>>,
-
 }
 
 impl Prefabs {

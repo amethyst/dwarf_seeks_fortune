@@ -7,6 +7,7 @@ unused_parens,
 unused_mut
 )]
 
+mod config;
 mod components;
 mod game_data;
 mod states;
@@ -18,7 +19,7 @@ use game_data::CustomGameDataBuilder;
 use precompile::MyPrefabData;
 use precompile::PrecompiledDefaultsBundle;
 use precompile::PrecompiledRenderBundle;
-
+use crate::config::*;
 use amethyst::{
     assets::{PrefabLoaderSystemDesc, Processor},
     audio::Source,
@@ -26,6 +27,7 @@ use amethyst::{
     utils::application_root_dir,
     Application,
 };
+use amethyst::prelude::Config;
 
 fn main() {
     let result = make_game();
@@ -40,10 +42,13 @@ fn make_game() -> amethyst::Result<()> {
     let assets_dir = app_root.join("assets/");
     let config_dir = assets_dir.join("config/");
     let display_config_path = config_dir.join("display.ron");
+    let config_path = config_dir.join("debug_config.ron");
     let bindings_config_path = config_dir.join("bindings.ron");
 
     let mut app_builder = Application::build(assets_dir, states::LoadingState::default())?;
 
+    let config = DebugConfig::load(&config_path)?;
+    app_builder.world.insert(config);
     let game_data = CustomGameDataBuilder::default()
         .with_base_bundle(
             &mut app_builder.world,
