@@ -20,6 +20,7 @@ use log::info;
 use precompile::AnimationId;
 use precompile::MyPrefabData;
 
+use crate::resources::*;
 use crate::components::*;
 use crate::game_data::CustomGameData;
 use crate::resources::setup_debug_lines;
@@ -97,6 +98,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
             .build();
         initialise_camera(world);
         setup_debug_lines(world);
+        world.insert(History::default());
     }
 
     fn update(

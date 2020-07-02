@@ -2,11 +2,13 @@ use crate::components::*;
 use amethyst::{
     core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, WriteStorage},
+    ecs::prelude::{Join, Read, Write, ReadExpect, ReadStorage, System, WriteStorage},
     input::{InputHandler, StringBindings},
     window::ScreenDimensions,
 };
 use crate::config::*;
+use crate::resources::*;
+
 
 pub struct MovementSystem;
 
@@ -43,11 +45,12 @@ impl<'s> System<'s> for PlayerSystem {
         ReadStorage<'s, PlayerTag>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, DebugConfig>,
+        Write<'s, History>,
     );
 
     fn run(
         &mut self,
-        (mut transforms, mut discrete_positions, mut steerings, mut velocities, player_tags, input, config): Self::SystemData,
+        (mut transforms, mut discrete_positions, mut steerings, mut velocities, player_tags, input, config, mut history): Self::SystemData,
     ) {
         for (_, transform, discrete_pos, steering, velocity) in (&player_tags, &mut transforms, &mut discrete_positions, &mut steerings, &mut velocities).join() {
             // 1: Set current discrete position.
@@ -55,7 +58,11 @@ impl<'s> System<'s> for PlayerSystem {
             // 3: Set velocity based on current position and desired position.
             // 4: If necessary, adjust position, snap to grid.
 
+            let old_pos = discrete_pos.clone();
             discrete_pos.x = calc_discrete_pos_x(transform);
+            if old_pos != *discrete_pos {
+                history.add_frame(Frame::new(discrete_pos.clone()));
+            }
 
             let input_x = input.axis_value("move_x").unwrap_or(0.0);
             if input_x.abs() > f32::EPSILON {
