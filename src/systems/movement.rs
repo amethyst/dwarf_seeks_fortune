@@ -50,7 +50,6 @@ impl<'s> System<'s> for PlayerSystem {
         (mut transforms, mut discrete_positions, mut steerings, mut velocities, player_tags, input, config): Self::SystemData,
     ) {
         for (_, transform, discrete_pos, steering, velocity) in (&player_tags, &mut transforms, &mut discrete_positions, &mut steerings, &mut velocities).join() {
-            //TODO:
             // 1: Set current discrete position.
             // 2: Set steering based on user input.
             // 3: Set velocity based on current position and desired position.
@@ -91,9 +90,8 @@ impl<'s> System<'s> for PlayerSystem {
 
 fn calc_discrete_pos_x(transform: &Transform) -> i32 {
     let actual_pos_x = transform.translation().x as i32;
-    let base_pos = (actual_pos_x - 50).div_euclid(50);// -50 because pos is off by 1 block (player width / 2)
+    let base_pos = (actual_pos_x - 50).div_euclid(50);
     let pos_remainder = actual_pos_x.rem_euclid(50);
-    // println!("actual_pos={:?} base_pos={:?} remainder: {:?} discrete: {:?}", actual_pos_x, base_pos, pos_remainder, discrete_pos.x);
     if pos_remainder > 25 {
         base_pos + 1
     } else {

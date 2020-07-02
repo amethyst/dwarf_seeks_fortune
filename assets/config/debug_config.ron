@@ -1,3 +1,10 @@
 (
-    player_speed: 50.0,
+    // An array of values that the 'player_speed' can have.
+    // Debug controls will allow toggling between these values,
+    // to slow the player down or speed them up. This makes testing easier.
+    speed_presets: [
+        20., 50., 250., 500., 750., 1000.,
+    ],
+    // The max speed that the player can travel at.
+    player_speed: 250.0,
 )

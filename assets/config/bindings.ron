@@ -4,6 +4,7 @@
     "move_x": Emulated(pos: Key(D), neg: Key(A)),
   },
   actions: {
-      "spawn": [[Key(Space)]],
+      "speedUp": [[Key(Add)]],
+      "slowDown": [[Key(Subtract)]],
   },
 )

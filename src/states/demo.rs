@@ -5,7 +5,7 @@ use amethyst::{
     assets::{Handle, Prefab},
     core::{Parent, transform::Transform},
     ecs::{Entities, Join, Entity, prelude::World, ReadStorage, WriteStorage},
-    input::{get_key, is_close_requested, is_key_down, VirtualKeyCode},
+    input::{InputEvent, get_key, is_close_requested, is_key_down, VirtualKeyCode},
     prelude::Builder,
     renderer::{Camera, sprite::SpriteRender},
     StateData,
@@ -25,6 +25,7 @@ use crate::game_data::CustomGameData;
 use crate::resources::setup_debug_lines;
 use crate::states::PausedState;
 use crate::prefabs::Prefabs;
+use crate::config::*;
 
 // #[derive(Default)]
 pub struct DemoState {
@@ -33,7 +34,7 @@ pub struct DemoState {
     paused_ui: Handle<UiPrefab>,
 }
 
-impl DemoState {
+impl<'a, 'b> DemoState {
     pub fn new(
         prefabs: Prefabs,
         fps_ui: Handle<UiPrefab>,
@@ -43,6 +44,21 @@ impl DemoState {
             prefabs,
             fps_ui,
             paused_ui,
+        }
+    }
+
+    fn handle_action(&mut self, action: &str, world: &mut World) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+        let mut config = world.fetch_mut::<DebugConfig>();
+        if action == "speedUp" {
+            let (old_speed, new_speed) = (*config).increase_speed();
+            println!("Speeding up, from {:?} to {:?}", old_speed, new_speed);
+            Trans::None
+        } else if action == "slowDown" {
+            let (old_speed, new_speed) = (*config).decrease_speed();
+            println!("Slowing down, from {:?} to {:?}", old_speed, new_speed);
+            Trans::None
+        } else {
+            Trans::None
         }
     }
 }
@@ -119,27 +135,33 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         data: StateData<'_, CustomGameData<'_, '_>>,
         event: StateEvent,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        if let StateEvent::Window(event) = &event {
-            // Check if the window should be closed
-            if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {
-                Trans::Quit
-            } else if is_key_down(&event, VirtualKeyCode::Escape) {
-                // Pause the game by going to the `PausedState`.
-                Trans::Push(Box::new(PausedState::new(
-                    data.world
-                        .create_entity()
-                        .with(self.paused_ui.clone())
-                        .build(),
-                )))
-            } else {
-                // Listen to any key events
-                if let Some(event) = get_key(&event) {
-                    info!("handling key event: {:?}", event);
+        match event {
+            // Events related to the window and inputs.
+            StateEvent::Window(event) => {
+                if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {
+                    Trans::Quit
+                } else if is_key_down(&event, VirtualKeyCode::Escape) {
+                    // Pause the game by going to the `PausedState`.
+                    Trans::Push(Box::new(PausedState::new(
+                        data.world
+                            .create_entity()
+                            .with(self.paused_ui.clone())
+                            .build(),
+                    )))
+                } else {
+                    Trans::None
                 }
-                Trans::None
             }
-        } else {
-            Trans::None
+            // Ui event. Button presses, mouse hover, etc...
+            StateEvent::Ui(_) => Trans::None,
+            StateEvent::Input(input_event) => {
+                // println!("Input event detected! {:?}", input_event);
+                if let InputEvent::ActionPressed(action) = input_event {
+                    self.handle_action(&action, data.world)
+                } else {
+                    Trans::None
+                }
+            }
         }
     }
 }
