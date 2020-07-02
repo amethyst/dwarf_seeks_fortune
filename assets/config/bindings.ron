@@ -6,5 +6,6 @@
   actions: {
       "speedUp": [[Key(Add)]],
       "slowDown": [[Key(Subtract)]],
+      "rewind": [[Key(Z)]],
   },
 )

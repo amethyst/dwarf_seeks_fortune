@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 pub struct DebugConfig {
     pub speed_presets: Vec<f32>,
     pub player_speed: f32,
+    pub seconds_per_rewind_frame: f32,
 }
 
 impl DebugConfig {

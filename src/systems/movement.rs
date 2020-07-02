@@ -60,8 +60,8 @@ impl<'s> System<'s> for PlayerSystem {
 
             let old_pos = discrete_pos.clone();
             discrete_pos.x = calc_discrete_pos_x(transform);
-            if old_pos != *discrete_pos {
-                history.add_frame(Frame::new(discrete_pos.clone()));
+            if old_pos != *discrete_pos || history.force_key_frame {
+                history.push_frame(Frame::new(discrete_pos.clone()));
             }
 
             let input_x = input.axis_value("move_x").unwrap_or(0.0);

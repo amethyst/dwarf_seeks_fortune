@@ -7,19 +7,17 @@ unused_parens,
 unused_mut
 )]
 
-mod config;
 mod components;
+mod config;
 mod game_data;
+mod prefabs;
+mod resources;
 mod states;
 mod systems;
-mod resources;
-mod prefabs;
 
-use game_data::CustomGameDataBuilder;
-use precompile::MyPrefabData;
-use precompile::PrecompiledDefaultsBundle;
-use precompile::PrecompiledRenderBundle;
 use crate::config::*;
+use crate::resources::*;
+use amethyst::prelude::{Config, SystemExt};
 use amethyst::{
     assets::{PrefabLoaderSystemDesc, Processor},
     audio::Source,
@@ -27,7 +25,10 @@ use amethyst::{
     utils::application_root_dir,
     Application,
 };
-use amethyst::prelude::Config;
+use game_data::CustomGameDataBuilder;
+use precompile::MyPrefabData;
+use precompile::PrecompiledDefaultsBundle;
+use precompile::PrecompiledRenderBundle;
 
 fn main() {
     let result = make_game();
@@ -69,18 +70,24 @@ fn make_game() -> amethyst::Result<()> {
         )
         .with_core(systems::UiSystem::default(), "ui_system", &[])
         .with_core(
-            systems::MovementSystem,
+            systems::MovementSystem.pausable(CurrentState::Running),
             "movement_system",
             &["input_system"],
         )
         .with_core(
-            systems::PlayerSystem,
+            systems::PlayerSystem.pausable(CurrentState::Running),
             "player_system",
             &["input_system"],
         )
         .with_core(systems::SpawnSystem::new(), "spawn_system", &[])
         .with_core(systems::DebugSystem, "debug_system", &["input_system"])
         .with_core(systems::CameraSystem, "camera_system", &[])
+        .with_core(systems::RewindControlSystem, "rewind_control_system", &["player_system"])
+        .with_core(
+            systems::RewindSystem.pausable(CurrentState::Rewinding),
+            "rewind_system",
+            &["rewind_control_system", "input_system"],
+        )
         .with_base_bundle(
             &mut app_builder.world,
             PrecompiledRenderBundle {

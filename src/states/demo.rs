@@ -7,7 +7,7 @@ use amethyst::{
     ecs::{Entities, Entity, Join, prelude::World, ReadStorage, WriteStorage},
     input::{get_key, InputEvent, is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
-    renderer::{formats::texture::ImageFormat, SpriteSheet, Texture, Camera, sprite::SpriteRender},
+    renderer::{formats::texture::ImageFormat, resources::Tint, palette::Srgba, SpriteSheet, Texture, Camera, sprite::SpriteRender},
     StateData,
     Trans, window::ScreenDimensions,
 };
@@ -97,7 +97,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
             .build();
         initialise_camera(world);
         setup_debug_lines(world);
-        world.insert(History::default());
+        world.write_resource::<History>().force_key_frame = true;
         initialize_sprite(world, self.prefabs.get_background());
     }
 
@@ -212,10 +212,15 @@ fn initialize_sprite(
         sprite_number: 0, // First sprite
     };
 
+    // White shows the sprite as normal.
+    // You can change the color at any point to modify the sprite's tint.
+    let tint = Tint(Srgba::new(1.0, 1.0, 1.0, 1.0));
+
     world
         .create_entity()
         .with(sprite_render)
         .with(sprite_transform)
+        .with(tint)
         // .with(Transparent) // If your sprite is transparent
         .build();
 }
