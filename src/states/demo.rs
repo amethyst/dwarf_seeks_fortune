@@ -2,12 +2,12 @@ use amethyst::{
     animation::{
         AnimationCommand, AnimationControlSet, AnimationSet, EndControl, get_animation_set,
     },
-    assets::{Handle, Prefab},
+    assets::{AssetStorage, Handle, Loader, Prefab},
     core::{Parent, transform::Transform},
-    ecs::{Entities, Join, Entity, prelude::World, ReadStorage, WriteStorage},
-    input::{InputEvent, get_key, is_close_requested, is_key_down, VirtualKeyCode},
-    prelude::Builder,
-    renderer::{Camera, sprite::SpriteRender},
+    ecs::{Entities, Entity, Join, prelude::World, ReadStorage, WriteStorage},
+    input::{get_key, InputEvent, is_close_requested, is_key_down, VirtualKeyCode},
+    prelude::*,
+    renderer::{formats::texture::ImageFormat, SpriteSheet, Texture, Camera, sprite::SpriteRender},
     StateData,
     Trans, window::ScreenDimensions,
 };
@@ -22,11 +22,10 @@ use precompile::MyPrefabData;
 
 use crate::resources::*;
 use crate::components::*;
-use crate::game_data::CustomGameData;
-use crate::resources::setup_debug_lines;
-use crate::states::PausedState;
-use crate::prefabs::Prefabs;
 use crate::config::*;
+use crate::game_data::CustomGameData;
+use crate::prefabs::Prefabs;
+use crate::states::PausedState;
 
 // #[derive(Default)]
 pub struct DemoState {
@@ -99,6 +98,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         initialise_camera(world);
         setup_debug_lines(world);
         world.insert(History::default());
+        initialize_sprite(world, self.prefabs.get_background());
     }
 
     fn update(
@@ -191,5 +191,31 @@ fn initialise_camera(world: &mut World) {
         })
         .with(Camera::standard_2d(width, height))
         .with(Transform::default())
+        .build();
+}
+
+fn initialize_sprite(
+    world: &mut World,
+    sprite_sheet_handle: Handle<SpriteSheet>,
+) {
+    let (width, height) = {
+        let dim = world.read_resource::<ScreenDimensions>();
+        (dim.width(), dim.height())
+    };
+
+    // Move the sprite to the middle of the window
+    let mut sprite_transform = Transform::default();
+    sprite_transform.set_translation_xyz(width / 2., height / 2., -1.);
+
+    let sprite_render = SpriteRender {
+        sprite_sheet: sprite_sheet_handle,
+        sprite_number: 0, // First sprite
+    };
+
+    world
+        .create_entity()
+        .with(sprite_render)
+        .with(sprite_transform)
+        // .with(Transparent) // If your sprite is transparent
         .build();
 }
