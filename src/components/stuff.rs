@@ -1,7 +1,7 @@
 use amethyst::{
-    assets::{PrefabData},
+    assets::PrefabData,
     derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage,  WriteStorage},
+    ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, WriteStorage},
     error::Error,
 };
 use serde::{Deserialize, Serialize};
@@ -36,7 +36,9 @@ impl Health {
     }
 }
 
-#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq, Eq)]
+#[derive(
+    Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq, Eq,
+)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
 pub struct DiscretePos {

@@ -1,8 +1,8 @@
 use amethyst::{
     assets::{Completion, Handle, Prefab, PrefabLoader, ProgressCounter, RonFormat},
-    renderer::{Texture, SpriteSheet},
     ecs::prelude::Entity,
     input::{is_close_requested, is_key_down, VirtualKeyCode},
+    renderer::{SpriteSheet, Texture},
     StateData, Trans,
 };
 use precompile::MyPrefabData;
@@ -17,7 +17,11 @@ pub struct Prefabs {
 }
 
 impl Prefabs {
-    pub fn new(bg_spritesheet: Handle<SpriteSheet>, mob: Handle<Prefab<MyPrefabData>>, frame: Handle<Prefab<MyPrefabData>>) -> Prefabs {
+    pub fn new(
+        bg_spritesheet: Handle<SpriteSheet>,
+        mob: Handle<Prefab<MyPrefabData>>,
+        frame: Handle<Prefab<MyPrefabData>>,
+    ) -> Prefabs {
         Prefabs {
             bg_spritesheet,
             mob,

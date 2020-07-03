@@ -2,15 +2,14 @@ use crate::components::Health;
 use crate::components::Velocity;
 use precompile::MyPrefabData;
 
-
 use amethyst::{
+    assets::{Handle, Prefab},
     core::timing::Time,
     core::transform::Transform,
     ecs::{
-        prelude::{ Read, ReadExpect,  System, WriteStorage},
+        prelude::{Read, ReadExpect, System, WriteStorage},
         Entities,
     },
-    assets::{Handle, Prefab},
     window::ScreenDimensions,
 };
 

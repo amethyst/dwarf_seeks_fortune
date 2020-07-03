@@ -1,14 +1,13 @@
 use crate::components::*;
+use crate::config::*;
 use crate::resources::*;
 use amethyst::{
-    renderer::{palette::Srgba,
-               resources::Tint, },
     core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Join, Read,  ReadStorage, System, Write, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorage},
     input::{InputHandler, StringBindings},
+    renderer::{palette::Srgba, resources::Tint},
 };
-use crate::config::*;
 
 pub struct RewindControlSystem;
 
@@ -23,7 +22,10 @@ impl<'s> System<'s> for RewindControlSystem {
         WriteStorage<'s, Tint>,
     );
 
-    fn run(&mut self, (mut current_state, mut rewind, mut history, input, time, config, mut tints): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut current_state, mut rewind, mut history, input, time, config, mut tints): Self::SystemData,
+    ) {
         history.force_key_frame = false;
         if input.action_is_down("rewind").unwrap_or(false) {
             rewind.cooldown = match *current_state {
@@ -69,14 +71,22 @@ impl<'s> System<'s> for RewindSystem {
         Write<'s, History>,
     );
 
-    fn run(&mut self, (mut transforms, mut positions, mut steerings, player_tags, rewind, mut history): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut transforms, mut positions, mut steerings, player_tags, rewind, mut history): Self::SystemData,
+    ) {
         if rewind.is_ready() {
             if let Some(frame) = history.pop_frame() {
                 println!("Rewinding player to {:?}", frame);
-                for (_, transform, pos, steering) in (&player_tags, &mut transforms, &mut positions, &mut steerings).join() {
-                    transform.set_translation_x(
-                        frame.player_position.x as f32 * 50. + 50.,
-                    );
+                for (_, transform, pos, steering) in (
+                    &player_tags,
+                    &mut transforms,
+                    &mut positions,
+                    &mut steerings,
+                )
+                    .join()
+                {
+                    transform.set_translation_x(frame.player_position.x as f32 * 50. + 50.);
                     *pos = frame.player_position;
                     steering.destination = frame.player_position;
                     // transform.set_translation_y(

@@ -1,5 +1,5 @@
 use amethyst::{
-    animation::{AnimationSetPrefab},
+    animation::AnimationSetPrefab,
     assets::{PrefabData, ProgressCounter},
     derive::PrefabData,
     ecs::{
@@ -7,9 +7,7 @@ use amethyst::{
         DenseVecStorage,
     },
     error::Error,
-    renderer::{
-        sprite::{prefab::SpriteScenePrefab, SpriteRender},
-    },
+    renderer::sprite::{prefab::SpriteScenePrefab, SpriteRender},
 };
 use serde::{Deserialize, Serialize};
 

@@ -1,10 +1,10 @@
 #![allow(
-dead_code,
-unused_must_use,
-unused_imports,
-unused_variables,
-unused_parens,
-unused_mut
+    dead_code,
+    unused_must_use,
+    unused_imports,
+    unused_variables,
+    unused_parens,
+    unused_mut
 )]
 #![forbid(unsafe_code)]
 
@@ -83,7 +83,11 @@ fn make_game() -> amethyst::Result<()> {
         .with_core(systems::SpawnSystem::new(), "spawn_system", &[])
         .with_core(systems::DebugSystem, "debug_system", &["input_system"])
         .with_core(systems::CameraSystem, "camera_system", &[])
-        .with_core(systems::RewindControlSystem, "rewind_control_system", &["player_system"])
+        .with_core(
+            systems::RewindControlSystem,
+            "rewind_control_system",
+            &["player_system"],
+        )
         .with_core(
             systems::RewindSystem.pausable(CurrentState::Rewinding),
             "rewind_system",

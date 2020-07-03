@@ -19,7 +19,8 @@ impl<'s> System<'s> for CameraSystem {
     );
 
     fn run(&mut self, (players, camera_frames, mut transforms): Self::SystemData) {
-        let maybe_player_pos = (&players, &transforms).join()
+        let maybe_player_pos = (&players, &transforms)
+            .join()
             .map(|(_, transform)| (transform.translation().x, transform.translation().y))
             .nth(0);
         if let Some((player_x, player_y)) = maybe_player_pos {

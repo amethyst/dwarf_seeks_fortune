@@ -1,30 +1,32 @@
-use amethyst::{
-    animation::{
-        AnimationCommand, AnimationControlSet, AnimationSet, EndControl, get_animation_set,
-    },
-    assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{Parent, transform::Transform},
-    ecs::{Entities, Entity, Join, prelude::World, ReadStorage, WriteStorage},
-    input::{get_key, InputEvent, is_close_requested, is_key_down, VirtualKeyCode},
-    prelude::*,
-    renderer::{formats::texture::ImageFormat, resources::Tint, palette::Srgba, SpriteSheet, Texture, Camera, sprite::SpriteRender},
-    StateData,
-    Trans, window::ScreenDimensions,
-};
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
+use amethyst::ui::UiPrefab;
 use amethyst::State;
 use amethyst::StateEvent;
-use amethyst::ui::UiPrefab;
+use amethyst::{
+    animation::{
+        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
+    },
+    assets::{AssetStorage, Handle, Loader, Prefab},
+    core::{transform::Transform, Parent},
+    ecs::{prelude::World, Entities, Entity, Join, ReadStorage, WriteStorage},
+    input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
+    prelude::*,
+    renderer::{
+        formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
+        Camera, SpriteSheet, Texture,
+    },
+    window::ScreenDimensions,
+    StateData, Trans,
+};
 
 use precompile::AnimationId;
 
-
-use crate::resources::*;
 use crate::components::*;
 use crate::config::*;
 use crate::game_data::CustomGameData;
 use crate::prefabs::Prefabs;
+use crate::resources::*;
 use crate::states::PausedState;
 
 pub struct DemoState {
@@ -46,7 +48,11 @@ impl<'a, 'b> DemoState {
         }
     }
 
-    fn handle_action(&mut self, action: &str, world: &mut World) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+    fn handle_action(
+        &mut self,
+        action: &str,
+        world: &mut World,
+    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
         let mut config = world.fetch_mut::<DebugConfig>();
         if action == "speedUp" {
             let (old_speed, new_speed) = (*config).increase_speed();
@@ -67,7 +73,11 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         let StateData { world, .. } = data;
         let discrete_pos = DiscretePos::default();
         let mut transform = Transform::default();
-        transform.set_translation_xyz((discrete_pos.x * 50 + 50) as f32, (discrete_pos.x * 50 + 50) as f32, 0.0);
+        transform.set_translation_xyz(
+            (discrete_pos.x * 50 + 50) as f32,
+            (discrete_pos.x * 50 + 50) as f32,
+            0.0,
+        );
         let scale_factor = 100.0 / 32.0;
         transform.set_scale(Vector3::new(scale_factor, scale_factor, 1.0));
         //Create player:
@@ -194,10 +204,7 @@ fn initialise_camera(world: &mut World) {
         .build();
 }
 
-fn initialize_sprite(
-    world: &mut World,
-    sprite_sheet_handle: Handle<SpriteSheet>,
-) {
+fn initialize_sprite(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let (width, height) = {
         let dim = world.read_resource::<ScreenDimensions>();
         (dim.width(), dim.height())

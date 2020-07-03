@@ -1,4 +1,3 @@
-
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Default)]
@@ -13,10 +12,10 @@ pub struct DebugConfig {
 impl DebugConfig {
     pub fn increase_speed(&mut self) -> (f32, f32) {
         let old_speed = self.player_speed;
-        let new_speed = self.speed_presets.iter()
-            .find(|&&speed| {
-                speed > self.player_speed
-            });
+        let new_speed = self
+            .speed_presets
+            .iter()
+            .find(|&&speed| speed > self.player_speed);
         if let Some(new_speed) = new_speed {
             self.player_speed = *new_speed;
             (old_speed, self.player_speed)
@@ -27,11 +26,11 @@ impl DebugConfig {
 
     pub fn decrease_speed(&mut self) -> (f32, f32) {
         let old_speed = self.player_speed;
-        let new_speed = self.speed_presets.iter()
+        let new_speed = self
+            .speed_presets
+            .iter()
             .rev()
-            .find(|&&speed| {
-                speed < self.player_speed
-            });
+            .find(|&&speed| speed < self.player_speed);
         if let Some(new_speed) = new_speed {
             self.player_speed = *new_speed;
             (old_speed, self.player_speed)

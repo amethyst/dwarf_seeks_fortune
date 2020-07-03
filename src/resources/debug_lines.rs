@@ -60,8 +60,5 @@ pub fn setup_debug_lines(world: &mut World) {
         Srgba::new(1.0, 0.0, 0.0, 0.8),
     );
 
-    world
-        .create_entity()
-        .with(debug_lines_component)
-        .build();
+    world.create_entity().with(debug_lines_component).build();
 }

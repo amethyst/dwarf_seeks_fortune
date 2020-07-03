@@ -2,17 +2,15 @@ use std::path::PathBuf;
 
 use crate::structs::AnimationId;
 use amethyst::{
-    animation::{AnimationBundle},
+    animation::AnimationBundle,
     core::{transform::TransformBundle, SystemBundle},
-    ecs::{
-         DispatcherBuilder,
-    },
+    ecs::DispatcherBuilder,
     error::Error,
     input::{InputBundle, StringBindings},
     prelude::World,
     renderer::{
         plugins::{RenderDebugLines, RenderFlat2D, RenderToWindow},
-        sprite::{SpriteRender},
+        sprite::SpriteRender,
         types::DefaultBackend,
         RenderingBundle,
     },
@@ -63,7 +61,7 @@ impl<'a, 'b, 'c> SystemBundle<'a, 'b> for PrecompiledDefaultsBundle<'c> {
             "sprite_animation_control",
             "sprite_sampler_interpolation",
         )
-            .build(world, builder)?;
+        .build(world, builder)?;
 
         // saves ~2 seconds
         InputBundle::<StringBindings>::new()

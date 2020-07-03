@@ -15,7 +15,7 @@ impl Default for History {
     fn default() -> History {
         History {
             force_key_frame: true,
-            frame_stack: vec!(),
+            frame_stack: vec![],
         }
     }
 }

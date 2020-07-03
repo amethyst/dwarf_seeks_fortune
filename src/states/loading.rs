@@ -1,18 +1,18 @@
+use amethyst::audio::output::init_output;
+use amethyst::prelude::WorldExt;
+use amethyst::ui::UiCreator;
+use amethyst::ui::UiLoader;
+use amethyst::ui::UiPrefab;
+use amethyst::State;
+use amethyst::StateEvent;
 use amethyst::{
     assets::{AssetStorage, Completion, Handle, Loader, PrefabLoader, ProgressCounter, RonFormat},
     ecs::prelude::Entity,
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
-    renderer::{formats::texture::ImageFormat, SpriteSheet, SpriteSheetFormat, Texture}, StateData,
-    Trans,
+    renderer::{formats::texture::ImageFormat, SpriteSheet, SpriteSheetFormat, Texture},
+    StateData, Trans,
 };
-use amethyst::audio::output::init_output;
-use amethyst::prelude::WorldExt;
-use amethyst::State;
-use amethyst::StateEvent;
-use amethyst::ui::UiCreator;
-use amethyst::ui::UiLoader;
-use amethyst::ui::UiPrefab;
 use precompile::MyPrefabData;
 
 use crate::game_data::CustomGameData;
@@ -49,8 +49,14 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         let frame_prefab = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
             loader.load("prefab/frame_animation.ron", RonFormat, &mut self.progress)
         });
-        let background_handle = load_texture("sprites/background.jpg", &data.world, &mut self.progress);
-        let bg_spritesheet = load_spritesheet("sprites/background.ron", background_handle, &data.world, &mut self.progress);
+        let background_handle =
+            load_texture("sprites/background.jpg", &data.world, &mut self.progress);
+        let bg_spritesheet = load_spritesheet(
+            "sprites/background.ron",
+            background_handle,
+            &data.world,
+            &mut self.progress,
+        );
         data.world.insert(mob_prefab.clone());
         data.world.insert(frame_prefab.clone());
         data.world.insert(bg_spritesheet.clone());
@@ -96,7 +102,10 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
     }
 }
 
-pub fn load_texture<N>(name: N, world: &World, progress: &mut ProgressCounter) -> Handle<Texture> where N: Into<String>, {
+pub fn load_texture<N>(name: N, world: &World, progress: &mut ProgressCounter) -> Handle<Texture>
+where
+    N: Into<String>,
+{
     let loader = world.read_resource::<Loader>();
     loader.load(
         name,
@@ -106,7 +115,20 @@ pub fn load_texture<N>(name: N, world: &World, progress: &mut ProgressCounter) -
     )
 }
 
-pub fn load_spritesheet<N>(name: N, texture_handle: Handle<Texture>, world: &World, progress: &mut ProgressCounter) -> Handle<SpriteSheet> where N: Into<String>, {
+pub fn load_spritesheet<N>(
+    name: N,
+    texture_handle: Handle<Texture>,
+    world: &World,
+    progress: &mut ProgressCounter,
+) -> Handle<SpriteSheet>
+where
+    N: Into<String>,
+{
     let loader = world.read_resource::<Loader>();
-    loader.load(name, SpriteSheetFormat(texture_handle), progress, &world.read_resource::<AssetStorage<SpriteSheet>>())
+    loader.load(
+        name,
+        SpriteSheetFormat(texture_handle),
+        progress,
+        &world.read_resource::<AssetStorage<SpriteSheet>>(),
+    )
 }
