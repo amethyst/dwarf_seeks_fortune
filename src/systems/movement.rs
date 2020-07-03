@@ -25,10 +25,10 @@ impl<'s> System<'s> for MovementSystem {
     ) {
         for (transform, velocity) in (&mut transforms, &velocities).join() {
             transform.set_translation_x(
-                (transform.translation().x + time.delta_seconds() * velocity.x),
+                transform.translation().x + time.delta_seconds() * velocity.x,
             );
             transform.set_translation_y(
-                (transform.translation().y + time.delta_seconds() * velocity.y),
+                transform.translation().y + time.delta_seconds() * velocity.y,
             );
         }
     }

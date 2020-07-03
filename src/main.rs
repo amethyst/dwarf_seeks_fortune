@@ -6,6 +6,7 @@ unused_variables,
 unused_parens,
 unused_mut
 )]
+#![forbid(unsafe_code)]
 
 mod components;
 mod config;

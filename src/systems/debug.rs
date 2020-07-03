@@ -14,32 +14,12 @@ impl<'s> System<'s> for DebugSystem {
         WriteStorage<'s, Transform>,
         ReadStorage<'s, DiscretePos>,
         ReadStorage<'s, Steering>,
-        ReadStorage<'s, DebugOrbTag>,
         ReadStorage<'s, PlayerTag>,
         ReadStorage<'s, DebugPosGhostTag>,
         ReadStorage<'s, DebugSteeringGhostTag>,
-        Read<'s, InputHandler<StringBindings>>,
-        ReadExpect<'s, ScreenDimensions>,
     );
 
-    fn run(&mut self, (mut transforms, positions, steerings, debug_orbs, player_tags, pos_ghost_tags, steering_ghost_tags, input, screen_dimens): Self::SystemData) {
-        for (transform, debug_orb) in (&mut transforms, &debug_orbs).join() {
-            let x_axis = input.axis_value("move_x");
-            let y_axis = input.axis_value("move_y");
-            if let Some(signum) = x_axis {
-                if signum.abs() > 0.01 {
-                    println!("Move x signum={:?}\t dimens:{:?}", signum, screen_dimens.width());
-                    transform.set_translation_x((screen_dimens.width() * signum).max(0.0));
-                }
-            }
-            if let Some(signum) = y_axis {
-                if signum.abs() > 0.01 {
-                    println!("Move y signum={:?}\t dimens:{:?}", signum, screen_dimens.height());
-                    transform.set_translation_y((screen_dimens.height() * signum).max(0.0));
-                }
-            }
-        }
-
+    fn run(&mut self, (mut transforms, positions, steerings, player_tags, pos_ghost_tags, steering_ghost_tags): Self::SystemData) {
         // Sets the transform on the ghost tags.
         // This is a debug thing to show us where the player is going.
         let maybe_destination = (&player_tags, &positions, &steerings).join()

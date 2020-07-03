@@ -1,27 +1,18 @@
 use crate::components::Health;
 use crate::components::Velocity;
 use precompile::MyPrefabData;
-use amethyst::renderer::SpriteSheet;
+
 
 use amethyst::{
     core::timing::Time,
     core::transform::Transform,
     ecs::{
-        prelude::{Join, Read, ReadExpect, ReadStorage, System, WriteStorage},
+        prelude::{ Read, ReadExpect,  System, WriteStorage},
         Entities,
     },
     assets::{Handle, Prefab},
-    input::{InputHandler, StringBindings},
-    renderer::SpriteRender,
     window::ScreenDimensions,
 };
-
-use rand::prelude::*;
-
-const GLOB_MAX_SPEED: f32 = 5.0;
-const GLOB_ACCELERATION: [f32; 2] = [0.5, 1.0];
-const GLOB_FRICTION: f32 = 0.9;
-const GLOB_GRAVITY: f32 = -0.5;
 
 #[derive(Default)]
 pub struct SpawnSystem {
@@ -42,7 +33,6 @@ impl<'s> System<'s> for SpawnSystem {
         WriteStorage<'s, Handle<Prefab<MyPrefabData>>>,
         Entities<'s>,
         ReadExpect<'s, Handle<Prefab<MyPrefabData>>>,
-        Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
         ReadExpect<'s, ScreenDimensions>,
     );
@@ -56,7 +46,6 @@ impl<'s> System<'s> for SpawnSystem {
             mut spriterenders,
             entities,
             mob_prefab,
-            input,
             time,
             screen_dimens,
         ): Self::SystemData,

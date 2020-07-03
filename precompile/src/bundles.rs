@@ -2,27 +2,23 @@ use std::path::PathBuf;
 
 use crate::structs::AnimationId;
 use amethyst::{
-    animation::{AnimationBundle, AnimationSetPrefab},
-    assets::{PrefabData, ProgressCounter},
+    animation::{AnimationBundle},
     core::{transform::TransformBundle, SystemBundle},
-    derive::PrefabData,
     ecs::{
-        prelude::{Component, Entity},
-        DenseVecStorage, DispatcherBuilder, WriteStorage,
+         DispatcherBuilder,
     },
     error::Error,
     input::{InputBundle, StringBindings},
     prelude::World,
     renderer::{
         plugins::{RenderDebugLines, RenderFlat2D, RenderToWindow},
-        sprite::{prefab::SpriteScenePrefab, SpriteRender},
+        sprite::{SpriteRender},
         types::DefaultBackend,
         RenderingBundle,
     },
     ui::{RenderUi, UiBundle},
     utils::fps_counter::FpsCounterBundle,
 };
-use serde::{Deserialize, Serialize};
 
 pub struct PrecompiledRenderBundle<'a> {
     pub display_config_path: &'a PathBuf,
@@ -67,7 +63,7 @@ impl<'a, 'b, 'c> SystemBundle<'a, 'b> for PrecompiledDefaultsBundle<'c> {
             "sprite_animation_control",
             "sprite_sampler_interpolation",
         )
-        .build(world, builder)?;
+            .build(world, builder)?;
 
         // saves ~2 seconds
         InputBundle::<StringBindings>::new()

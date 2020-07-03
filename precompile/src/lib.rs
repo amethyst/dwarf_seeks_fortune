@@ -1,11 +1,10 @@
-#![allow(
-    dead_code,
-    unused_must_use,
-    unused_imports,
-    unused_variables,
-    unused_parens,
-    unused_mut
-)]
+#![forbid(unsafe_code)]
+
+//! Inspired by the user Cart on the Amethyst forums:
+//! https://community.amethyst.rs/t/better-compile-times/1264
+//!
+//! This crate bundles some code that takes a tong time to compile but that rarely changes during
+//! development of the game. That way it doesn't need to be recompiled every time.
 
 mod bundles;
 mod startup;

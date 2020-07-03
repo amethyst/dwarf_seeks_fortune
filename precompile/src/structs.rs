@@ -1,25 +1,15 @@
-use std::path::PathBuf;
-
 use amethyst::{
-    animation::{AnimationBundle, AnimationSetPrefab},
+    animation::{AnimationSetPrefab},
     assets::{PrefabData, ProgressCounter},
-    core::{transform::TransformBundle, SystemBundle},
     derive::PrefabData,
     ecs::{
         prelude::{Component, Entity},
-        DenseVecStorage, DispatcherBuilder, WriteStorage,
+        DenseVecStorage,
     },
     error::Error,
-    input::{InputBundle, StringBindings},
-    prelude::World,
     renderer::{
-        plugins::{RenderFlat2D, RenderToWindow},
         sprite::{prefab::SpriteScenePrefab, SpriteRender},
-        types::DefaultBackend,
-        RenderingBundle,
     },
-    ui::{RenderUi, UiBundle},
-    utils::fps_counter::FpsCounterBundle,
 };
 use serde::{Deserialize, Serialize};
 

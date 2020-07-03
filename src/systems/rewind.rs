@@ -5,12 +5,10 @@ use amethyst::{
                resources::Tint, },
     core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
+    ecs::prelude::{Join, Read,  ReadStorage, System, Write, WriteStorage},
     input::{InputHandler, StringBindings},
-    window::ScreenDimensions,
 };
 use crate::config::*;
-use std::io::SeekFrom::Current;
 
 pub struct RewindControlSystem;
 
@@ -46,7 +44,7 @@ impl<'s> System<'s> for RewindControlSystem {
             *current_state = CurrentState::Running;
         }
 
-        for (tint) in (&mut tints).join() {
+        for tint in (&mut tints).join() {
             tint.0 = if *current_state == CurrentState::Running {
                 Srgba::new(1.0, 1.0, 1.0, 1.0)
             } else {

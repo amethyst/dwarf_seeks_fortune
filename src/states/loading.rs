@@ -1,5 +1,5 @@
 use amethyst::{
-    assets::{AssetStorage, Completion, Handle, Loader, Prefab, PrefabLoader, ProgressCounter, RonFormat},
+    assets::{AssetStorage, Completion, Handle, Loader, PrefabLoader, ProgressCounter, RonFormat},
     ecs::prelude::Entity,
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,

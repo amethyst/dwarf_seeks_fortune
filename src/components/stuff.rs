@@ -1,11 +1,13 @@
 use amethyst::{
-    assets::{PrefabData, ProgressCounter},
+    assets::{PrefabData},
     derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, VecStorage, WriteStorage},
+    ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage,  WriteStorage},
     error::Error,
 };
 use serde::{Deserialize, Serialize};
 
+/// Velocity in meters per second.
+/// TODO: Figure out screen coords / world coords difference.
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
@@ -34,24 +36,6 @@ impl Health {
     }
 }
 
-// Deprecated: Get rid of player in this form.
-#[derive(Debug, Deserialize, Serialize, PrefabData)]
-pub struct Player {
-    pub velocity: Velocity,
-}
-
-impl Component for Player {
-    type Storage = VecStorage<Self>;
-}
-
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
-#[prefab(Component)]
-pub struct DebugOrbTag;
-
-impl Component for DebugOrbTag {
-    type Storage = NullStorage<Self>;
-}
-
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq, Eq)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
@@ -77,6 +61,7 @@ impl Steering {
     }
 }
 
+/// The entity with this component is the player.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct PlayerTag;
@@ -85,7 +70,7 @@ impl Component for PlayerTag {
     type Storage = NullStorage<Self>;
 }
 
-
+/// A debug entity that shows the player's current discrete position.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct DebugPosGhostTag;
@@ -94,6 +79,7 @@ impl Component for DebugPosGhostTag {
     type Storage = NullStorage<Self>;
 }
 
+/// A debug entity that shows the player's destination.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct DebugSteeringGhostTag;
@@ -102,6 +88,13 @@ impl Component for DebugSteeringGhostTag {
     type Storage = NullStorage<Self>;
 }
 
+/// The camera will be a child entity of the camera frame.
+///
+/// The camera frame will maintain the rough position of the camera. Usually this will be the
+/// player's position.
+///
+/// The camera itself will maintain an offset position. Usually this will be at the origin
+/// (no offset). If there is camera shake, that will be done through this offset.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct CameraFrameTag;

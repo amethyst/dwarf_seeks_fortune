@@ -16,9 +16,9 @@ use amethyst::prelude::WorldExt;
 use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::ui::UiPrefab;
-use log::info;
+
 use precompile::AnimationId;
-use precompile::MyPrefabData;
+
 
 use crate::resources::*;
 use crate::components::*;
@@ -27,7 +27,6 @@ use crate::game_data::CustomGameData;
 use crate::prefabs::Prefabs;
 use crate::states::PausedState;
 
-// #[derive(Default)]
 pub struct DemoState {
     prefabs: Prefabs,
     fps_ui: Handle<UiPrefab>,
@@ -71,7 +70,8 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         transform.set_translation_xyz((discrete_pos.x * 50 + 50) as f32, (discrete_pos.x * 50 + 50) as f32, 0.0);
         let scale_factor = 100.0 / 32.0;
         transform.set_scale(Vector3::new(scale_factor, scale_factor, 1.0));
-        let player = world
+        //Create player:
+        world
             .create_entity()
             .with(self.prefabs.get_mob())
             .with(transform)

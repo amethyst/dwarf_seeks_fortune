@@ -1,9 +1,4 @@
-use amethyst::{
-    assets::{PrefabData, ProgressCounter},
-    derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, VecStorage, WriteStorage},
-    error::Error,
-};
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Default)]

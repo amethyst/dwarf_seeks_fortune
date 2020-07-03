@@ -1,8 +1,13 @@
 use crate::components::*;
 
+/// Holds the full history of the current game. Used to rewind games to an earlier point.
 #[derive(Debug)]
 pub struct History {
+    /// If this is true, then a new Frame should be created this tick, even if nothing changed.
+    /// This is used at the start of the game to create the initial Frame, and also after rewinding,
+    /// to record the state of the game at that point.
     pub force_key_frame: bool,
+    /// A stack of Frames. Each frame records some change in game state.
     frame_stack: Vec<Frame>,
 }
 
@@ -17,7 +22,6 @@ impl Default for History {
 
 impl History {
     pub fn push_frame(&mut self, frame: Frame) {
-        println!("Inserting frame: {:?}", frame);
         self.frame_stack.push(frame);
     }
 
@@ -37,6 +41,8 @@ impl Frame {
     }
 }
 
+/// Used to toggle systems on and off. Some systems can only run if the game is running normally.
+/// Some systems can only run if the game is rewinding.
 #[derive(Debug, PartialEq)]
 pub enum CurrentState {
     Running,
@@ -49,8 +55,10 @@ impl Default for CurrentState {
     }
 }
 
+/// Helper resource for the rewinding mechanism.
 #[derive(Debug, Default)]
 pub struct Rewind {
+    /// The time in seconds until a new Frame can be popped off the History.
     pub cooldown: f32,
 }
 
