@@ -7,7 +7,7 @@
 
 Prefab(
     entities: [
-        // Frame
+        // Mob
         PrefabEntity(
             data: MyPrefabData(
                 // SpriteScenePrefab
@@ -15,7 +15,7 @@ Prefab(
                     // SpriteSheetPrefab with index 0
                     sheet: Sheet(
                         // TexturePrefab
-                        texture: File("sprites/frame.png", (
+                        texture: File("textures/mob.png", (
                             "IMAGE", (
                                 sampler_info: (
                                     min_filter: Nearest,
@@ -35,12 +35,16 @@ Prefab(
                             ),
                         )),
                         sprites: [
+                            // Mob sprites
+                            // Sprites with indexes from 0 to 5
                             Grid((
-                                texture_width: 50,
-                                texture_height: 50,
-                                columns: 1,
+                                texture_width: 192,
+                                texture_height: 32,
+                                columns: 6,
                                 rows: 1,
-                                cell_size: (50, 50),
+                                cell_size: (32, 32),
+                                // Shifts the grid by 32 pixels down and the bat changes to brown
+                                // position: (0, 32),
                             )),
                             // Brown bat sprites
                             // Sprites with indexes from 6 to 11
@@ -57,14 +61,20 @@ Prefab(
                                 ],
                             )),
                         ],
-                         // optional
-                        name: "frame",
+                        // optional
+                        name: "mob",
                     ),
                     // SpriteRenderPrefab
                     render: (
-                        sheet: "frame",
+                        sheet: "mob",
                         sprite_number: 0,
                     ),
+                    // Transform: Do not use this, it sucks. It completely overwrites the initial transform you give an entity.
+                    // transform: (
+                    //     // translation: (150.0, 37.5, 0.0),
+                    //     // scale: (10.0,10.0,10.0),
+                    //     // translation: (0.0, 0.0, 0.0),
+                    // ),
                 ),
                 // AnimationSetPrefab
                 animation_set: (
@@ -80,9 +90,9 @@ Prefab(
                                         SpriteIndex,
                                         (
                                             // Time of key frames
-                                            input: [0.0, 1.0],
+                                            input: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2],
                                             // Sprite indexes from SpriteSheet for key frames
-                                            output: [0, 0],
+                                            output: [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0],
                                             // Sprites can only ever be animated with Step
                                             function: Step,
                                         ),

@@ -49,20 +49,20 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         assets.put_still(
             SpriteType::Background,
             load_spritesheet(
-                "sprites/background.jpg",
-                "sprites/background.ron",
+                "textures/background.jpg",
+                "prefab/still_background.ron",
                 data.world,
                 &mut self.progress,
             ),
         );
         assets.put_animated(
             AnimType::Frame,
-            load_animation("prefab/frame_animation.ron", data.world, &mut self.progress),
+            load_animation("prefab/still_frame.ron", data.world, &mut self.progress),
         );
         assets.put_animated(
             AnimType::Mob,
             load_animation(
-                "prefab/sprite_animation.ron",
+                "prefab/anim_mob.ron",
                 data.world,
                 &mut self.progress,
             ),
