@@ -1,10 +1,10 @@
 #![allow(
-    dead_code,
-    unused_must_use,
-    unused_imports,
-    unused_variables,
-    unused_parens,
-    unused_mut
+dead_code,
+unused_must_use,
+unused_imports,
+unused_variables,
+unused_parens,
+unused_mut
 )]
 #![forbid(unsafe_code)]
 
@@ -93,6 +93,7 @@ fn make_game() -> amethyst::Result<()> {
             "rewind_system",
             &["rewind_control_system", "input_system"],
         )
+        .with_core(systems::ResizeSystem, "resize_system", &[])
         .with_base_bundle(
             &mut app_builder.world,
             PrecompiledRenderBundle {

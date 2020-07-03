@@ -18,8 +18,8 @@ use amethyst::{
     },
     window::ScreenDimensions,
     StateData, Trans,
+    winit::{WindowEvent, Event},
 };
-
 use precompile::AnimationId;
 
 use crate::components::*;
@@ -150,6 +150,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         match event {
             // Events related to the window and inputs.
             StateEvent::Window(event) => {
+                if let Event::WindowEvent { window_id: _, event: WindowEvent::Resized(_) } = event {
+                    *data.world.write_resource::<ResizeState>() = ResizeState::Resizing;
+                };
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {
                     Trans::Quit
                 } else if is_key_down(&event, VirtualKeyCode::Escape) {
@@ -204,6 +207,7 @@ fn initialise_camera(world: &mut World) {
         .build();
 }
 
+/// Background init. Background is temporary, just to test out tinting when rewinding.
 fn initialize_sprite(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let (width, height) = {
         let dim = world.read_resource::<ScreenDimensions>();
