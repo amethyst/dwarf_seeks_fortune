@@ -1,22 +1,19 @@
 #![allow(
-dead_code,
-unused_must_use,
-unused_imports,
-unused_variables,
-unused_parens,
-unused_mut
+    dead_code,
+    unused_must_use,
+    unused_imports,
+    unused_variables,
+    unused_parens,
+    unused_mut
 )]
 #![forbid(unsafe_code)]
 
 mod components;
-mod config;
 mod game_data;
-mod prefabs;
 mod resources;
 mod states;
 mod systems;
 
-use crate::config::*;
 use crate::resources::*;
 use amethyst::prelude::{Config, SystemExt};
 use amethyst::{

@@ -1,9 +1,12 @@
 use crate::components::*;
 use crate::resources::*;
 use amethyst::{
-    core::{timing::Time, Parent},
     core::transform::Transform,
-    ecs::{Entities, prelude::{Join, Write, Read, ReadExpect, ReadStorage, System, WriteStorage}},
+    core::{timing::Time, Parent},
+    ecs::{
+        prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
+        Entities,
+    },
     input::{InputHandler, StringBindings},
     renderer::{sprite::SpriteRender, Camera},
     window::ScreenDimensions,
@@ -48,24 +51,37 @@ impl<'s> System<'s> for ResizeSystem {
         Write<'s, ResizeState>,
     );
 
-    fn run(&mut self, (entities, mut cameras, mut transforms, mut parents, camera_frames, dimens, mut resize): Self::SystemData) {
+    fn run(
+        &mut self,
+        (entities, mut cameras, mut transforms, mut parents, camera_frames, dimens, mut resize): Self::SystemData,
+    ) {
         if *resize != ResizeState::Resizing {
             return;
         }
-        println!("Resizing camera. Camera entity will be destroyed and recreated. ({:?}, {:?})", dimens.width(), dimens.height());
-        let frame = (&*entities, &camera_frames).join()
+        println!(
+            "Resizing camera. Camera entity will be destroyed and recreated. ({:?}, {:?})",
+            dimens.width(),
+            dimens.height()
+        );
+        let frame = (&*entities, &camera_frames)
+            .join()
             .map(|(entity, _)| entity)
             .nth(0);
-        let cam = (&*entities, &cameras).join()
+        let cam = (&*entities, &cameras)
+            .join()
             .map(|(entity, _)| entity)
             .nth(0);
         if let Some(frame) = frame {
             if let Some(cam) = cam {
                 entities.delete(cam);
             }
-            entities.build_entity()
+            entities
+                .build_entity()
                 .with(Parent { entity: frame }, &mut parents)
-                .with(Camera::standard_2d(dimens.width(), dimens.height()), &mut cameras)
+                .with(
+                    Camera::standard_2d(dimens.width(), dimens.height()),
+                    &mut cameras,
+                )
                 .with(Transform::default(), &mut transforms)
                 .build();
         }

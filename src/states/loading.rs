@@ -6,7 +6,9 @@ use amethyst::ui::UiPrefab;
 use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
-    assets::{AssetStorage, Completion, Handle, Loader, PrefabLoader, ProgressCounter, RonFormat},
+    assets::{
+        AssetStorage, Completion, Handle, Loader, Prefab, PrefabLoader, ProgressCounter, RonFormat,
+    },
     ecs::prelude::Entity,
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
@@ -16,7 +18,7 @@ use amethyst::{
 use precompile::MyPrefabData;
 
 use crate::game_data::CustomGameData;
-use crate::prefabs::Prefabs;
+use crate::resources::*;
 use crate::states::DemoState;
 
 #[derive(Default)]
@@ -25,7 +27,6 @@ pub struct LoadingState {
     load_ui: Option<Entity>,
     fps_ui: Option<Handle<UiPrefab>>,
     paused_ui: Option<Handle<UiPrefab>>,
-    prefabs: Option<Prefabs>,
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
@@ -43,24 +44,30 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
             data.world
                 .exec(|loader: UiLoader<'_>| loader.load("ui/paused.ron", &mut self.progress)),
         );
-        let mob_prefab = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
-            loader.load("prefab/sprite_animation.ron", RonFormat, &mut self.progress)
-        });
-        let frame_prefab = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
-            loader.load("prefab/frame_animation.ron", RonFormat, &mut self.progress)
-        });
-        let background_handle =
-            load_texture("sprites/background.jpg", &data.world, &mut self.progress);
-        let bg_spritesheet = load_spritesheet(
-            "sprites/background.ron",
-            background_handle,
-            &data.world,
-            &mut self.progress,
+
+        let mut assets = Assets::default();
+        assets.put_still(
+            SpriteType::Background,
+            load_spritesheet(
+                "sprites/background.jpg",
+                "sprites/background.ron",
+                data.world,
+                &mut self.progress,
+            ),
         );
-        data.world.insert(mob_prefab.clone());
-        data.world.insert(frame_prefab.clone());
-        data.world.insert(bg_spritesheet.clone());
-        self.prefabs = Some(Prefabs::new(bg_spritesheet, mob_prefab, frame_prefab));
+        assets.put_animated(
+            AnimType::Frame,
+            load_animation("prefab/frame_animation.ron", data.world, &mut self.progress),
+        );
+        assets.put_animated(
+            AnimType::Mob,
+            load_animation(
+                "prefab/sprite_animation.ron",
+                data.world,
+                &mut self.progress,
+            ),
+        );
+        data.world.insert(assets);
     }
 
     fn handle_event(
@@ -92,7 +99,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                     let _ = data.world.delete_entity(entity);
                 }
                 Trans::Switch(Box::new(DemoState::new(
-                    self.prefabs.as_ref().unwrap().clone(),
                     self.fps_ui.as_ref().unwrap().clone(),
                     self.paused_ui.as_ref().unwrap().clone(),
                 )))
@@ -116,19 +122,33 @@ where
 }
 
 pub fn load_spritesheet<N>(
-    name: N,
-    texture_handle: Handle<Texture>,
+    texture_name: N,
+    spritesheet_name: N,
     world: &World,
-    progress: &mut ProgressCounter,
+    mut progress: &mut ProgressCounter,
 ) -> Handle<SpriteSheet>
 where
     N: Into<String>,
 {
+    let texture_handle = load_texture(texture_name, &world, &mut progress);
     let loader = world.read_resource::<Loader>();
     loader.load(
-        name,
+        spritesheet_name,
         SpriteSheetFormat(texture_handle),
         progress,
         &world.read_resource::<AssetStorage<SpriteSheet>>(),
     )
+}
+
+pub fn load_animation<N>(
+    prefab_name: N,
+    world: &mut World,
+    progress: &mut ProgressCounter,
+) -> Handle<Prefab<MyPrefabData>>
+where
+    N: Into<String>,
+{
+    world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
+        loader.load(prefab_name, RonFormat, progress)
+    })
 }

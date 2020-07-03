@@ -17,35 +17,24 @@ use amethyst::{
         Camera, SpriteSheet, Texture,
     },
     window::ScreenDimensions,
+    winit::{Event, WindowEvent},
     StateData, Trans,
-    winit::{WindowEvent, Event},
 };
 use precompile::AnimationId;
 
 use crate::components::*;
-use crate::config::*;
 use crate::game_data::CustomGameData;
-use crate::prefabs::Prefabs;
 use crate::resources::*;
 use crate::states::PausedState;
 
 pub struct DemoState {
-    prefabs: Prefabs,
     fps_ui: Handle<UiPrefab>,
     paused_ui: Handle<UiPrefab>,
 }
 
 impl<'a, 'b> DemoState {
-    pub fn new(
-        prefabs: Prefabs,
-        fps_ui: Handle<UiPrefab>,
-        paused_ui: Handle<UiPrefab>,
-    ) -> DemoState {
-        DemoState {
-            prefabs,
-            fps_ui,
-            paused_ui,
-        }
+    pub fn new(fps_ui: Handle<UiPrefab>, paused_ui: Handle<UiPrefab>) -> DemoState {
+        DemoState { fps_ui, paused_ui }
     }
 
     fn handle_action(
@@ -71,6 +60,14 @@ impl<'a, 'b> DemoState {
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
+        let mob = world.read_resource::<Assets>().get_animated(AnimType::Mob);
+        let frame = world
+            .read_resource::<Assets>()
+            .get_animated(AnimType::Frame);
+        let background = world
+            .read_resource::<Assets>()
+            .get_still(SpriteType::Background);
+
         let discrete_pos = DiscretePos::default();
         let mut transform = Transform::default();
         transform.set_translation_xyz(
@@ -83,7 +80,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         //Create player:
         world
             .create_entity()
-            .with(self.prefabs.get_mob())
+            .with(mob)
             .with(transform)
             .with(discrete_pos)
             .with(Velocity::default())
@@ -95,20 +92,20 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         ghost_transform.set_scale(Vector3::new(2.0, 2.0, 1.0));
         world
             .create_entity()
-            .with(self.prefabs.get_frame())
+            .with(frame.clone())
             .with(ghost_transform)
             .with(DebugSteeringGhostTag)
             .build();
         world
             .create_entity()
-            .with(self.prefabs.get_frame())
+            .with(frame)
             .with(Transform::default())
             .with(DebugPosGhostTag)
             .build();
         initialise_camera(world);
         setup_debug_lines(world);
         world.write_resource::<History>().force_key_frame = true;
-        initialize_sprite(world, self.prefabs.get_background());
+        initialize_sprite(world, background);
     }
 
     fn update(
@@ -150,7 +147,11 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         match event {
             // Events related to the window and inputs.
             StateEvent::Window(event) => {
-                if let Event::WindowEvent { window_id: _, event: WindowEvent::Resized(_) } = event {
+                if let Event::WindowEvent {
+                    window_id: _,
+                    event: WindowEvent::Resized(_),
+                } = event
+                {
                     *data.world.write_resource::<ResizeState>() = ResizeState::Resizing;
                 };
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {

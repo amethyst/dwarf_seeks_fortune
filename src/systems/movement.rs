@@ -1,5 +1,4 @@
 use crate::components::*;
-use crate::config::*;
 use crate::resources::*;
 use amethyst::{
     core::timing::Time,
