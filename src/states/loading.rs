@@ -61,11 +61,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         );
         assets.put_animated(
             AnimType::Mob,
-            load_animation(
-                "prefab/anim_mob.ron",
-                data.world,
-                &mut self.progress,
-            ),
+            load_animation("prefab/anim_mob.ron", data.world, &mut self.progress),
         );
         data.world.insert(assets);
     }

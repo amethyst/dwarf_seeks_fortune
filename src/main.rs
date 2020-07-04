@@ -42,7 +42,7 @@ fn make_game() -> amethyst::Result<()> {
     let config_dir = assets_dir.join("config/");
     let display_config_path = config_dir.join("display.ron");
     let config_path = config_dir.join("debug_config.ron");
-    let bindings_config_path = config_dir.join("bindings.ron");
+    let bindings_config_path = config_dir.join("input_bindings.ron");
 
     let mut app_builder = Application::build(assets_dir, states::LoadingState::default())?;
 
@@ -80,6 +80,11 @@ fn make_game() -> amethyst::Result<()> {
         .with_core(systems::SpawnSystem::new(), "spawn_system", &[])
         .with_core(systems::DebugSystem, "debug_system", &["input_system"])
         .with_core(systems::CameraSystem, "camera_system", &[])
+        .with_core(
+            systems::CameraControlSystem,
+            "camera_control_system",
+            &["camera_system"],
+        )
         .with_core(
             systems::RewindControlSystem,
             "rewind_control_system",

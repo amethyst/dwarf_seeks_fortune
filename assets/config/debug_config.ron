@@ -6,7 +6,7 @@
         20., 50., 250., 500., 750., 1000.,
     ],
     // The max speed that the player can travel at.
-    player_speed: 250.0,
+    player_speed: 500.0,
     // Number of seconds to leave between frames when rewinding time.
     seconds_per_rewind_frame: 0.05,
 )

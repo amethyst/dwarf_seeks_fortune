@@ -1,5 +1,6 @@
 use amethyst::{
     assets::PrefabData,
+    core::math::Vector2,
     derive::PrefabData,
     ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, WriteStorage},
     error::Error,
@@ -97,10 +98,29 @@ impl Component for DebugSteeringGhostTag {
 ///
 /// The camera itself will maintain an offset position. Usually this will be at the origin
 /// (no offset). If there is camera shake, that will be done through this offset.
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Component, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
-pub struct CameraFrameTag;
+pub struct CameraFrameTag {
+    /// Player will be able to pan the camera around to a limited degree.
+    /// This is the current offset from the camera's default position.
+    pub pan: Vector2<f32>,
+    /// The maximum distance in meters that the player can pan the camera.
+    pub max_pan: f32,
+    /// Speed at which the camera may pan, in meters per second.
+    pub panning_speed: f32,
+    /// Speed at which the camera may pan back to its default position after the player lets go
+    /// of the panning controls. This will be faster than the speed at which the player can pan the
+    /// camera around, resulting in a sort of rubber banding effect.
+    pub panning_recovery_speed: f32,
+}
 
-impl Component for CameraFrameTag {
-    type Storage = NullStorage<Self>;
+impl Default for CameraFrameTag {
+    fn default() -> Self {
+        CameraFrameTag {
+            pan: Vector2::new(0., 0.),
+            max_pan: 250.,
+            panning_speed: 500.,
+            panning_recovery_speed: 2000.,
+        }
+    }
 }

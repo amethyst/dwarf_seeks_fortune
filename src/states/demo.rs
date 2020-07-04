@@ -194,7 +194,7 @@ fn initialise_camera(world: &mut World) {
 
     let camera_frame = world
         .create_entity()
-        .with(CameraFrameTag)
+        .with(CameraFrameTag::default())
         .with(transform)
         .build();
 
