@@ -24,7 +24,7 @@ use amethyst::{
 use precompile::AnimationId;
 
 use crate::components::*;
-use crate::entities::initialise_camera;
+use crate::entities::*;
 use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
@@ -58,7 +58,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
         setup_debug_lines(world);
-        initialise_camera(world);
+        let cursor = init_cursor(world);
+        // create_camera_under_parent(world, cursor);
+        create_camera(world);
     }
 
     fn update(
@@ -125,4 +127,18 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
             }
         }
     }
+}
+
+fn init_cursor(world: &mut World) -> Entity {
+    let sprite_handle = world.read_resource::<Assets>().get_still(&SpriteType::Frame);
+    world
+        .create_entity()
+        .with(SpriteRender {
+            sprite_sheet: sprite_handle,
+            sprite_number: 0,
+        })
+        .with(Transform::default())
+        .with(DiscretePos::default())
+        .with(CursorTag)
+        .build()
 }

@@ -1,5 +1,5 @@
 use crate::components::*;
-use crate::entities::initialise_camera;
+use crate::entities::*;
 use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
@@ -65,10 +65,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         let background = world
             .read_resource::<Assets>()
             .get_still(&SpriteType::Background);
-        initialise_camera(world);
+        create_camera(world);
         setup_debug_lines(world);
         world.write_resource::<History>().force_key_frame = true;
-        init_background(world, background);
         load_level(world);
     }
 
@@ -144,33 +143,4 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
             }
         }
     }
-}
-
-/// Background init. Background is temporary, just to test out tinting when rewinding.
-fn init_background(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
-    let (width, height) = {
-        let dim = world.read_resource::<ScreenDimensions>();
-        (dim.width(), dim.height())
-    };
-
-    // Move the sprite to the middle of the window
-    let mut sprite_transform = Transform::default();
-    sprite_transform.set_translation_xyz(width / 2., height / 2., -1.);
-
-    let sprite_render = SpriteRender {
-        sprite_sheet: sprite_sheet_handle,
-        sprite_number: 0, // First sprite
-    };
-
-    // White shows the sprite as normal.
-    // You can change the color at any point to modify the sprite's tint.
-    let tint = Tint(Srgba::new(1.0, 1.0, 1.0, 1.0));
-
-    world
-        .create_entity()
-        .with(sprite_render)
-        .with(sprite_transform)
-        .with(tint)
-        // .with(Transparent) // If your sprite is transparent
-        .build();
 }

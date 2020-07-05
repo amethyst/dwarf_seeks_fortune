@@ -1,6 +1,7 @@
 use crate::components::*;
 use amethyst::{
     core::{transform::Transform, Parent},
+    ecs::Entity,
     prelude::{Builder, World, WorldExt},
     renderer::{
         formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
@@ -10,27 +11,30 @@ use amethyst::{
 };
 
 /// Initialise the camera.
-pub fn initialise_camera(world: &mut World) {
+pub fn create_camera(world: &mut World) {
+    let frame = initialise_camera_frame(world);
+    create_camera_under_parent(world, frame);
+}
+
+pub fn create_camera_under_parent(world: &mut World, parent: Entity) {
     let (width, height) = {
         let dim = world.fetch::<ScreenDimensions>();
         (dim.width(), dim.height())
     };
-    // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left.
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(0.0, 0.0, 1.0);
-
-    let camera_frame = world
-        .create_entity()
-        .with(CameraFrameTag::default())
-        .with(transform)
-        .build();
-
     world
         .create_entity()
-        .with(Parent {
-            entity: camera_frame,
-        })
+        .with(Parent { entity: parent })
         .with(Camera::standard_2d(width, height))
         .with(Transform::default())
         .build();
+}
+
+pub fn initialise_camera_frame(world: &mut World) -> Entity {
+    let mut transform = Transform::default();
+    transform.set_translation_xyz(0.0, 0.0, 10.0);
+    world
+        .create_entity()
+        .with(CameraFrameTag::default())
+        .with(transform)
+        .build()
 }

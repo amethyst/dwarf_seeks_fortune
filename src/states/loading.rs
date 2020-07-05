@@ -121,13 +121,13 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                 if let Some(entity) = self.load_ui {
                     let _ = data.world.delete_entity(entity);
                 }
-                Trans::Switch(Box::new(DemoState::new(
-                    self.fps_ui.as_ref().unwrap().clone(),
-                    self.paused_ui.as_ref().unwrap().clone(),
-                )))
-                // Trans::Switch(Box::new(EditorState::new(
+                // Trans::Switch(Box::new(DemoState::new(
                 //     self.fps_ui.as_ref().unwrap().clone(),
+                //     self.paused_ui.as_ref().unwrap().clone(),
                 // )))
+                Trans::Switch(Box::new(EditorState::new(
+                    self.fps_ui.as_ref().unwrap().clone(),
+                )))
             }
             Completion::Loading => Trans::None,
         }
