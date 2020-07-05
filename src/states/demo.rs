@@ -16,6 +16,7 @@ use amethyst::{
         formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
         Camera, SpriteSheet, Texture,
     },
+    utils::application_root_dir,
     window::ScreenDimensions,
     winit::{Event, WindowEvent},
     StateData, Trans,
@@ -63,7 +64,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         let mob = world.read_resource::<Assets>().get_animated(AnimType::Mob);
         let frame = world
             .read_resource::<Assets>()
-            .get_animated(AnimType::Frame);
+            .get_still(SpriteType::Frame);
         let background = world
             .read_resource::<Assets>()
             .get_still(SpriteType::Background);
@@ -88,17 +89,21 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
             .with(PlayerTag)
             .build();
 
+        let sprite_render = SpriteRender {
+            sprite_sheet: frame,
+            sprite_number: 0, // First sprite
+        };
         let mut ghost_transform = Transform::default();
         ghost_transform.set_scale(Vector3::new(2.0, 2.0, 1.0));
         world
             .create_entity()
-            .with(frame.clone())
+            .with(sprite_render.clone())
             .with(ghost_transform)
             .with(DebugSteeringGhostTag)
             .build();
         world
             .create_entity()
-            .with(frame)
+            .with(sprite_render)
             .with(Transform::default())
             .with(DebugPosGhostTag)
             .build();
@@ -106,6 +111,13 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         setup_debug_lines(world);
         world.write_resource::<History>().force_key_frame = true;
         initialize_sprite(world, background);
+
+        let level_file = application_root_dir().expect("Root dir not found!")
+            .join("assets/")
+            .join("tiles/")
+            .join("testlevel.ron");
+        let map = Map::load(level_file);
+        println!("Map loaded: {:?}", map);
     }
 
     fn update(

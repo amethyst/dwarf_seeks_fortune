@@ -6,3 +6,15 @@ Design goals:
     - Map editor
 - Be a proper example of how to use Amethyst. Document everything.
 - Add tests where necessary.
+
+Brainstorm ideas for tools:
+- Dynamite
+- Tunnel bore machine
+- Ladder
+- Balloons that go up, attachable to tools/blocks? Moves tools to where you can actualy use them.
+- Water streams to move tools or blocks?
+
+TODO:
+- Break 1 / 2 blocks horizontally
+- Break 1 / 2 blocks below
+- Moveable blocks

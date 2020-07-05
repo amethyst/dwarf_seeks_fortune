@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use amethyst::{
     assets::{Completion, Handle, Prefab, PrefabLoader, ProgressCounter, RonFormat},
     ecs::prelude::Entity,
@@ -27,33 +28,44 @@ impl Assets {
         (*self
             .stills
             .get(&asset_type)
-            .expect(&format!("Spritesheet asset missing: {:?}", asset_type)))
-        .clone()
+            .or_else(|| {
+                println!("Spritesheet asset {:?} is missing!", asset_type);
+                self.stills.get(&SpriteType::NotFound)
+            })
+            .expect(&format!("Fallback asset also missing.")))
+            .clone()
     }
 
     pub fn get_animated(&self, asset_type: AnimType) -> Handle<Prefab<MyPrefabData>> {
         (*self
             .animated
             .get(&asset_type)
-            .expect(&format!("Animated asset missing: {:?}", asset_type)))
-        .clone()
+            .or_else(|| {
+                println!("Animation asset {:?} is missing!", asset_type);
+                self.animated.get(&AnimType::NotFound)
+            })
+            .expect(&format!("Fallback asset also missing!")))
+            .clone()
     }
 }
 
-// TODO: Remove this??
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum AssetType {
     Still(SpriteType),
     Animated(AnimType),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum SpriteType {
+    /// This is the fallback sprite to use if the desired sprite cannot be found.
+    NotFound,
     Background,
+    Frame,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum AnimType {
+    /// The fallback animated asset to use if the desired asset could not be found.
+    NotFound,
     Mob,
-    Frame,
 }

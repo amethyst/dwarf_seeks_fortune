@@ -1,0 +1,10 @@
+Map(
+    tiles: [
+        Tile(
+            pos: [6,0],
+            dimens: [1,1],
+            asset: Still(NotFound),
+            tile_type: StaticTile,
+        ),
+    ],
+)

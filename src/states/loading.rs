@@ -47,17 +47,35 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
 
         let mut assets = Assets::default();
         assets.put_still(
-            SpriteType::Background,
+            SpriteType::NotFound,
             load_spritesheet(
-                "textures/background.jpg",
-                "prefab/still_background.ron",
+                "textures/not_found.png",
+                "prefab/still_not_found.ron",
+                data.world,
+                &mut self.progress,
+            ),
+        );
+        // assets.put_still(
+        //     SpriteType::Background,
+        //     load_spritesheet(
+        //         "textures/background.jpg",
+        //         "prefab/still_background.ron",
+        //         data.world,
+        //         &mut self.progress,
+        //     ),
+        // );
+        assets.put_still(
+            SpriteType::Frame,
+            load_spritesheet(
+                "textures/frame.png",
+                "prefab/still_frame.ron",
                 data.world,
                 &mut self.progress,
             ),
         );
         assets.put_animated(
-            AnimType::Frame,
-            load_animation("prefab/still_frame.ron", data.world, &mut self.progress),
+            AnimType::NotFound,
+            load_animation("prefab/anim_not_found.ron", data.world, &mut self.progress),
         );
         assets.put_animated(
             AnimType::Mob,
