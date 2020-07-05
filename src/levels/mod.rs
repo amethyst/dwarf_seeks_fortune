@@ -1,4 +1,5 @@
 mod load;
-pub mod map;
+mod map;
 
 pub use self::load::*;
+pub use self::map::*;

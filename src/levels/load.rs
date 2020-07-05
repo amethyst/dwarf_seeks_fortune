@@ -25,6 +25,7 @@ use precompile::{AnimationId, MyPrefabData};
 
 use crate::components::*;
 use crate::game_data::CustomGameData;
+use crate::levels::map::*;
 use crate::resources::*;
 use crate::states::PausedState;
 
@@ -57,9 +58,9 @@ pub fn load_level(world: &mut World) {
                 builder = builder.with(anim_asset);
             }
             builder = builder.with(transform);
-            match tile.tile_type {
-                TileType::Player => {
-                    let player = build_player(tile, builder);
+            match tile.tile_type.entity_type {
+                EntityType::Player => {
+                    let player = build_player(builder);
                     build_frames(player, world);
                 }
                 _ => {
@@ -93,7 +94,7 @@ fn build_frames(player: Entity, world: &mut World) {
         .build();
 }
 
-fn build_player(tile: &Tile, builder: EntityBuilder) -> Entity {
+fn build_player(builder: EntityBuilder) -> Entity {
     builder
         .with(DiscretePos::default())
         .with(Velocity::default())
@@ -103,23 +104,23 @@ fn build_player(tile: &Tile, builder: EntityBuilder) -> Entity {
 }
 
 fn load_transform(tile: &Tile) -> Transform {
-    let asset_dimensions = get_asset_dimensions(&tile.asset);
+    let asset_dimensions = get_asset_dimensions(&tile.tile_type.asset);
     let mut transform = Transform::default();
     transform.set_translation_xyz(
-        tile.pos.x as f32 * FACTOR + tile.dimens.x as f32 * FACTOR * 0.5,
-        tile.pos.y as f32 * FACTOR + tile.dimens.y as f32 * FACTOR * 0.5,
+        tile.pos.x as f32 * FACTOR + tile.tile_type.dimens.x as f32 * FACTOR * 0.5,
+        tile.pos.y as f32 * FACTOR + tile.tile_type.dimens.y as f32 * FACTOR * 0.5,
         0.0,
     );
     transform.set_scale(Vector3::new(
-        (tile.dimens.x as f32 * FACTOR) / asset_dimensions.x as f32,
-        (tile.dimens.y as f32 * FACTOR) / asset_dimensions.y as f32,
+        (tile.tile_type.dimens.x as f32 * FACTOR) / asset_dimensions.x as f32,
+        (tile.tile_type.dimens.y as f32 * FACTOR) / asset_dimensions.y as f32,
         1.0,
     ));
     transform
 }
 
 fn load_still_asset(tile: &Tile, world: &World) -> Option<SpriteRender> {
-    match &tile.asset {
+    match &tile.tile_type.asset {
         AssetType::Animated(anim) => None,
         AssetType::Still(spritesheet, sprite_nr) => {
             let handle = world.read_resource::<Assets>().get_still(&spritesheet);
@@ -132,7 +133,7 @@ fn load_still_asset(tile: &Tile, world: &World) -> Option<SpriteRender> {
 }
 
 fn load_anim_asset(tile: &Tile, world: &World) -> Option<Handle<Prefab<MyPrefabData>>> {
-    match &tile.asset {
+    match &tile.tile_type.asset {
         AssetType::Animated(anim) => {
             let handle = world.read_resource::<Assets>().get_animated(&anim);
             Some(handle)

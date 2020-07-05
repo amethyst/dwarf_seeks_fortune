@@ -1,9 +1,3 @@
-use crate::components::*;
-use crate::entities::initialise_camera;
-use crate::game_data::CustomGameData;
-use crate::levels::*;
-use crate::resources::*;
-use crate::states::PausedState;
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
 use amethyst::ui::UiPrefab;
@@ -29,14 +23,26 @@ use amethyst::{
 };
 use precompile::AnimationId;
 
-pub struct DemoState {
+use crate::components::*;
+use crate::entities::initialise_camera;
+use crate::game_data::CustomGameData;
+use crate::levels::*;
+use crate::resources::*;
+use crate::states::PausedState;
+
+/// TODO:
+/// Have a map in resources, this is what is being built up and what will be saved later.
+/// Cursor points at location. Derives width and height from block loaded on brush??
+/// Brush (contains block-type)
+/// When holding shift, should do multi-select (ideally only if block allows it)
+/// Camera follows cursor?
+pub struct EditorState {
     fps_ui: Handle<UiPrefab>,
-    paused_ui: Handle<UiPrefab>,
 }
 
-impl<'a, 'b> DemoState {
-    pub fn new(fps_ui: Handle<UiPrefab>, paused_ui: Handle<UiPrefab>) -> DemoState {
-        DemoState { fps_ui, paused_ui }
+impl<'a, 'b> EditorState {
+    pub fn new(fps_ui: Handle<UiPrefab>) -> EditorState {
+        EditorState { fps_ui }
     }
 
     fn handle_action(
@@ -44,32 +50,15 @@ impl<'a, 'b> DemoState {
         action: &str,
         world: &mut World,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        let mut config = world.fetch_mut::<DebugConfig>();
-        if action == "speedUp" {
-            let (old_speed, new_speed) = (*config).increase_speed();
-            println!("Speeding up, from {:?} to {:?}", old_speed, new_speed);
-            Trans::None
-        } else if action == "slowDown" {
-            let (old_speed, new_speed) = (*config).decrease_speed();
-            println!("Slowing down, from {:?} to {:?}", old_speed, new_speed);
-            Trans::None
-        } else {
-            Trans::None
-        }
+        Trans::None
     }
 }
 
-impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
+impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
-        let background = world
-            .read_resource::<Assets>()
-            .get_still(&SpriteType::Background);
-        initialise_camera(world);
         setup_debug_lines(world);
-        world.write_resource::<History>().force_key_frame = true;
-        init_background(world, background);
-        load_level(world);
+        initialise_camera(world);
     }
 
     fn update(
@@ -120,14 +109,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
                 };
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {
                     Trans::Quit
-                } else if is_key_down(&event, VirtualKeyCode::Escape) {
-                    // Pause the game by going to the `PausedState`.
-                    Trans::Push(Box::new(PausedState::new(
-                        data.world
-                            .create_entity()
-                            .with(self.paused_ui.clone())
-                            .build(),
-                    )))
                 } else {
                     Trans::None
                 }
@@ -144,33 +125,4 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
             }
         }
     }
-}
-
-/// Background init. Background is temporary, just to test out tinting when rewinding.
-fn init_background(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
-    let (width, height) = {
-        let dim = world.read_resource::<ScreenDimensions>();
-        (dim.width(), dim.height())
-    };
-
-    // Move the sprite to the middle of the window
-    let mut sprite_transform = Transform::default();
-    sprite_transform.set_translation_xyz(width / 2., height / 2., -1.);
-
-    let sprite_render = SpriteRender {
-        sprite_sheet: sprite_sheet_handle,
-        sprite_number: 0, // First sprite
-    };
-
-    // White shows the sprite as normal.
-    // You can change the color at any point to modify the sprite's tint.
-    let tint = Tint(Srgba::new(1.0, 1.0, 1.0, 1.0));
-
-    world
-        .create_entity()
-        .with(sprite_render)
-        .with(sprite_transform)
-        .with(tint)
-        // .with(Transparent) // If your sprite is transparent
-        .build();
 }

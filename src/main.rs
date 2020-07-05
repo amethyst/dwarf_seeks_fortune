@@ -9,6 +9,7 @@
 #![forbid(unsafe_code)]
 
 mod components;
+mod entities;
 mod game_data;
 mod levels;
 mod resources;

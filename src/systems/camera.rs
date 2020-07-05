@@ -50,14 +50,12 @@ impl<'s> System<'s> for CameraControlSystem {
                 let pan_add =
                     Vector2::new(pan_x, pan_y) * frame.panning_speed * time.delta_seconds();
                 frame.pan += pan_add;
-                println!("panned_: {:?}", frame.pan);
                 frame.pan = Vector2::new(
                     *partial_clamp(&frame.pan.x, &-frame.max_pan, &frame.max_pan)
                         .expect("Oh noes!"),
                     *partial_clamp(&frame.pan.y, &-frame.max_pan, &frame.max_pan)
                         .expect("Oh noes!"),
                 );
-                println!("clamped: {:?}", frame.pan);
             }
         }
     }

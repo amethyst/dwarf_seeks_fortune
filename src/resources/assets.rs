@@ -50,7 +50,7 @@ impl Assets {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize)]
 pub enum AssetType {
     /// A static, non-animated image.
     /// Contains both a handle to the sprite sheet and the number of the sprite on the sheet.
@@ -59,7 +59,7 @@ pub enum AssetType {
     Animated(AnimType),
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum SpriteType {
     /// This is the fallback sprite to use if the desired sprite cannot be found.
     NotFound,
@@ -68,7 +68,7 @@ pub enum SpriteType {
     Blocks,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum AnimType {
     /// The fallback animated asset to use if the desired asset could not be found.
     NotFound,

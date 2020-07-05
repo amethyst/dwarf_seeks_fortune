@@ -19,7 +19,7 @@ use precompile::MyPrefabData;
 
 use crate::game_data::CustomGameData;
 use crate::resources::*;
-use crate::states::DemoState;
+use crate::states::{DemoState, EditorState};
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -125,6 +125,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                     self.fps_ui.as_ref().unwrap().clone(),
                     self.paused_ui.as_ref().unwrap().clone(),
                 )))
+                // Trans::Switch(Box::new(EditorState::new(
+                //     self.fps_ui.as_ref().unwrap().clone(),
+                // )))
             }
             Completion::Loading => Trans::None,
         }

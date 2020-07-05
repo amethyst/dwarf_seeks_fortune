@@ -2,45 +2,53 @@ Map(
     tiles: [
         Tile(
             pos: [0,0],
-            dimens: [2,2],
-            asset: Animated(Mob),
-            tile_type: Player,
+            tile_type:(
+                dimens: [2,2],
+                asset: Animated(Mob),
+                entity_type: Player,
+            )
         ),
         Tile(
             pos: [0,-1],
+            tile_type:(
             dimens: [1,1],
             asset: Still(Blocks, 0),
-            tile_type: StaticTile,
+            entity_type: DestructableTerrain,)
         ),
         Tile(
             pos: [1,-1],
+            tile_type:(
             dimens: [1,1],
             asset: Still(Blocks, 0),
-            tile_type: StaticTile,
+            entity_type: DestructableTerrain,)
         ),
         Tile(
             pos: [2,-1],
+            tile_type:(
             dimens: [1,1],
             asset: Still(Blocks, 0),
-            tile_type: StaticTile,
+            entity_type: DestructableTerrain,)
         ),
         Tile(
             pos: [3,-1],
+            tile_type:(
             dimens: [1,1],
             asset: Still(Blocks, 0),
-            tile_type: StaticTile,
+            entity_type: DestructableTerrain,)
         ),
         Tile(
             pos: [4,0],
+            tile_type:(
             dimens: [2,2],
             asset: Still(Blocks, 1),
-            tile_type: StaticTile,
+            entity_type: DestructableTerrain,)
         ),
         Tile(
             pos: [-1,2],
+            tile_type:(
             dimens: [1,1],
             asset: Still(Blocks, 1),
-            tile_type: StaticTile,
+            entity_type: DestructableTerrain,)
         ),
     ],
 )
