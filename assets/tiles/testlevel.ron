@@ -1,9 +1,45 @@
 Map(
     tiles: [
         Tile(
-            pos: [6,0],
+            pos: [0,0],
+            dimens: [2,2],
+            asset: Animated(Mob),
+            tile_type: Player,
+        ),
+        Tile(
+            pos: [0,-1],
             dimens: [1,1],
-            asset: Still(NotFound),
+            asset: Still(Blocks, 0),
+            tile_type: StaticTile,
+        ),
+        Tile(
+            pos: [1,-1],
+            dimens: [1,1],
+            asset: Still(Blocks, 0),
+            tile_type: StaticTile,
+        ),
+        Tile(
+            pos: [2,-1],
+            dimens: [1,1],
+            asset: Still(Blocks, 0),
+            tile_type: StaticTile,
+        ),
+        Tile(
+            pos: [3,-1],
+            dimens: [1,1],
+            asset: Still(Blocks, 0),
+            tile_type: StaticTile,
+        ),
+        Tile(
+            pos: [4,0],
+            dimens: [2,2],
+            asset: Still(Blocks, 1),
+            tile_type: StaticTile,
+        ),
+        Tile(
+            pos: [-1,2],
+            dimens: [1,1],
+            asset: Still(Blocks, 1),
             tile_type: StaticTile,
         ),
     ],

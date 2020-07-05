@@ -1,14 +1,12 @@
-use serde::{Deserialize, Serialize};
 use crate::resources::*;
-use amethyst::{
-    core::math::Point2,
-};
+use amethyst::core::math::Point2;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct Map {
-    tiles: Vec<Tile>,
+    pub tiles: Vec<Tile>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -27,12 +25,12 @@ pub struct Tile {
     pub tile_type: TileType,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub enum TileType {
     /// Collidable, static terrain. Doesn't move.
     StaticTile,
     /// Spawn a player here.
-    PlayerStart,
+    Player,
     Key,
     MobSpawner,
     Door,

@@ -25,6 +25,7 @@ use precompile::AnimationId;
 
 use crate::components::*;
 use crate::game_data::CustomGameData;
+use crate::levels::*;
 use crate::resources::*;
 use crate::states::PausedState;
 
@@ -61,63 +62,14 @@ impl<'a, 'b> DemoState {
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
-        let mob = world.read_resource::<Assets>().get_animated(AnimType::Mob);
-        let frame = world
-            .read_resource::<Assets>()
-            .get_still(SpriteType::Frame);
         let background = world
             .read_resource::<Assets>()
-            .get_still(SpriteType::Background);
-
-        let discrete_pos = DiscretePos::default();
-        let mut transform = Transform::default();
-        transform.set_translation_xyz(
-            (discrete_pos.x * 50 + 50) as f32,
-            (discrete_pos.x * 50 + 50) as f32,
-            0.0,
-        );
-        let scale_factor = 100.0 / 32.0;
-        transform.set_scale(Vector3::new(scale_factor, scale_factor, 1.0));
-        //Create player:
-        world
-            .create_entity()
-            .with(mob)
-            .with(transform)
-            .with(discrete_pos)
-            .with(Velocity::default())
-            .with(Steering::new(discrete_pos))
-            .with(PlayerTag)
-            .build();
-
-        let sprite_render = SpriteRender {
-            sprite_sheet: frame,
-            sprite_number: 0, // First sprite
-        };
-        let mut ghost_transform = Transform::default();
-        ghost_transform.set_scale(Vector3::new(2.0, 2.0, 1.0));
-        world
-            .create_entity()
-            .with(sprite_render.clone())
-            .with(ghost_transform)
-            .with(DebugSteeringGhostTag)
-            .build();
-        world
-            .create_entity()
-            .with(sprite_render)
-            .with(Transform::default())
-            .with(DebugPosGhostTag)
-            .build();
+            .get_still(&SpriteType::Background);
         initialise_camera(world);
         setup_debug_lines(world);
         world.write_resource::<History>().force_key_frame = true;
         initialize_sprite(world, background);
-
-        let level_file = application_root_dir().expect("Root dir not found!")
-            .join("assets/")
-            .join("tiles/")
-            .join("testlevel.ron");
-        let map = Map::load(level_file);
-        println!("Map loaded: {:?}", map);
+        load_level(world);
     }
 
     fn update(

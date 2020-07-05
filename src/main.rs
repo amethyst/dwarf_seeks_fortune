@@ -10,6 +10,7 @@
 
 mod components;
 mod game_data;
+mod levels;
 mod resources;
 mod states;
 mod systems;

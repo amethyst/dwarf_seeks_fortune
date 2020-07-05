@@ -1,4 +1,3 @@
-use serde::{Deserialize, Serialize};
 use amethyst::{
     assets::{Completion, Handle, Prefab, PrefabLoader, ProgressCounter, RonFormat},
     ecs::prelude::Entity,
@@ -6,7 +5,9 @@ use amethyst::{
     renderer::{SpriteSheet, Texture},
     StateData, Trans,
 };
+use amethyst::core::math::Point2;
 use precompile::MyPrefabData;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Default, Debug)]
@@ -24,10 +25,10 @@ impl Assets {
         self.animated.insert(asset_type, asset);
     }
 
-    pub fn get_still(&self, asset_type: SpriteType) -> Handle<SpriteSheet> {
+    pub fn get_still(&self, asset_type: &SpriteType) -> Handle<SpriteSheet> {
         (*self
             .stills
-            .get(&asset_type)
+            .get(asset_type)
             .or_else(|| {
                 println!("Spritesheet asset {:?} is missing!", asset_type);
                 self.stills.get(&SpriteType::NotFound)
@@ -36,10 +37,10 @@ impl Assets {
             .clone()
     }
 
-    pub fn get_animated(&self, asset_type: AnimType) -> Handle<Prefab<MyPrefabData>> {
+    pub fn get_animated(&self, asset_type: &AnimType) -> Handle<Prefab<MyPrefabData>> {
         (*self
             .animated
-            .get(&asset_type)
+            .get(asset_type)
             .or_else(|| {
                 println!("Animation asset {:?} is missing!", asset_type);
                 self.animated.get(&AnimType::NotFound)
@@ -51,16 +52,17 @@ impl Assets {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum AssetType {
-    Still(SpriteType),
+    Still(SpriteType, usize),
     Animated(AnimType),
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum SpriteType {
     /// This is the fallback sprite to use if the desired sprite cannot be found.
     NotFound,
     Background,
     Frame,
+    Blocks,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
@@ -68,4 +70,21 @@ pub enum AnimType {
     /// The fallback animated asset to use if the desired asset could not be found.
     NotFound,
     Mob,
+}
+
+pub fn get_asset_dimensions(asset: &AssetType) -> Point2<i32> {
+    match asset {
+        AssetType::Still(sprite_type, _) => {
+            match sprite_type {
+                SpriteType::NotFound => Point2::new(128, 128),
+                SpriteType::Background => Point2::new(2449, 1632),
+                SpriteType::Frame => Point2::new(50, 50),
+                SpriteType::Blocks => Point2::new(128, 128),
+            }
+        }
+        AssetType::Animated(anim_type) => match anim_type {
+            AnimType::NotFound => Point2::new(128, 128),
+            AnimType::Mob => Point2::new(32, 32),
+        },
+    }
 }
