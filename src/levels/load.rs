@@ -1,26 +1,26 @@
-use amethyst::{
-    animation::{
-        AnimationCommand, AnimationControlSet, AnimationSet, EndControl, get_animation_set,
-    },
-    assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{Parent, transform::Transform},
-    ecs::{Entities, Entity, EntityBuilder, Join, prelude::World, ReadStorage, WriteStorage},
-    input::{get_key, InputEvent, is_close_requested, is_key_down, VirtualKeyCode},
-    prelude::*,
-    renderer::{
-        Camera, formats::texture::ImageFormat, palette::Srgba, resources::Tint,
-        sprite::SpriteRender, SpriteSheet, Texture,
-    },
-    StateData,
-    Trans,
-    utils::application_root_dir,
-    window::ScreenDimensions, winit::{Event, WindowEvent},
-};
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
+use amethyst::ui::UiPrefab;
 use amethyst::State;
 use amethyst::StateEvent;
-use amethyst::ui::UiPrefab;
+use amethyst::{
+    animation::{
+        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
+    },
+    assets::{AssetStorage, Handle, Loader, Prefab},
+    core::{transform::Transform, Parent},
+    ecs::{prelude::World, Entities, Entity, EntityBuilder, Join, ReadStorage, WriteStorage},
+    input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
+    prelude::*,
+    renderer::{
+        formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
+        Camera, SpriteSheet, Texture,
+    },
+    utils::application_root_dir,
+    window::ScreenDimensions,
+    winit::{Event, WindowEvent},
+    StateData, Trans,
+};
 use precompile::{AnimationId, MyPrefabData};
 
 use crate::components::*;
@@ -62,13 +62,17 @@ pub fn load_level(world: &mut World) {
                     let player = build_player(tile, builder);
                     build_frames(player, world);
                 }
-                _ => { builder.build(); }
+                _ => {
+                    builder.build();
+                }
             };
         });
 }
 
 fn build_frames(player: Entity, world: &mut World) {
-    let frame = world.read_resource::<Assets>().get_still(&SpriteType::Frame);
+    let frame = world
+        .read_resource::<Assets>()
+        .get_still(&SpriteType::Frame);
     let sprite_render = SpriteRender {
         sprite_sheet: frame,
         sprite_number: 0, // First sprite
@@ -90,7 +94,8 @@ fn build_frames(player: Entity, world: &mut World) {
 }
 
 fn build_player(tile: &Tile, builder: EntityBuilder) -> Entity {
-    builder.with(DiscretePos::default())
+    builder
+        .with(DiscretePos::default())
         .with(Velocity::default())
         .with(Steering::default())
         .with(PlayerTag)

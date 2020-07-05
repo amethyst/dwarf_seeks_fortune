@@ -1,3 +1,4 @@
+use amethyst::core::math::Point2;
 use amethyst::{
     assets::{Completion, Handle, Prefab, PrefabLoader, ProgressCounter, RonFormat},
     ecs::prelude::Entity,
@@ -5,7 +6,6 @@ use amethyst::{
     renderer::{SpriteSheet, Texture},
     StateData, Trans,
 };
-use amethyst::core::math::Point2;
 use precompile::MyPrefabData;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -34,7 +34,7 @@ impl Assets {
                 self.stills.get(&SpriteType::NotFound)
             })
             .expect(&format!("Fallback asset also missing.")))
-            .clone()
+        .clone()
     }
 
     pub fn get_animated(&self, asset_type: &AnimType) -> Handle<Prefab<MyPrefabData>> {
@@ -46,13 +46,16 @@ impl Assets {
                 self.animated.get(&AnimType::NotFound)
             })
             .expect(&format!("Fallback asset also missing!")))
-            .clone()
+        .clone()
     }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum AssetType {
+    /// A static, non-animated image.
+    /// Contains both a handle to the sprite sheet and the number of the sprite on the sheet.
     Still(SpriteType, usize),
+    /// An animated image.
     Animated(AnimType),
 }
 
@@ -72,16 +75,16 @@ pub enum AnimType {
     Mob,
 }
 
+/// Matches a still or animated asset to its dimensions in pixels. Required to calculate the
+/// correct scale factor for the entity to make it fit within its in-world bounds.
 pub fn get_asset_dimensions(asset: &AssetType) -> Point2<i32> {
     match asset {
-        AssetType::Still(sprite_type, _) => {
-            match sprite_type {
-                SpriteType::NotFound => Point2::new(128, 128),
-                SpriteType::Background => Point2::new(2449, 1632),
-                SpriteType::Frame => Point2::new(50, 50),
-                SpriteType::Blocks => Point2::new(128, 128),
-            }
-        }
+        AssetType::Still(sprite_type, _) => match sprite_type {
+            SpriteType::NotFound => Point2::new(128, 128),
+            SpriteType::Background => Point2::new(2449, 1632),
+            SpriteType::Frame => Point2::new(50, 50),
+            SpriteType::Blocks => Point2::new(128, 128),
+        },
         AssetType::Animated(anim_type) => match anim_type {
             AnimType::NotFound => Point2::new(128, 128),
             AnimType::Mob => Point2::new(32, 32),
