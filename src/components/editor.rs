@@ -87,7 +87,6 @@ impl Default for LineDirection {
     }
 }
 
-
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]

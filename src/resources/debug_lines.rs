@@ -29,23 +29,28 @@ pub fn setup_debug_lines(world: &mut World) {
     // Setup debug lines as a component and add lines to render axis&grid
     let mut debug_lines_component = DebugLinesComponent::new();
 
-    let (screen_w, screen_h) = {
-        let screen_dimensions = world.read_resource::<ScreenDimensions>();
-        (screen_dimensions.width(), screen_dimensions.height())
-    };
-
-    for y in (0..(screen_h as u16)).step_by(100).skip(1).map(f32::from) {
+    for y in (0..(100 as u16)).step_by(2).skip(1).map(f32::from) {
         debug_lines_component.add_line(
-            [0.0, y, 0.0].into(),
-            [screen_w, y, 0.0].into(),
+            [-100., y, 0.0].into(),
+            [100., y, 0.0].into(),
+            Srgba::new(0.3, 0.3, 0.3, 0.5),
+        );
+        debug_lines_component.add_line(
+            [-100., -y, 0.0].into(),
+            [100., -y, 0.0].into(),
             Srgba::new(0.3, 0.3, 0.3, 0.5),
         );
     }
 
-    for x in (0..(screen_w as u16)).step_by(100).skip(1).map(f32::from) {
+    for x in (0..(100 as u16)).step_by(2).skip(1).map(f32::from) {
         debug_lines_component.add_line(
-            [x, 0.0, 0.0].into(),
-            [x, screen_h, 0.0].into(),
+            [x, -100., 0.0].into(),
+            [x, 100., 0.0].into(),
+            Srgba::new(0.3, 0.3, 0.3, 0.5),
+        );
+        debug_lines_component.add_line(
+            [-x, -100., 0.0].into(),
+            [-x, 100., 0.0].into(),
             Srgba::new(0.3, 0.3, 0.3, 0.5),
         );
     }

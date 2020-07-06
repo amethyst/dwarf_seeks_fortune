@@ -49,10 +49,7 @@ impl<'s> System<'s> for RewindControlSystem {
             tint.0 = if *current_state == CurrentState::Running {
                 Srgba::new(1.0, 1.0, 1.0, 1.0)
             } else {
-                // let (r, g, b, a) = tint.0.into_components();
-                // let colour = 0.299 * r + 0.587 * g + 0.114 * b;
                 Srgba::new(0.1, 0.1, 0.1, 1.0)
-                // Srgba::new(0.299*, 0.587, 0.114, 1.0)
             };
         }
     }
@@ -85,12 +82,9 @@ impl<'s> System<'s> for RewindSystem {
                 )
                     .join()
                 {
-                    transform.set_translation_x(frame.player_position.x as f32 * 50. + 50.);
+                    transform.set_translation_x(frame.player_position.x as f32 + 1.);
                     *pos = frame.player_position;
                     steering.destination = frame.player_position;
-                    // transform.set_translation_y(
-                    //     frame.player_pos.y * 50 + 50),
-                    // );
                 }
             }
         }

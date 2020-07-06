@@ -1,6 +1,6 @@
 use crate::components::*;
 use amethyst::{
-    core::{transform::Transform, Parent},
+    core::{math::Vector3, transform::Transform, Parent},
     ecs::Entity,
     prelude::{Builder, World, WorldExt},
     renderer::{
@@ -32,6 +32,7 @@ pub fn create_camera_under_parent(world: &mut World, parent: Entity) {
 pub fn initialise_camera_frame(world: &mut World) -> Entity {
     let mut transform = Transform::default();
     transform.set_translation_xyz(0.0, 0.0, 10.0);
+    transform.set_scale(Vector3::new(1. / 50., 1. / 50., 1.0));
     world
         .create_entity()
         .with(CameraFrameTag::default())

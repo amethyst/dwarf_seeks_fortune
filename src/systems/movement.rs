@@ -78,7 +78,7 @@ impl<'s> System<'s> for PlayerSystem {
             if input_x.abs() > f32::EPSILON {
                 steering.direction = input_x;
                 let offset_from_discrete_pos =
-                    (discrete_pos.x * 50) as f32 - (transform.translation().x - 50.);
+                    discrete_pos.x as f32 - (transform.translation().x - 1.);
                 if offset_from_discrete_pos < f32::EPSILON && input_x > f32::EPSILON {
                     steering.destination.x = discrete_pos.x + 1;
                 } else if offset_from_discrete_pos > -f32::EPSILON && input_x < f32::EPSILON {
@@ -89,7 +89,7 @@ impl<'s> System<'s> for PlayerSystem {
                 }
             }
 
-            let desired_pos = steering.destination.x as f32 * 50.0 + 50.0;
+            let desired_pos = steering.destination.x as f32 + 1.0;
             let delta = desired_pos - transform.translation().x;
             let delta_signum = if delta.abs() < f32::EPSILON {
                 0.0
@@ -100,19 +100,13 @@ impl<'s> System<'s> for PlayerSystem {
                 velocity.x = delta_signum * config.player_speed;
             } else {
                 velocity.x = 0.0;
-                transform.set_translation_x((discrete_pos.x * 50 + 50) as f32);
+                transform.set_translation_x((discrete_pos.x + 1) as f32);
             }
         }
     }
 }
 
 fn calc_discrete_pos_x(transform: &Transform) -> i32 {
-    let actual_pos_x = transform.translation().x as i32;
-    let base_pos = (actual_pos_x - 50).div_euclid(50);
-    let pos_remainder = actual_pos_x.rem_euclid(50);
-    if pos_remainder > 25 {
-        base_pos + 1
-    } else {
-        base_pos
-    }
+    let anchor_pos_x = transform.translation().x - 1.;
+    anchor_pos_x.round() as i32
 }

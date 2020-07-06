@@ -160,10 +160,10 @@ fn init_cursor(world: &mut World) -> Entity {
         .with(Selection::default())
         .build();
     let mut transform = Transform::default();
-    transform.set_translation_xyz(50. / 2., 50. / 2., 2.0);
+    transform.set_translation_xyz(0.5, 0.5, 2.0);
     transform.set_scale(Vector3::new(
-        50. / asset_dimensions.x as f32,
-        50. / asset_dimensions.y as f32,
+        1. / asset_dimensions.x as f32,
+        1. / asset_dimensions.y as f32,
         1.0,
     ));
     world

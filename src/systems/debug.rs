@@ -31,12 +31,12 @@ impl<'s> System<'s> for DebugSystem {
             .nth(0);
         if let Some((pos, destination)) = maybe_destination {
             for (_, transform) in (&steering_ghost_tags, &mut transforms).join() {
-                transform.set_translation_x((destination.x * 50 + 50) as f32);
-                transform.set_translation_y((destination.y * 50 + 50) as f32);
+                transform.set_translation_x(destination.x as f32 + 1.0);
+                transform.set_translation_y(destination.y as f32 + 1.0);
             }
             for (_, transform) in (&pos_ghost_tags, &mut transforms).join() {
-                transform.set_translation_x((pos.x * 50 + 25) as f32);
-                transform.set_translation_y((pos.y * 50 + 25) as f32);
+                transform.set_translation_x(pos.x as f32 + 0.5);
+                transform.set_translation_y(pos.y as f32 + 0.5);
             }
         }
     }

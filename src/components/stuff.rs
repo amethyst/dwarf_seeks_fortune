@@ -124,9 +124,9 @@ impl Default for CameraFrameTag {
     fn default() -> Self {
         CameraFrameTag {
             pan: Vector2::new(0., 0.),
-            max_pan: 250.,
-            panning_speed: 500.,
-            panning_recovery_speed: 2000.,
+            max_pan: 5.,
+            panning_speed: 10.,
+            panning_recovery_speed: 40.,
         }
     }
 }
