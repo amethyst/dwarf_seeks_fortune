@@ -86,3 +86,13 @@ impl Default for LineDirection {
         LineDirection::Neutral
     }
 }
+
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub struct PaintedTileTag;
+
+impl Component for PaintedTileTag {
+    type Storage = NullStorage<Self>;
+}

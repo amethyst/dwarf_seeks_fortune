@@ -73,6 +73,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                 entity_type: EntityType::DestructableTerrain,
             },
         });
+        world.insert(Map::default());
     }
 
     fn update(

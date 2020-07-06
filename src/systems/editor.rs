@@ -2,7 +2,7 @@ use amethyst::{
     core::math::Vector3,
     core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
+    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage, Entities},
     input::{InputHandler, StringBindings},
     window::ScreenDimensions,
 };
@@ -10,6 +10,7 @@ use amethyst::{
 use crate::components::*;
 use crate::resources::*;
 use std::cmp::min;
+use crate::levels::Map;
 
 pub struct CursorSystem;
 
@@ -28,7 +29,7 @@ impl<'s> System<'s> for CursorSystem {
         (mut transforms, mut discrete_positions, mut cursors, input, time, config): Self::SystemData,
     ) {
         for (cursor, transform, discrete_pos) in
-            (&mut cursors, &mut transforms, &mut discrete_positions).join()
+        (&mut cursors, &mut transforms, &mut discrete_positions).join()
         {
             let input_x = input.axis_value("move_x").unwrap_or(0.0);
             let input_y = input.axis_value("move_y").unwrap_or(0.0);
@@ -116,18 +117,19 @@ pub struct TilePaintSystem;
 
 impl<'s> System<'s> for TilePaintSystem {
     type SystemData = (
-        // Entities<'s>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, DiscretePos>,
         WriteStorage<'s, Cursor>,
         WriteStorage<'s, Selection>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
+        Write<'s, Map>,
+        Entities<'s>,
     );
 
     fn run(
         &mut self,
-        (mut transforms, mut discrete_positions, mut cursors, mut selections, input, time): Self::SystemData,
+        (mut transforms, mut discrete_positions, mut cursors, mut selections, input, time, map, entities): Self::SystemData,
     ) {
         let enter = input.action_is_down("enter").unwrap_or(false);
         if !enter {
