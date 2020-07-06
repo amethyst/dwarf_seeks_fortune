@@ -1,4 +1,3 @@
-use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
 use amethyst::ui::UiPrefab;
 use amethyst::State;
@@ -8,13 +7,17 @@ use amethyst::{
         get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
     },
     assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{transform::Transform, Parent},
+    core::{
+        math::{Point2, Vector3},
+        transform::Transform,
+        Parent,
+    },
     ecs::{prelude::World, Entities, Entity, Join, ReadStorage, WriteStorage},
     input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
     prelude::*,
     renderer::{
         formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
-        Camera, SpriteSheet, Texture,
+        Camera, SpriteSheet, Texture, Transparent,
     },
     utils::application_root_dir,
     window::ScreenDimensions,
@@ -62,8 +65,14 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         let StateData { world, .. } = data;
         setup_debug_lines(world);
         let cursor = init_cursor(world);
-        // create_camera_under_parent(world, cursor);
         create_camera(world);
+        world.insert(Brush {
+            tile: TileType {
+                dimens: Point2::new(1, 1),
+                asset: AssetType::Still(SpriteType::Blocks, 0),
+                entity_type: EntityType::DestructableTerrain,
+            },
+        });
     }
 
     fn update(
@@ -137,17 +146,20 @@ fn init_cursor(world: &mut World) -> Entity {
         .read_resource::<Assets>()
         .get_still(&SpriteType::Selection);
     let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 0));
+    let mut selection_transform = Transform::default();
+    selection_transform.set_translation_z(1.0);
     world
         .create_entity()
         .with(SpriteRender {
             sprite_sheet: sprite_handle.clone(),
             sprite_number: 1,
         })
-        .with(Transform::default())
+        .with(Transparent)
+        .with(selection_transform)
         .with(Selection::default())
         .build();
     let mut transform = Transform::default();
-    transform.set_translation_xyz(50. / 2., 50. / 2., 0.0);
+    transform.set_translation_xyz(50. / 2., 50. / 2., 2.0);
     transform.set_scale(Vector3::new(
         50. / asset_dimensions.x as f32,
         50. / asset_dimensions.y as f32,
@@ -159,6 +171,7 @@ fn init_cursor(world: &mut World) -> Entity {
             sprite_sheet: sprite_handle,
             sprite_number: 0,
         })
+        .with(Transparent)
         .with(transform)
         .with(DiscretePos::default())
         .with(Cursor::default())

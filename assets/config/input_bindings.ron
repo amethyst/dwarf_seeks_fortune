@@ -11,5 +11,6 @@
       "slowDown": [[Key(Subtract)]],
       "rewind": [[Key(Z)]],
       "shift": [[Key(LShift)]],
+      "enter": [[Key(Return)]],
   },
 )

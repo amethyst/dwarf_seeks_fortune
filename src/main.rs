@@ -43,13 +43,16 @@ fn make_game() -> amethyst::Result<()> {
     let assets_dir = app_root.join("assets/");
     let config_dir = assets_dir.join("config/");
     let display_config_path = config_dir.join("display.ron");
-    let config_path = config_dir.join("debug_config.ron");
+    let debug_config_path = config_dir.join("debug_config.ron");
+    let editor_config_path = config_dir.join("editor_config.ron");
     let bindings_config_path = config_dir.join("input_bindings.ron");
 
     let mut app_builder = Application::build(assets_dir, states::LoadingState::default())?;
 
-    let config = DebugConfig::load(&config_path)?;
-    app_builder.world.insert(config);
+    let debug_config = DebugConfig::load(&debug_config_path)?;
+    let editor_config = EditorConfig::load(&editor_config_path)?;
+    app_builder.world.insert(debug_config);
+    app_builder.world.insert(editor_config);
     let game_data = CustomGameDataBuilder::default()
         .with_base_bundle(
             &mut app_builder.world,
@@ -79,7 +82,6 @@ fn make_game() -> amethyst::Result<()> {
             "player_system",
             &["input_system"],
         )
-        .with_core(systems::SpawnSystem::new(), "spawn_system", &[])
         .with_core(systems::DebugSystem, "debug_system", &["input_system"])
         .with_core(systems::CameraSystem, "camera_system", &[])
         .with_core(
@@ -103,6 +105,11 @@ fn make_game() -> amethyst::Result<()> {
             systems::SelectionSystem,
             "selection_system",
             &["cursor_system"],
+        )
+        .with_core(
+            systems::TilePaintSystem,
+            "tile_paint_system",
+            &["selection_system"],
         )
         .with_base_bundle(
             &mut app_builder.world,
