@@ -98,7 +98,7 @@ fn make_game() -> amethyst::Result<()> {
             &["rewind_control_system", "input_system"],
         )
         .with_core(systems::ResizeSystem, "resize_system", &[])
-        .with_core(systems::CursorSystem::default(), "cursor_system", &[])
+        .with_core(systems::CursorSystem, "cursor_system", &[])
         .with_base_bundle(
             &mut app_builder.world,
             PrecompiledRenderBundle {

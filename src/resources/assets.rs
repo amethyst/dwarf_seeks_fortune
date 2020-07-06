@@ -66,6 +66,7 @@ pub enum SpriteType {
     Background,
     Frame,
     Blocks,
+    Selection,
 }
 
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
@@ -80,10 +81,9 @@ pub enum AnimType {
 pub fn get_asset_dimensions(asset: &AssetType) -> Point2<i32> {
     match asset {
         AssetType::Still(sprite_type, _) => match sprite_type {
-            SpriteType::NotFound => Point2::new(128, 128),
             SpriteType::Background => Point2::new(2449, 1632),
             SpriteType::Frame => Point2::new(50, 50),
-            SpriteType::Blocks => Point2::new(128, 128),
+            _ => Point2::new(128, 128),
         },
         AssetType::Animated(anim_type) => match anim_type {
             AnimType::NotFound => Point2::new(128, 128),

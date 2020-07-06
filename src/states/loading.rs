@@ -82,6 +82,15 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                 &mut self.progress,
             ),
         );
+        assets.put_still(
+            SpriteType::Selection,
+            load_spritesheet(
+                "textures/selection.png",
+                "prefab/still_selection.ron",
+                data.world,
+                &mut self.progress,
+            ),
+        );
         assets.put_animated(
             AnimType::NotFound,
             load_animation("prefab/anim_not_found.ron", data.world, &mut self.progress),

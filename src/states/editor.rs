@@ -36,6 +36,9 @@ use crate::states::PausedState;
 /// Brush (contains block-type)
 /// When holding shift, should do multi-select (ideally only if block allows it)
 /// Camera follows cursor?
+/// Undo function
+/// Layers?
+///
 pub struct EditorState {
     fps_ui: Handle<UiPrefab>,
 }
@@ -130,15 +133,24 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
 }
 
 fn init_cursor(world: &mut World) -> Entity {
-    let sprite_handle = world.read_resource::<Assets>().get_still(&SpriteType::Frame);
+    let sprite_handle = world
+        .read_resource::<Assets>()
+        .get_still(&SpriteType::Selection);
+    let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 0));
+    let mut transform = Transform::default();
+    transform.set_scale(Vector3::new(
+        50. / asset_dimensions.x as f32,
+        50. / asset_dimensions.y as f32,
+        1.0,
+    ));
     world
         .create_entity()
         .with(SpriteRender {
             sprite_sheet: sprite_handle,
             sprite_number: 0,
         })
-        .with(Transform::default())
+        .with(transform)
         .with(DiscretePos::default())
-        .with(CursorTag)
+        .with(Cursor::default())
         .build()
 }
