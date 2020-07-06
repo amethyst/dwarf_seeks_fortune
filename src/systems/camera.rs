@@ -67,12 +67,11 @@ pub struct CameraSystem;
 impl<'s> System<'s> for CameraSystem {
     type SystemData = (
         ReadStorage<'s, PlayerTag>,
-        ReadStorage<'s, CursorTag>,
         ReadStorage<'s, CameraFrameTag>,
         WriteStorage<'s, Transform>,
     );
 
-    fn run(&mut self, (players, cursors, camera_frames, mut transforms): Self::SystemData) {
+    fn run(&mut self, (players, camera_frames, mut transforms): Self::SystemData) {
         let maybe_player_pos = (&players, &transforms)
             .join()
             .map(|(_, transform)| (transform.translation().x, transform.translation().y))
@@ -82,18 +81,19 @@ impl<'s> System<'s> for CameraSystem {
                 transform.set_translation_x(player_x + frame.pan.x);
                 transform.set_translation_y(player_y + frame.pan.y);
             }
-        } else {
-            let maybe_cursor_pos = (&cursors, &transforms)
-                .join()
-                .map(|(_, transform)| (transform.translation().x, transform.translation().y))
-                .next();
-            if let Some((cursor_x, cursor_y)) = maybe_cursor_pos {
-                for (frame, transform) in (&camera_frames, &mut transforms).join() {
-                    transform.set_translation_x(cursor_x + frame.pan.x);
-                    transform.set_translation_y(cursor_y + frame.pan.y);
-                }
-            }
         }
+        // else {
+        //     let maybe_cursor_pos = (&cursors, &transforms)
+        //         .join()
+        //         .map(|(_, transform)| (transform.translation().x, transform.translation().y))
+        //         .next();
+        //     if let Some((cursor_x, cursor_y)) = maybe_cursor_pos {
+        //         for (frame, transform) in (&camera_frames, &mut transforms).join() {
+        //             transform.set_translation_x(cursor_x + frame.pan.x);
+        //             transform.set_translation_y(cursor_y + frame.pan.y);
+        //         }
+        //     }
+        // }
     }
 }
 

@@ -3,8 +3,6 @@
     "move_y": Emulated(pos: Key(W), neg: Key(S)),
     "move_x": Emulated(pos: Key(D), neg: Key(A)),
     "zoom": MouseWheel(horizontal: false),
-//    "pan_x":Emulated(pos: Key(L),neg:Key(J)),
-//    "pan_y":Emulated(pos: Key(I),neg:Key(K)),
     "pan_x":Emulated(pos: Key(Right),neg:Key(Left)),
     "pan_y":Emulated(pos: Key(Up),neg:Key(Down)),
   },
@@ -12,5 +10,6 @@
       "speedUp": [[Key(Add)]],
       "slowDown": [[Key(Subtract)]],
       "rewind": [[Key(Z)]],
+      "shift": [[Key(LShift)]],
   },
 )

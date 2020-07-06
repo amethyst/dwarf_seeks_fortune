@@ -1,4 +1,5 @@
 use amethyst::{
+    core::math::Vector3,
     core::timing::Time,
     core::transform::Transform,
     ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
@@ -8,6 +9,7 @@ use amethyst::{
 
 use crate::components::*;
 use crate::resources::*;
+use std::cmp::min;
 
 const COOLDOWN_HIGH: f32 = 0.5;
 const COOLDOWN_LOW: f32 = 0.05;
@@ -62,6 +64,49 @@ impl<'s> System<'s> for CursorSystem {
                 }
             }
             cursor.last_direction = new_direction;
+        }
+    }
+}
+
+pub struct SelectionSystem;
+
+impl<'s> System<'s> for SelectionSystem {
+    type SystemData = (
+        WriteStorage<'s, Transform>,
+        WriteStorage<'s, DiscretePos>,
+        WriteStorage<'s, Cursor>,
+        WriteStorage<'s, Selection>,
+        Read<'s, InputHandler<StringBindings>>,
+        Read<'s, Time>,
+    );
+
+    fn run(
+        &mut self,
+        (mut transforms, mut discrete_positions, mut cursors, mut selections, input, time): Self::SystemData,
+    ) {
+        let cursor_data = (&mut cursors, &mut discrete_positions)
+            .join()
+            .map(|(cursor, pos)| (cursor.last_direction, (pos.x, pos.y)))
+            .next();
+        if let Some((direction, (x, y))) = cursor_data {
+            let shift = input.action_is_down("shift").unwrap_or(false);
+            for (selection, transform) in (&mut selections, &mut transforms).join() {
+                if !shift && !direction.is_neutral() {
+                    selection.start = DiscretePos::new(x, y);
+                }
+                let width = (selection.start.x - x).abs() + 1;
+                let height = (selection.start.y - y).abs() + 1;
+                transform.set_scale(Vector3::new(
+                    (width as f32 * 50.) / 128.,
+                    (height as f32 * 50.) / 128.,
+                    1.0,
+                ));
+                transform.set_translation_xyz(
+                    (width as f32 * 25.) + (min(selection.start.x, x) as f32 * 50.),
+                    (height as f32 * 25.) + (min(selection.start.y, y) as f32 * 50.),
+                    0.0,
+                );
+            }
         }
     }
 }

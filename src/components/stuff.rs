@@ -47,6 +47,12 @@ pub struct DiscretePos {
     pub y: i32,
 }
 
+impl DiscretePos {
+    pub fn new(x: i32, y: i32) -> Self {
+        DiscretePos { x, y }
+    }
+}
+
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]

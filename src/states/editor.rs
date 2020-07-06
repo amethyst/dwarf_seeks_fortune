@@ -137,7 +137,17 @@ fn init_cursor(world: &mut World) -> Entity {
         .read_resource::<Assets>()
         .get_still(&SpriteType::Selection);
     let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 0));
+    world
+        .create_entity()
+        .with(SpriteRender {
+            sprite_sheet: sprite_handle.clone(),
+            sprite_number: 1,
+        })
+        .with(Transform::default())
+        .with(Selection::default())
+        .build();
     let mut transform = Transform::default();
+    transform.set_translation_xyz(50. / 2., 50. / 2., 0.0);
     transform.set_scale(Vector3::new(
         50. / asset_dimensions.x as f32,
         50. / asset_dimensions.y as f32,

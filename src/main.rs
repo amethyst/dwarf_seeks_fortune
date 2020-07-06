@@ -99,6 +99,11 @@ fn make_game() -> amethyst::Result<()> {
         )
         .with_core(systems::ResizeSystem, "resize_system", &[])
         .with_core(systems::CursorSystem, "cursor_system", &[])
+        .with_core(
+            systems::SelectionSystem,
+            "selection_system",
+            &["cursor_system"],
+        )
         .with_base_bundle(
             &mut app_builder.world,
             PrecompiledRenderBundle {
