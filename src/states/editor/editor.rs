@@ -31,6 +31,8 @@ use crate::entities::*;
 use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
+use crate::states::editor::paint::paint_tiles;
+use crate::states::editor::save::save;
 use crate::states::PausedState;
 
 /// TODO:
@@ -125,12 +127,25 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
             // Ui event. Button presses, mouse hover, etc...
             StateEvent::Ui(_) => Trans::None,
             StateEvent::Input(input_event) => {
-                // println!("Input event detected! {:?}", input_event);
-                if let InputEvent::ActionPressed(action) = input_event {
-                    self.handle_action(&action, data.world)
-                } else {
-                    Trans::None
-                }
+                match input_event {
+                    InputEvent::KeyReleased {
+                        key_code: VirtualKeyCode::Return,
+                        scancode: _,
+                    } => {
+                        paint_tiles(data.world);
+                    }
+                    InputEvent::KeyReleased {
+                        key_code: VirtualKeyCode::F5,
+                        scancode: _,
+                    } => {
+                        save(data.world);
+                    }
+                    InputEvent::ActionPressed(action) => {
+                        self.handle_action(&action, data.world);
+                    }
+                    _ => (),
+                };
+                Trans::None
             }
         }
     }

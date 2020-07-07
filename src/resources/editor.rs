@@ -3,6 +3,7 @@ use crate::levels::*;
 use crate::resources::*;
 use amethyst::core::math::Point2;
 use serde::{Deserialize, Serialize};
+use std::cmp::min;
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
@@ -42,4 +43,16 @@ pub struct Selector {
     pub start: DiscretePos,
     /// Inclusive bound. The end point of the selection is always set to the current location of the cursor.
     pub end: DiscretePos,
+}
+
+impl Selector {
+    pub fn lower_bounds(&self) -> Point2<i32> {
+        Point2::new(min(self.start.x, self.end.x), min(self.start.y, self.end.y))
+    }
+    pub fn dimens(&self) -> Point2<i32> {
+        Point2::new(
+            (self.start.x - self.end.x).abs() + 1,
+            (self.start.y - self.end.y).abs() + 1,
+        )
+    }
 }

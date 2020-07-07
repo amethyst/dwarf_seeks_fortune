@@ -37,6 +37,7 @@ impl Health {
     }
 }
 
+// TODO: Maybe remove for a Point2, or rename to Pos?
 #[derive(
     Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq, Eq,
 )]

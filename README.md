@@ -20,3 +20,6 @@ TODO:
 - Break 1 / 2 blocks horizontally
 - Break 1 / 2 blocks below
 - Moveable blocks
+
+Level bounds:
+- Create clear distinction between what is inside level and what is outside, by using different background. For now, always use rectangular shape.

@@ -37,19 +37,21 @@ pub fn load_level(world: &mut World) {
         .expect("Root dir not found!")
         .join("assets/")
         .join("tiles/")
-        .join("testlevel.ron");
+        .join("generated.ron");
     let map = Map::load(level_file);
     // println!("Map loaded: {:?}", map);
     //TODO: handle map loading error gracefully.
     map.expect("Failed to load map.")
+        .layers
+        .get(0)
+        .expect("Map should have one layer!")
         .tiles
         .iter()
-        .for_each(|tile| {
+        .for_each(|(pos, tile)| {
             // println!("Tile: {:?}", tile);
             let still_asset = load_still_asset(tile, &world);
             let anim_asset = load_anim_asset(tile, &world);
-            let transform =
-                load_transform(&tile.pos, &tile.tile_type.dimens, &tile.tile_type.asset);
+            let transform = load_transform(&pos, &tile.dimens, &tile.asset);
             let mut builder = world.create_entity();
             if let Some(still_asset) = still_asset {
                 builder = builder.with(still_asset);
@@ -58,7 +60,7 @@ pub fn load_level(world: &mut World) {
                 builder = builder.with(anim_asset);
             }
             builder = builder.with(transform);
-            match tile.tile_type.entity_type {
+            match tile.entity_type {
                 EntityType::Player => {
                     let player = build_player(builder);
                     build_frames(player, world);
@@ -132,8 +134,8 @@ pub(crate) fn load_transform(
     transform
 }
 
-fn load_still_asset(tile: &Tile, world: &World) -> Option<SpriteRender> {
-    match &tile.tile_type.asset {
+fn load_still_asset(tile: &TileType, world: &World) -> Option<SpriteRender> {
+    match &tile.asset {
         AssetType::Animated(anim) => None,
         AssetType::Still(spritesheet, sprite_nr) => {
             let handle = world.read_resource::<Assets>().get_still(&spritesheet);
@@ -145,8 +147,8 @@ fn load_still_asset(tile: &Tile, world: &World) -> Option<SpriteRender> {
     }
 }
 
-fn load_anim_asset(tile: &Tile, world: &World) -> Option<Handle<Prefab<MyPrefabData>>> {
-    match &tile.tile_type.asset {
+fn load_anim_asset(tile: &TileType, world: &World) -> Option<Handle<Prefab<MyPrefabData>>> {
+    match &tile.asset {
         AssetType::Animated(anim) => {
             let handle = world.read_resource::<Assets>().get_animated(&anim);
             Some(handle)

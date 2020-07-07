@@ -1,12 +1,38 @@
 use crate::resources::*;
 use amethyst::core::math::Point2;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(default)]
+#[serde(deny_unknown_fields)]
+pub struct Map {
+    pub layers: Vec<TileLayer>,
+}
+
+impl Default for Map {
+    fn default() -> Self {
+        Map {
+            layers: vec![TileLayer::default()],
+        }
+    }
+}
+
+impl Map {
+    pub fn put_tile(&mut self, pos: Point2<i32>, tile: TileType) {
+        self.layers
+            .get_mut(0)
+            .expect("There should be at least 1 layer in this Map.")
+            .tiles
+            .insert(pos, tile);
+    }
+}
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
-pub struct Map {
-    pub tiles: Vec<Tile>,
+pub struct TileLayer {
+    pub tiles: HashMap<Point2<i32>, TileType>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
