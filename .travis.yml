@@ -1,0 +1,5 @@
+language: rust
+before_script:
+- rustup component add rustfmt
+script:
+- cargo fmt -- --check

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/Jazarro/towerdef.svg?branch=master)](https://travis-ci.com/Jazarro/towerdef)
+
 # towerdef (Working title)
 
 Design goals:
