@@ -1,7 +1,6 @@
 use crate::components::*;
 use crate::levels::*;
 use crate::resources::*;
-use amethyst::core::math::Point2;
 use serde::{Deserialize, Serialize};
 use std::cmp::min;
 
@@ -29,7 +28,7 @@ impl Default for Brush {
     fn default() -> Self {
         Brush {
             tile: TileType {
-                dimens: Point2::new(1, 1),
+                dimens: Pos::new(1, 1),
                 asset: AssetType::Still(SpriteType::Blocks, 0),
                 entity_type: EntityType::DestructableTerrain,
             },
@@ -40,17 +39,17 @@ impl Default for Brush {
 #[derive(Debug, Default)]
 pub struct Selector {
     /// Inclusive bound.
-    pub start: DiscretePos,
+    pub start: Pos,
     /// Inclusive bound. The end point of the selection is always set to the current location of the cursor.
-    pub end: DiscretePos,
+    pub end: Pos,
 }
 
 impl Selector {
-    pub fn lower_bounds(&self) -> Point2<i32> {
-        Point2::new(min(self.start.x, self.end.x), min(self.start.y, self.end.y))
+    pub fn lower_bounds(&self) -> Pos {
+        Pos::new(min(self.start.x, self.end.x), min(self.start.y, self.end.y))
     }
-    pub fn dimens(&self) -> Point2<i32> {
-        Point2::new(
+    pub fn dimens(&self) -> Pos {
+        Pos::new(
             (self.start.x - self.end.x).abs() + 1,
             (self.start.y - self.end.y).abs() + 1,
         )

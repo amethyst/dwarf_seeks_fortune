@@ -118,7 +118,7 @@ pub struct TilePaintSystem;
 impl<'s> System<'s> for TilePaintSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
-        WriteStorage<'s, DiscretePos>,
+        WriteStorage<'s, Pos>,
         WriteStorage<'s, Cursor>,
         WriteStorage<'s, SelectionTag>,
         WriteStorage<'s, PaintedTileTag>,

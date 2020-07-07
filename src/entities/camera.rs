@@ -35,7 +35,7 @@ pub fn initialise_camera_frame(world: &mut World) -> Entity {
     transform.set_scale(Vector3::new(1. / 50., 1. / 50., 1.0));
     world
         .create_entity()
-        .with(CameraFrameTag::default())
+        .with(CameraFrame::default())
         .with(transform)
         .build()
 }

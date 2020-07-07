@@ -1,4 +1,4 @@
-use crate::components::DiscretePos;
+use crate::components::Pos;
 use crate::levels::*;
 use amethyst::{
     assets::PrefabData,

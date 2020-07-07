@@ -32,7 +32,7 @@ pub struct PlayerSystem;
 impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
-        WriteStorage<'s, DiscretePos>,
+        WriteStorage<'s, Pos>,
         WriteStorage<'s, Steering>,
         WriteStorage<'s, Velocity>,
         ReadStorage<'s, PlayerTag>,

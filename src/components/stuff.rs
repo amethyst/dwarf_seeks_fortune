@@ -23,34 +23,19 @@ impl Velocity {
     }
 }
 
-#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
-#[prefab(Component)]
-#[serde(deny_unknown_fields)]
-pub struct Health {
-    hp: u32,
-    max_hp: u32,
-}
-
-impl Health {
-    pub fn new(max_hp: u32) -> Health {
-        Health { hp: max_hp, max_hp }
-    }
-}
-
-// TODO: Maybe remove for a Point2, or rename to Pos?
 #[derive(
-    Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq, Eq,
+    Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq, Eq, Hash,
 )]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
-pub struct DiscretePos {
+pub struct Pos {
     pub x: i32,
     pub y: i32,
 }
 
-impl DiscretePos {
+impl Pos {
     pub fn new(x: i32, y: i32) -> Self {
-        DiscretePos { x, y }
+        Pos { x, y }
     }
 }
 
@@ -59,11 +44,11 @@ impl DiscretePos {
 #[serde(deny_unknown_fields)]
 pub struct Steering {
     pub direction: f32,
-    pub destination: DiscretePos,
+    pub destination: Pos,
 }
 
 impl Steering {
-    pub fn new(destination: DiscretePos) -> Steering {
+    pub fn new(destination: Pos) -> Steering {
         Steering {
             direction: 0.0,
             destination,
@@ -107,7 +92,7 @@ impl Component for DebugSteeringGhostTag {
 /// (no offset). If there is camera shake, that will be done through this offset.
 #[derive(Clone, Copy, Debug, Component, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
-pub struct CameraFrameTag {
+pub struct CameraFrame {
     /// Player will be able to pan the camera around to a limited degree.
     /// This is the current offset from the camera's default position.
     pub pan: Vector2<f32>,
@@ -121,9 +106,9 @@ pub struct CameraFrameTag {
     pub panning_recovery_speed: f32,
 }
 
-impl Default for CameraFrameTag {
+impl Default for CameraFrame {
     fn default() -> Self {
-        CameraFrameTag {
+        CameraFrame {
             pan: Vector2::new(0., 0.),
             max_pan: 5.,
             panning_speed: 10.,

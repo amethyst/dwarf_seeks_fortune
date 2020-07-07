@@ -60,7 +60,7 @@ pub struct RewindSystem;
 impl<'s> System<'s> for RewindSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
-        WriteStorage<'s, DiscretePos>,
+        WriteStorage<'s, Pos>,
         WriteStorage<'s, Steering>,
         ReadStorage<'s, PlayerTag>,
         Read<'s, Rewind>,

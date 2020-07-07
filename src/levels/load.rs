@@ -7,11 +7,7 @@ use amethyst::{
         get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
     },
     assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{
-        math::{Point2, Vector3},
-        transform::Transform,
-        Parent,
-    },
+    core::{math::Vector3, transform::Transform, Parent},
     ecs::{prelude::World, Entities, Entity, EntityBuilder, Join, ReadStorage, WriteStorage},
     input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
     prelude::*,
@@ -82,8 +78,8 @@ fn build_frames(player: Entity, world: &mut World) {
     };
 
     let steering_ghost_transform = load_transform(
-        &Point2::new(0, 0),
-        &Point2::new(2, 2),
+        &Pos::new(0, 0),
+        &Pos::new(2, 2),
         &AssetType::Still(SpriteType::Frame, 0),
     );
     world
@@ -93,8 +89,8 @@ fn build_frames(player: Entity, world: &mut World) {
         .with(DebugSteeringGhostTag)
         .build();
     let pos_ghost_transform = load_transform(
-        &Point2::new(0, 0),
-        &Point2::new(1, 1),
+        &Pos::new(0, 0),
+        &Pos::new(1, 1),
         &AssetType::Still(SpriteType::Frame, 0),
     );
     world
@@ -107,18 +103,14 @@ fn build_frames(player: Entity, world: &mut World) {
 
 fn build_player(builder: EntityBuilder) -> Entity {
     builder
-        .with(DiscretePos::default())
+        .with(Pos::default())
         .with(Velocity::default())
         .with(Steering::default())
         .with(PlayerTag)
         .build()
 }
 
-pub(crate) fn load_transform(
-    pos: &Point2<i32>,
-    dimens: &Point2<i32>,
-    asset: &AssetType,
-) -> Transform {
+pub(crate) fn load_transform(pos: &Pos, dimens: &Pos, asset: &AssetType) -> Transform {
     let asset_dimensions = get_asset_dimensions(&asset);
     let mut transform = Transform::default();
     transform.set_translation_xyz(

@@ -12,7 +12,7 @@ pub struct DebugSystem;
 impl<'s> System<'s> for DebugSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
-        ReadStorage<'s, DiscretePos>,
+        ReadStorage<'s, Pos>,
         ReadStorage<'s, Steering>,
         ReadStorage<'s, PlayerTag>,
         ReadStorage<'s, DebugPosGhostTag>,

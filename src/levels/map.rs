@@ -1,5 +1,5 @@
+use crate::components::Pos;
 use crate::resources::*;
-use amethyst::core::math::Point2;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -19,7 +19,7 @@ impl Default for Map {
 }
 
 impl Map {
-    pub fn put_tile(&mut self, pos: Point2<i32>, tile: TileType) {
+    pub fn put_tile(&mut self, pos: Pos, tile: TileType) {
         self.layers
             .get_mut(0)
             .expect("There should be at least 1 layer in this Map.")
@@ -32,7 +32,7 @@ impl Map {
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileLayer {
-    pub tiles: HashMap<Point2<i32>, TileType>,
+    pub tiles: HashMap<Pos, TileType>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -40,7 +40,7 @@ pub struct Tile {
     /// The position of the tile in tile coordinates.
     /// If this tile is more than 1x1 in width/height, then the position describes the
     /// bottom-left block in the tile.
-    pub pos: Point2<i32>,
+    pub pos: Pos,
     pub tile_type: TileType,
 }
 
@@ -48,7 +48,7 @@ pub struct Tile {
 pub struct TileType {
     /// The width and height of the tile in tile coordinates.
     /// Most tiles will be 1 by 1. Some tiles, like mobs, may be 2 by 2.
-    pub dimens: Point2<i32>,
+    pub dimens: Pos,
     /// Which asset to draw on the screen? Will be stretched to fit the width and height
     /// set in 'dimens'.
     pub asset: AssetType,

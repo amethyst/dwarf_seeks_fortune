@@ -32,11 +32,11 @@ impl History {
 
 #[derive(Debug)]
 pub struct Frame {
-    pub player_position: DiscretePos,
+    pub player_position: Pos,
 }
 
 impl Frame {
-    pub fn new(player_position: DiscretePos) -> Self {
+    pub fn new(player_position: Pos) -> Self {
         Frame { player_position }
     }
 }

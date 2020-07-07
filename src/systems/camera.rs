@@ -23,7 +23,7 @@ pub struct CameraControlSystem;
 impl<'s> System<'s> for CameraControlSystem {
     type SystemData = (
         ReadStorage<'s, PlayerTag>,
-        WriteStorage<'s, CameraFrameTag>,
+        WriteStorage<'s, CameraFrame>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
     );
@@ -67,7 +67,7 @@ pub struct CameraSystem;
 impl<'s> System<'s> for CameraSystem {
     type SystemData = (
         ReadStorage<'s, PlayerTag>,
-        ReadStorage<'s, CameraFrameTag>,
+        ReadStorage<'s, CameraFrame>,
         WriteStorage<'s, Transform>,
     );
 
@@ -107,7 +107,7 @@ impl<'s> System<'s> for ResizeSystem {
         WriteStorage<'s, Camera>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Parent>,
-        ReadStorage<'s, CameraFrameTag>,
+        ReadStorage<'s, CameraFrame>,
         ReadExpect<'s, ScreenDimensions>,
         Write<'s, ResizeState>,
     );
