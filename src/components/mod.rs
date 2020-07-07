@@ -1,5 +1,9 @@
+mod camera;
 mod editor;
-mod stuff;
+mod movement;
+mod player;
 
+pub use self::camera::*;
 pub use self::editor::*;
-pub use self::stuff::*;
+pub use self::movement::*;
+pub use self::player::*;
