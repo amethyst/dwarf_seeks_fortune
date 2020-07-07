@@ -66,13 +66,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         setup_debug_lines(world);
         let cursor = init_cursor(world);
         create_camera(world);
-        world.insert(Brush {
-            tile: TileType {
-                dimens: Point2::new(1, 1),
-                asset: AssetType::Still(SpriteType::Blocks, 0),
-                entity_type: EntityType::DestructableTerrain,
-            },
-        });
+        world.insert(EditorData::default());
         world.insert(Map::default());
     }
 
@@ -157,7 +151,7 @@ fn init_cursor(world: &mut World) -> Entity {
         })
         .with(Transparent)
         .with(selection_transform)
-        .with(Selection::default())
+        .with(SelectionTag)
         .build();
     let mut transform = Transform::default();
     transform.set_translation_xyz(0.5, 0.5, 2.0);
@@ -174,7 +168,6 @@ fn init_cursor(world: &mut World) -> Entity {
         })
         .with(Transparent)
         .with(transform)
-        .with(DiscretePos::default())
         .with(Cursor::default())
         .build()
 }

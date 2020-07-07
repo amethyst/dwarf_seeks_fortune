@@ -112,7 +112,11 @@ fn build_player(builder: EntityBuilder) -> Entity {
         .build()
 }
 
-fn load_transform(pos: &Point2<i32>, dimens: &Point2<i32>, asset: &AssetType) -> Transform {
+pub(crate) fn load_transform(
+    pos: &Point2<i32>,
+    dimens: &Point2<i32>,
+    asset: &AssetType,
+) -> Transform {
     let asset_dimensions = get_asset_dimensions(&asset);
     let mut transform = Transform::default();
     transform.set_translation_xyz(

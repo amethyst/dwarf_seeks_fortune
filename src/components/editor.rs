@@ -9,18 +9,13 @@ use amethyst::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Component, Debug, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
-pub struct Brush {
-    pub tile: TileType,
-}
+pub struct SelectionTag;
 
-#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
-#[prefab(Component)]
-#[serde(deny_unknown_fields)]
-pub struct Selection {
-    pub start: DiscretePos,
+impl Component for SelectionTag {
+    type Storage = NullStorage<Self>;
 }
 
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
