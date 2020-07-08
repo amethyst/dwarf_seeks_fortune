@@ -60,3 +60,18 @@ impl Steering {
         }
     }
 }
+
+#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub struct Movement {
+    pub grounded: bool,
+}
+
+// #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
+// #[prefab(Component)]
+// #[serde(deny_unknown_fields)]
+// pub struct Collider {
+//     pub collides_top: bool,
+//     pub collides_rest: bool,
+// }

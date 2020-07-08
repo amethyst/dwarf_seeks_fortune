@@ -25,14 +25,27 @@ use precompile::{AnimationId, MyPrefabData};
 use crate::components::*;
 use crate::game_data::CustomGameData;
 use crate::levels::map::*;
+use crate::levels::TileDefinitions;
 use crate::resources::*;
 use crate::states::PausedState;
 
-pub fn load_level(world: &mut World) {
-    let level_file = application_root_dir()
+pub fn load_tile_definitions() -> TileDefinitions {
+    let file = application_root_dir()
         .expect("Root dir not found!")
         .join("assets/")
         .join("tiles/")
+        .join("tiles.ron");
+    let tile_defs = TileDefinitions::load(file);
+    println!("Tile definitions loaded: {:?}", tile_defs);
+    tile_defs.expect("Whoa!...")
+}
+
+pub fn load_level(world: &mut World) {
+    let tile_defs = load_tile_definitions();
+    let level_file = application_root_dir()
+        .expect("Root dir not found!")
+        .join("assets/")
+        .join("levels/")
         .join("generated.ron");
     let map = Map::load(level_file);
     // println!("Map loaded: {:?}", map);

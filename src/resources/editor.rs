@@ -36,6 +36,7 @@ impl Default for Brush {
     }
 }
 
+/// TODO: Rename to Selection?
 #[derive(Debug, Default)]
 pub struct Selector {
     /// Inclusive bound.
