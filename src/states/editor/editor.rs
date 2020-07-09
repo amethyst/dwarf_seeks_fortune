@@ -69,7 +69,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         let cursor = init_cursor(world);
         create_camera(world);
         world.insert(EditorData::default());
-        world.insert(Map::default());
     }
 
     fn update(

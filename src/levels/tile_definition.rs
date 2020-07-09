@@ -15,6 +15,12 @@ pub struct Level {
     pub tile_defs: HashMap<Pos, String>,
 }
 
+impl Level {
+    pub fn put_tile(&mut self, pos: Pos, tile_def_key: String) {
+        self.tile_defs.insert(pos, tile_def_key);
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
@@ -22,7 +28,7 @@ pub struct TileDefinitions {
     pub map: HashMap<String, TileDefinition>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct TileDefinition {
     /// How wide and high is the tile?
@@ -56,7 +62,7 @@ impl TileDefinition {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 /// If there are any special rules that apply to this tile, the archetype signals this.
 /// For example: a tile with the Archetype Player will be targeted by player input, etc.
@@ -80,7 +86,7 @@ pub enum Archetype {
     NotFound,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CollisionDefinition {
     /// Player can stand on these tiles. Examples include regular blocks and ladders.

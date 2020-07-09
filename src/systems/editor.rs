@@ -8,7 +8,6 @@ use amethyst::{
 };
 
 use crate::components::*;
-use crate::levels::Map;
 use crate::levels::*;
 use crate::resources::*;
 use std::cmp::min;
@@ -124,7 +123,6 @@ impl<'s> System<'s> for TilePaintSystem {
         WriteStorage<'s, PaintedTileTag>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
-        Write<'s, Map>,
         Entities<'s>,
     );
 
@@ -138,7 +136,6 @@ impl<'s> System<'s> for TilePaintSystem {
             mut tiles,
             input,
             time,
-            map,
             entities,
         ): Self::SystemData,
     ) {

@@ -25,7 +25,6 @@ use precompile::{AnimationId, MyPrefabData};
 
 use crate::components::*;
 use crate::game_data::CustomGameData;
-use crate::levels::map::*;
 use crate::levels::{Archetype, Level, TileDefinition, TileDefinitions};
 use crate::resources::*;
 use crate::states::PausedState;

@@ -14,23 +14,29 @@ pub struct EditorConfig {
 
 #[derive(Debug, Default)]
 pub struct EditorData {
+    pub level: Level,
     pub brush: Brush,
     pub selector: Selector,
 }
 
 #[derive(Debug)]
 pub struct Brush {
-    pub tile: TileType,
+    pub tile_def_key: String,
+    pub tile_def: TileDefinition,
 }
 
 //TODO: remove temporary default brush:
 impl Default for Brush {
     fn default() -> Self {
         Brush {
-            tile: TileType {
+            tile_def_key: String::from("Block1"),
+            tile_def: TileDefinition {
                 dimens: Pos::new(1, 1),
-                asset: AssetType::Still(SpriteType::Blocks, 0),
-                entity_type: EntityType::DestructableTerrain,
+                unique: false,
+                mandatory: false,
+                collision: None,
+                asset: Some(AssetType::Still(SpriteType::Blocks, 0)),
+                archetype: Archetype::Block,
             },
         }
     }
