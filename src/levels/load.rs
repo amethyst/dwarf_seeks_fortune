@@ -7,6 +7,7 @@ use amethyst::{
         get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
     },
     assets::{AssetStorage, Handle, Loader, Prefab},
+    config::ConfigError,
     core::{math::Vector3, transform::Transform, Parent},
     ecs::{prelude::World, Entities, Entity, EntityBuilder, Join, ReadStorage, WriteStorage},
     input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
@@ -25,60 +26,72 @@ use precompile::{AnimationId, MyPrefabData};
 use crate::components::*;
 use crate::game_data::CustomGameData;
 use crate::levels::map::*;
-use crate::levels::TileDefinitions;
+use crate::levels::{Archetype, Level, TileDefinition, TileDefinitions};
 use crate::resources::*;
 use crate::states::PausedState;
+use std::error::Error;
 
-pub fn load_tile_definitions() -> TileDefinitions {
+pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
     let file = application_root_dir()
         .expect("Root dir not found!")
         .join("assets/")
         .join("tiles/")
         .join("tiles.ron");
     let tile_defs = TileDefinitions::load(file);
-    println!("Tile definitions loaded: {:?}", tile_defs);
-    tile_defs.expect("Whoa!...")
+    // println!("Tile definitions loaded: {:?}", tile_defs);
+    tile_defs
 }
 
-pub fn load_level(world: &mut World) {
-    let tile_defs = load_tile_definitions();
+pub fn load_level(world: &mut World) -> Result<(), ConfigError> {
+    let fallback_def = TileDefinition::fallback();
+    let tile_defs = load_tile_definitions()?;
     let level_file = application_root_dir()
         .expect("Root dir not found!")
         .join("assets/")
         .join("levels/")
         .join("generated.ron");
-    let map = Map::load(level_file);
+    let level = Level::load(level_file)?;
     // println!("Map loaded: {:?}", map);
-    //TODO: handle map loading error gracefully.
-    map.expect("Failed to load map.")
-        .layers
-        .get(0)
-        .expect("Map should have one layer!")
-        .tiles
-        .iter()
-        .for_each(|(pos, tile)| {
-            // println!("Tile: {:?}", tile);
-            let still_asset = load_still_asset(tile, &world);
-            let anim_asset = load_anim_asset(tile, &world);
-            let transform = load_transform(&pos, &tile.dimens, &tile.asset);
-            let mut builder = world.create_entity();
-            if let Some(still_asset) = still_asset {
-                builder = builder.with(still_asset);
-            }
-            if let Some(anim_asset) = anim_asset {
-                builder = builder.with(anim_asset);
-            }
+    level.tile_defs.iter().for_each(|(pos, tile_def_key)| {
+        let tile_def = tile_defs
+            .map
+            .get(tile_def_key)
+            .or_else(|| {
+                println!(
+                    "Failed to find tile definition {:?}, using fallback: ",
+                    tile_def_key
+                );
+                Some(&fallback_def)
+            })
+            .expect("Has fallback, cannot be None, thus safe to unwrap.");
+        let still_asset = load_still_asset(tile_def, &world);
+        let anim_asset = load_anim_asset(tile_def, &world);
+        let transform = if let Some(asset) = &tile_def.asset {
+            Some(load_transform(&pos, &tile_def.dimens, asset))
+        } else {
+            None
+        };
+        let mut builder = world.create_entity();
+        if let Some(still_asset) = still_asset {
+            builder = builder.with(still_asset);
+        }
+        if let Some(anim_asset) = anim_asset {
+            builder = builder.with(anim_asset);
+        }
+        if let Some(transform) = transform {
             builder = builder.with(transform);
-            match tile.entity_type {
-                EntityType::Player => {
-                    let player = build_player(builder);
-                    build_frames(player, world);
-                }
-                _ => {
-                    builder.build();
-                }
-            };
-        });
+        }
+        match tile_def.archetype {
+            Archetype::Player => {
+                let player = build_player(builder);
+                build_frames(player, world);
+            }
+            _ => {
+                builder.build();
+            }
+        };
+    });
+    Ok(())
 }
 
 fn build_frames(player: Entity, world: &mut World) {
@@ -139,8 +152,8 @@ pub(crate) fn load_transform(pos: &Pos, dimens: &Pos, asset: &AssetType) -> Tran
     transform
 }
 
-fn load_still_asset(tile: &TileType, world: &World) -> Option<SpriteRender> {
-    match &tile.asset {
+fn load_still_asset(tile: &TileDefinition, world: &World) -> Option<SpriteRender> {
+    match &tile.asset? {
         AssetType::Animated(anim) => None,
         AssetType::Still(spritesheet, sprite_nr) => {
             let handle = world.read_resource::<Assets>().get_still(&spritesheet);
@@ -152,8 +165,8 @@ fn load_still_asset(tile: &TileType, world: &World) -> Option<SpriteRender> {
     }
 }
 
-fn load_anim_asset(tile: &TileType, world: &World) -> Option<Handle<Prefab<MyPrefabData>>> {
-    match &tile.asset {
+fn load_anim_asset(tile: &TileDefinition, world: &World) -> Option<Handle<Prefab<MyPrefabData>>> {
+    match &tile.asset? {
         AssetType::Animated(anim) => {
             let handle = world.read_resource::<Assets>().get_animated(&anim);
             Some(handle)

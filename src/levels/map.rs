@@ -3,6 +3,7 @@ use crate::resources::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+//TODO: Rename to Level or something.
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
@@ -24,7 +25,7 @@ impl Map {
             .get_mut(0)
             .expect("There should be at least 1 layer in this Map.")
             .tiles
-            .insert(pos, tile);
+            .insert(pos, "FIXMETODO!!!!!".parse().unwrap());
     }
 }
 
@@ -32,7 +33,7 @@ impl Map {
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileLayer {
-    pub tiles: HashMap<Pos, TileType>,
+    pub tiles: HashMap<Pos, String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

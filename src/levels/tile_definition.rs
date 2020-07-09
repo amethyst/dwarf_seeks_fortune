@@ -1,13 +1,25 @@
 use crate::components::Pos;
-use crate::resources::AssetType;
+use crate::resources::{AssetType, SpriteType};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+/// Describes a complete level.
+/// Contains a map of positions, mapped to tile definitions.
+/// This struct can be loaded from a level file and used to start a game.
+#[derive(Debug, Deserialize, Serialize, Default)]
+#[serde(default)]
+#[serde(deny_unknown_fields)]
+pub struct Level {
+    /// Mapping of (x,y) position in the world to a TileDefinition key.
+    /// These keys can be used to look up the corresponding TileDefinition.
+    pub tile_defs: HashMap<Pos, String>,
+}
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileDefinitions {
-    map: HashMap<String, TileDefinition>,
+    pub map: HashMap<String, TileDefinition>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -29,9 +41,28 @@ pub struct TileDefinition {
     pub archetype: Archetype,
 }
 
+impl TileDefinition {
+    /// Use the fallback if the real TileDefinition could not be found.
+    /// This avoids the game having to panic if a level file is slightly corrupted or out of date.
+    pub fn fallback() -> Self {
+        TileDefinition {
+            dimens: Pos::new(1, 1),
+            unique: false,
+            mandatory: false,
+            collision: None,
+            asset: Some(AssetType::Still(SpriteType::NotFound, 0)),
+            archetype: Archetype::NotFound,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 /// If there are any special rules that apply to this tile, the archetype signals this.
+/// For example: a tile with the Archetype Player will be targeted by player input, etc.
+///
+/// TODO: Maybe change how this is defined. It's not complete and maybe too restricted.
+///         For example, MobSpawner doesn't define which mobs it will spawn.
 pub enum Archetype {
     /// ordinary block. Does nothing.
     Block,
@@ -45,6 +76,8 @@ pub enum Archetype {
     Ladder,
     /// Spawns mobs from this location.
     MobSpawner,
+    /// A fallback archetype used when an archetype lookup failed.
+    NotFound,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -56,7 +89,7 @@ pub struct CollisionDefinition {
     pub collides_side: bool,
     /// When standing underneath a two-high ledge of these tiles, the player cannot jump.
     pub collides_bottom: bool,
-    // TODO: Add special collision.
+    // TODO: Add special collision?
 }
 
 // Colliding:

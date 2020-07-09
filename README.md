@@ -8,6 +8,7 @@ Design goals:
     - Map editor (be able to jump into level straight away from the editor)
 - Be a proper example of how to use Amethyst. Document everything. Be helpful resource for people learning Amethyst.
 - Write guides explaining how certain features are implemented? (e.g. asset loading, camera, etc) Guides should serve as next step after reading the pong tutorial and basic examples in Amethyst, be a real-world implementation.
+- Purposely depend on specific release version of the engine, not on master. Provides more stable example.
 - Add tests where necessary.
 
 Brainstorm ideas:
