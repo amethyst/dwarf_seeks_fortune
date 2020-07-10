@@ -1,9 +1,3 @@
-use crate::components::*;
-use crate::entities::*;
-use crate::game_data::CustomGameData;
-use crate::levels::*;
-use crate::resources::*;
-use crate::states::PausedState;
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
 use amethyst::ui::UiPrefab;
@@ -29,19 +23,21 @@ use amethyst::{
 };
 use precompile::AnimationId;
 
-pub struct DemoState {
+use crate::components::*;
+use crate::entities::*;
+use crate::game_data::CustomGameData;
+use crate::levels::*;
+use crate::resources::*;
+use crate::states::{EditorState, PausedState};
+
+pub struct PlayTestState {
     root: Option<Entity>,
-    paused_ui: Handle<UiPrefab>,
 }
 
-impl<'a, 'b> DemoState {
-    pub fn new(paused_ui: Handle<UiPrefab>) -> DemoState {
-        DemoState {
-            root: None,
-            paused_ui,
-        }
+impl<'a, 'b> PlayTestState {
+    pub(crate) fn new() -> Self {
+        PlayTestState { root: None }
     }
-
     fn handle_action(
         &mut self,
         action: &str,
@@ -62,12 +58,12 @@ impl<'a, 'b> DemoState {
     }
 }
 
-impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
+impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayTestState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
-        self.root = Some(world.create_entity().build());
+        self.root = Some(world.create_entity().with(EditorRootTag).build());
         create_camera(world, &self.root.unwrap());
-        // setup_debug_lines(world);
+        // setup_debug_lines(world, &self.root.unwrap());
         world.write_resource::<History>().force_key_frame = true;
         load_level(world);
     }
@@ -121,13 +117,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {
                     Trans::Quit
                 } else if is_key_down(&event, VirtualKeyCode::Escape) {
-                    // Pause the game by going to the `PausedState`.
-                    Trans::Push(Box::new(PausedState::new(
-                        data.world
-                            .create_entity()
-                            .with(self.paused_ui.clone())
-                            .build(),
-                    )))
+                    Trans::Replace(Box::new(EditorState::new()))
                 } else {
                     Trans::None
                 }

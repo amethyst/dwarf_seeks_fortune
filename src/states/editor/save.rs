@@ -1,3 +1,4 @@
+use crate::levels::Level;
 use crate::resources::EditorData;
 use amethyst::{
     prelude::{Config, World, WorldExt},
@@ -11,5 +12,6 @@ pub fn save(world: &mut World) {
         .join("levels/")
         .join("generated.ron");
     let mut data = world.write_resource::<EditorData>();
-    (&*data).level.write(level_file);
+    let level: Level = (&*data).level.clone().into();
+    level.write(level_file);
 }

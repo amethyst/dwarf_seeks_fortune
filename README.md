@@ -25,10 +25,11 @@ Brainstorm ideas:
     - Trap that flings knife? Knife goes round forever.
 
 TODO:
-- Level data format, tile refs and separate tile data
 - Formalise z-ordering
 - Jumping and collision detection.
 - Maybe extract editor into its own crate?
+- PlayTest state
+- Custom input bindings
 
 Level bounds:
 - Create clear distinction between what is inside level and what is outside, by using different background. For now, always use rectangular shape.

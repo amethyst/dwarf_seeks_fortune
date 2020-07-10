@@ -33,24 +33,18 @@ use crate::levels::*;
 use crate::resources::*;
 use crate::states::editor::paint::paint_tiles;
 use crate::states::editor::save::save;
-use crate::states::PausedState;
+use crate::states::{PausedState, PlayTestState};
 
-/// TODO:
-/// Have a map in resources, this is what is being built up and what will be saved later.
-/// Cursor points at location. Derives width and height from block loaded on brush??
-/// Brush (contains block-type)
-/// When holding shift, should do multi-select (ideally only if block allows it)
-/// Camera follows cursor?
-/// Undo function
-/// Layers?
-///
 pub struct EditorState {
-    fps_ui: Handle<UiPrefab>,
+    /// All entities that belong to the EditorState should be a descendant of this root entity.
+    /// The root will be deleted at the end of the state's life cycle, which will delete
+    /// all descendants as well.
+    root: Option<Entity>,
 }
 
 impl<'a, 'b> EditorState {
-    pub fn new(fps_ui: Handle<UiPrefab>) -> EditorState {
-        EditorState { fps_ui }
+    pub fn new() -> EditorState {
+        EditorState { root: None }
     }
 
     fn handle_action(
@@ -65,9 +59,10 @@ impl<'a, 'b> EditorState {
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
-        setup_debug_lines(world);
-        let cursor = init_cursor(world);
-        create_camera(world);
+        self.root = Some(world.create_entity().with(EditorRootTag).build());
+        setup_debug_lines(world, &self.root.unwrap());
+        let cursor = init_cursor(world, &self.root.unwrap());
+        create_camera(world, &self.root.unwrap());
         world.insert(EditorData::default());
     }
 
@@ -119,6 +114,10 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                 };
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {
                     Trans::Quit
+                } else if is_key_down(&event, VirtualKeyCode::Escape) {
+                    save(data.world);
+                    data.world.delete_entity(self.root.unwrap());
+                    Trans::Replace(Box::new(PlayTestState::new()))
                 } else {
                     Trans::None
                 }
@@ -150,7 +149,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     }
 }
 
-fn init_cursor(world: &mut World) -> Entity {
+fn init_cursor(world: &mut World, root: &Entity) -> Entity {
     let sprite_handle = world
         .read_resource::<Assets>()
         .get_still(&SpriteType::Selection);
@@ -159,6 +158,9 @@ fn init_cursor(world: &mut World) -> Entity {
     selection_transform.set_translation_z(1.0);
     world
         .create_entity()
+        .with(Parent {
+            entity: root.clone(),
+        })
         .with(SpriteRender {
             sprite_sheet: sprite_handle.clone(),
             sprite_number: 1,
@@ -176,6 +178,9 @@ fn init_cursor(world: &mut World) -> Entity {
     ));
     world
         .create_entity()
+        .with(Parent {
+            entity: root.clone(),
+        })
         .with(SpriteRender {
             sprite_sheet: sprite_handle,
             sprite_number: 0,

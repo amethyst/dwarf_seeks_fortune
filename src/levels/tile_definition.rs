@@ -15,12 +15,6 @@ pub struct Level {
     pub tile_defs: HashMap<Pos, String>,
 }
 
-impl Level {
-    pub fn put_tile(&mut self, pos: Pos, tile_def_key: String) {
-        self.tile_defs.insert(pos, tile_def_key);
-    }
-}
-
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]

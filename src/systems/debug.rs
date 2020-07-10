@@ -13,6 +13,7 @@ impl<'s> System<'s> for DebugSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, Pos>,
+        ReadStorage<'s, EditorRootTag>,
         ReadStorage<'s, Steering>,
         ReadStorage<'s, PlayerTag>,
         ReadStorage<'s, DebugPosGhostTag>,
@@ -21,7 +22,15 @@ impl<'s> System<'s> for DebugSystem {
 
     fn run(
         &mut self,
-        (mut transforms, positions, steerings, player_tags, pos_ghost_tags, steering_ghost_tags): Self::SystemData,
+        (
+            mut transforms,
+            positions,
+            root_tags,
+            steerings,
+            player_tags,
+            pos_ghost_tags,
+            steering_ghost_tags,
+        ): Self::SystemData,
     ) {
         // Sets the transform on the ghost tags.
         // This is a debug thing to show us where the player is going.

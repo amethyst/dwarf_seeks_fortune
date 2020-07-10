@@ -1,6 +1,6 @@
 use crate::components::*;
 use crate::levels::*;
-use crate::resources::{Assets, EditorData, SpriteType};
+use crate::resources::{Assets, EditorData, SpriteType, TileEdit};
 use amethyst::prelude::Builder;
 use amethyst::{
     core::math::Vector3,
@@ -20,7 +20,9 @@ pub fn paint_tiles(world: &mut World) {
             for y in lower_bounds.y..(lower_bounds.y + dimens.y) {
                 created.push((Pos::new(x, y), (&*editor_data).brush.tile_def.clone()));
                 let key = (&*editor_data).brush.tile_def_key.clone();
-                (&mut *editor_data).level.put_tile(Pos::new(x, y), key);
+                (&mut *editor_data)
+                    .level
+                    .put_tile(Pos::new(x, y), TileEdit::new(key));
             }
         }
     }

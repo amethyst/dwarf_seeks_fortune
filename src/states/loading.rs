@@ -132,12 +132,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                     let _ = data.world.delete_entity(entity);
                 }
                 if editor_mode {
-                    Trans::Switch(Box::new(EditorState::new(
-                        self.fps_ui.as_ref().unwrap().clone(),
-                    )))
+                    Trans::Switch(Box::new(EditorState::new()))
                 } else {
                     Trans::Switch(Box::new(DemoState::new(
-                        self.fps_ui.as_ref().unwrap().clone(),
                         self.paused_ui.as_ref().unwrap().clone(),
                     )))
                 }

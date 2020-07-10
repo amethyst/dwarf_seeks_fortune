@@ -3,10 +3,10 @@
 use amethyst::{
     core::{
         transform::{Transform, TransformBundle},
-        Time,
+        Parent, Time,
     },
     derive::SystemDesc,
-    ecs::{Read, ReadExpect, System, SystemData, WorldExt, Write},
+    ecs::{prelude::*, Entity, Read, ReadExpect, System, SystemData, WorldExt, Write},
     prelude::*,
     renderer::{
         camera::Camera,
@@ -20,9 +20,9 @@ use amethyst::{
     window::ScreenDimensions,
 };
 
-pub fn setup_debug_lines(world: &mut World) {
+pub fn setup_debug_lines(world: &mut World, root: &Entity) {
     // Setup debug lines as a resource
-    world.insert(DebugLines::new());
+    // world.insert(DebugLines::new());
     // Configure width of lines. Optional step
     // world.insert(DebugLinesParams { line_width: 2.0 });
 
@@ -65,5 +65,11 @@ pub fn setup_debug_lines(world: &mut World) {
         Srgba::new(1.0, 0.0, 0.0, 0.8),
     );
 
-    world.create_entity().with(debug_lines_component).build();
+    world
+        .create_entity()
+        .with(Parent {
+            entity: (*root).clone(),
+        })
+        .with(debug_lines_component)
+        .build();
 }
