@@ -20,7 +20,7 @@ use amethyst::{
     window::ScreenDimensions,
 };
 
-pub fn setup_debug_lines(world: &mut World, root: &Entity) {
+pub fn setup_debug_lines(world: &mut World) {
     // Setup debug lines as a resource
     // world.insert(DebugLines::new());
     // Configure width of lines. Optional step
@@ -65,11 +65,5 @@ pub fn setup_debug_lines(world: &mut World, root: &Entity) {
         Srgba::new(1.0, 0.0, 0.0, 0.8),
     );
 
-    world
-        .create_entity()
-        .with(Parent {
-            entity: (*root).clone(),
-        })
-        .with(debug_lines_component)
-        .build();
+    world.create_entity().with(debug_lines_component).build();
 }

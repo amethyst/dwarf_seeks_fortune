@@ -71,7 +71,11 @@ fn make_game() -> amethyst::Result<()> {
             "ui_event_handler",
             &[],
         )
-        .with_core(systems::UiSystem::default(), "ui_system", &[])
+        .with_core(
+            systems::FpsCounterUiSystem::default(),
+            "fps_counter_ui_system",
+            &[],
+        )
         .with_core(
             systems::MovementSystem.pausable(CurrentState::Running),
             "movement_system",

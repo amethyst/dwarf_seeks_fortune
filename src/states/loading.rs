@@ -25,26 +25,26 @@ use crate::states::{DemoState, EditorState};
 pub struct LoadingState {
     progress: ProgressCounter,
     load_ui: Option<Entity>,
-    fps_ui: Option<Handle<UiPrefab>>,
-    paused_ui: Option<Handle<UiPrefab>>,
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         init_output(data.world);
         self.load_ui = Some(data.world.exec(|mut creator: UiCreator<'_>| {
-            creator.create("ui/fps.ron", &mut self.progress);
             creator.create("ui/loading.ron", &mut self.progress)
         }));
-        self.fps_ui = Some(
+        let mut ui_handles = UiHandles::default();
+        ui_handles.put_handle(
+            UiType::Fps,
             data.world
                 .exec(|loader: UiLoader<'_>| loader.load("ui/fps.ron", &mut self.progress)),
         );
-        self.paused_ui = Some(
+        ui_handles.put_handle(
+            UiType::Paused,
             data.world
                 .exec(|loader: UiLoader<'_>| loader.load("ui/paused.ron", &mut self.progress)),
         );
-
+        data.world.insert(ui_handles);
         let mut assets = Assets::default();
         assets.put_still(
             SpriteType::NotFound,
@@ -55,15 +55,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                 &mut self.progress,
             ),
         );
-        // assets.put_still(
-        //     SpriteType::Background,
-        //     load_spritesheet(
-        //         "textures/background.jpg",
-        //         "prefab/still_background.ron",
-        //         data.world,
-        //         &mut self.progress,
-        //     ),
-        // );
         assets.put_still(
             SpriteType::Frame,
             load_spritesheet(
@@ -132,11 +123,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                     let _ = data.world.delete_entity(entity);
                 }
                 if editor_mode {
-                    Trans::Switch(Box::new(EditorState::new()))
+                    Trans::Switch(Box::new(EditorState))
                 } else {
-                    Trans::Switch(Box::new(DemoState::new(
-                        self.paused_ui.as_ref().unwrap().clone(),
-                    )))
+                    Trans::Switch(Box::new(DemoState))
                 }
             }
             Completion::Loading => Trans::None,

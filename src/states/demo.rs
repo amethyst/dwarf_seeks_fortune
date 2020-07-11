@@ -29,19 +29,9 @@ use amethyst::{
 };
 use precompile::AnimationId;
 
-pub struct DemoState {
-    root: Option<Entity>,
-    paused_ui: Handle<UiPrefab>,
-}
+pub struct DemoState;
 
 impl<'a, 'b> DemoState {
-    pub fn new(paused_ui: Handle<UiPrefab>) -> DemoState {
-        DemoState {
-            root: None,
-            paused_ui,
-        }
-    }
-
     fn handle_action(
         &mut self,
         action: &str,
@@ -65,9 +55,8 @@ impl<'a, 'b> DemoState {
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
-        self.root = Some(world.create_entity().build());
-        create_camera(world, &self.root.unwrap());
-        // setup_debug_lines(world);
+        create_camera(world);
+        setup_debug_lines(world);
         world.write_resource::<History>().force_key_frame = true;
         load_level(world);
     }
@@ -122,12 +111,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
                     Trans::Quit
                 } else if is_key_down(&event, VirtualKeyCode::Escape) {
                     // Pause the game by going to the `PausedState`.
-                    Trans::Push(Box::new(PausedState::new(
-                        data.world
-                            .create_entity()
-                            .with(self.paused_ui.clone())
-                            .build(),
-                    )))
+                    Trans::Push(Box::new(PausedState::new()))
                 } else {
                     Trans::None
                 }

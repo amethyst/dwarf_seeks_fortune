@@ -1,4 +1,6 @@
 use crate::game_data::CustomGameData;
+use crate::resources::*;
+use amethyst::prelude::Builder;
 use amethyst::{
     ecs::prelude::{Entity, WorldExt},
     input::{is_key_down, VirtualKeyCode},
@@ -6,22 +8,20 @@ use amethyst::{
 };
 
 pub struct PausedState {
-    ui: Entity,
+    ui: Option<Entity>,
 }
 
 impl PausedState {
-    pub fn new(ui: Entity) -> PausedState {
-        PausedState { ui }
+    pub fn new() -> PausedState {
+        PausedState { ui: None }
     }
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PausedState {
-    // fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-    //     let StateData { world, .. } = data;
-    //     init_output(&mut world.res);
-    //
-    //     println!("PausedState on_start");
-    // }
+    fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        println!("PausedState on_start");
+        self.ui = UiHandles::add_ui(&UiType::Paused, data.world);
+    }
 
     fn handle_event(
         &mut self,
@@ -30,8 +30,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PausedState {
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
         if let StateEvent::Window(event) = &event {
             if is_key_down(&event, VirtualKeyCode::Escape) {
-                let _ = data.world.delete_entity(self.ui);
-                // Go back to the `GameplayState`.
+                if let Some(ui) = self.ui {
+                    let _ = data.world.delete_entity(ui);
+                }
                 return Trans::Pop;
             }
         }

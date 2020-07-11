@@ -35,18 +35,9 @@ use crate::states::editor::paint::paint_tiles;
 use crate::states::editor::save::save;
 use crate::states::{PausedState, PlayTestState};
 
-pub struct EditorState {
-    /// All entities that belong to the EditorState should be a descendant of this root entity.
-    /// The root will be deleted at the end of the state's life cycle, which will delete
-    /// all descendants as well.
-    root: Option<Entity>,
-}
+pub struct EditorState;
 
 impl<'a, 'b> EditorState {
-    pub fn new() -> EditorState {
-        EditorState { root: None }
-    }
-
     fn handle_action(
         &mut self,
         action: &str,
@@ -59,10 +50,10 @@ impl<'a, 'b> EditorState {
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
-        self.root = Some(world.create_entity().with(EditorRootTag).build());
-        setup_debug_lines(world, &self.root.unwrap());
-        let cursor = init_cursor(world, &self.root.unwrap());
-        create_camera(world, &self.root.unwrap());
+        UiHandles::add_ui(&UiType::Fps, world);
+        setup_debug_lines(world);
+        let cursor = init_cursor(world);
+        create_camera(world);
         world.insert(EditorData::default());
     }
 
@@ -116,8 +107,8 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                     Trans::Quit
                 } else if is_key_down(&event, VirtualKeyCode::Escape) {
                     save(data.world);
-                    data.world.delete_entity(self.root.unwrap());
-                    Trans::Replace(Box::new(PlayTestState::new()))
+                    data.world.delete_all();
+                    Trans::Replace(Box::new(PlayTestState))
                 } else {
                     Trans::None
                 }
@@ -149,7 +140,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     }
 }
 
-fn init_cursor(world: &mut World, root: &Entity) -> Entity {
+fn init_cursor(world: &mut World) -> Entity {
     let sprite_handle = world
         .read_resource::<Assets>()
         .get_still(&SpriteType::Selection);
@@ -158,9 +149,6 @@ fn init_cursor(world: &mut World, root: &Entity) -> Entity {
     selection_transform.set_translation_z(1.0);
     world
         .create_entity()
-        .with(Parent {
-            entity: root.clone(),
-        })
         .with(SpriteRender {
             sprite_sheet: sprite_handle.clone(),
             sprite_number: 1,
@@ -178,9 +166,6 @@ fn init_cursor(world: &mut World, root: &Entity) -> Entity {
     ));
     world
         .create_entity()
-        .with(Parent {
-            entity: root.clone(),
-        })
         .with(SpriteRender {
             sprite_sheet: sprite_handle,
             sprite_number: 0,
