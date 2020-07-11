@@ -54,6 +54,7 @@ pub fn setup_debug_lines(world: &mut World) {
             Srgba::new(0.3, 0.3, 0.3, 0.5),
         );
     }
+
     debug_lines_component.add_line(
         [-5000., 0.0, 0.0].into(),
         [5000., 0.0, 0.0].into(),

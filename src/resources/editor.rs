@@ -1,9 +1,11 @@
+use std::cmp::min;
+use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
+
 use crate::components::*;
 use crate::levels::*;
 use crate::resources::*;
-use serde::{Deserialize, Serialize};
-use std::cmp::min;
-use std::collections::HashMap;
 
 /// The level editor uses this to store data related to the level it is editing.
 /// An instance of LevelEdit can be transformed into a Level.
@@ -15,14 +17,18 @@ pub struct LevelEdit {
 }
 
 impl LevelEdit {
-    pub fn put_tile(&mut self, pos: Pos, tile_edit: TileEdit) {
-        self.tile_map.insert(pos, tile_edit);
+    pub fn put_tile(&mut self, pos: Pos, tile_edit: Option<TileEdit>) {
+        if let Some(tile_edit) = tile_edit {
+            self.tile_map.insert(pos, tile_edit);
+        } else {
+            self.tile_map.remove(&pos);
+        }
     }
     pub fn is_dirty(&self, pos: &Pos) -> bool {
         self.tile_map
             .get(pos)
             .map(|tile_edit| tile_edit.dirty)
-            .or(Some(false))
+            .or(Some(true))
             .expect("Should never panic.")
     }
 }
@@ -77,26 +83,37 @@ pub struct EditorData {
     pub selector: Selector,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Brush {
-    pub tile_def_key: String,
-    pub tile_def: TileDefinition,
+    palette: Vec<Option<String>>,
+    palette_index: usize,
 }
 
-//TODO: remove temporary default brush:
-impl Default for Brush {
-    fn default() -> Self {
-        Brush {
-            tile_def_key: String::from("Player"),
-            tile_def: TileDefinition {
-                dimens: Pos::new(1, 1),
-                unique: false,
-                mandatory: false,
-                collision: None,
-                asset: Some(AssetType::Animated(AnimType::Mob)),
-                archetype: Archetype::Block,
-            },
-        }
+impl Brush {
+    pub fn set_palette(&mut self, defs: &TileDefinitions) {
+        self.palette.clear();
+        self.palette.push(None);
+        defs.map.keys().for_each(|key| {
+            self.palette.push(Some(key.clone()));
+        });
+    }
+    pub fn select_previous(&mut self) {
+        self.select(-1);
+    }
+    pub fn select_next(&mut self) {
+        self.select(1);
+    }
+
+    fn select(&mut self, offset: i32) {
+        self.palette_index =
+            (self.palette_index as i32 + offset).rem_euclid(self.palette.len() as i32) as usize;
+        println!("Selected brush: {:?}", self.get_key());
+    }
+
+    pub fn get_key(&self) -> &Option<String> {
+        self.palette
+            .get(self.palette_index)
+            .expect("Should not panic.")
     }
 }
 

@@ -59,8 +59,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         if let Ok(level_edit) = load(world) {
             editor_data.level = level_edit;
         }
-        world.insert(editor_data);
         let tile_defs = load_tile_definitions().expect("Tile definitions failed to load!");
+        editor_data.brush.set_palette(&tile_defs);
+        world.insert(editor_data);
         world.insert(tile_defs);
     }
 
@@ -135,6 +136,24 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                         scancode: _,
                     } => {
                         save(data.world);
+                    }
+                    InputEvent::KeyReleased {
+                        key_code: VirtualKeyCode::LBracket,
+                        scancode: _,
+                    } => {
+                        println!("bro, it workes man.");
+                        &(*data.world.write_resource::<EditorData>())
+                            .brush
+                            .select_previous();
+                    }
+                    InputEvent::KeyReleased {
+                        key_code: VirtualKeyCode::RBracket,
+                        scancode: _,
+                    } => {
+                        println!("bro, it workes man.");
+                        &(*data.world.write_resource::<EditorData>())
+                            .brush
+                            .select_next();
                     }
                     InputEvent::ActionPressed(action) => {
                         self.handle_action(&action, data.world);
