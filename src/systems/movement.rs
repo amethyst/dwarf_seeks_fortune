@@ -1,4 +1,5 @@
 use crate::components::*;
+use crate::levels::*;
 use crate::resources::*;
 use amethyst::{
     core::timing::Time,
@@ -38,6 +39,7 @@ impl<'s> System<'s> for PlayerSystem {
         ReadStorage<'s, PlayerTag>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, DebugConfig>,
+        Read<'s, TileMap>,
         Write<'s, History>,
     );
 
@@ -51,6 +53,7 @@ impl<'s> System<'s> for PlayerSystem {
             player_tags,
             input,
             config,
+            tile_map,
             mut history,
         ): Self::SystemData,
     ) {
@@ -63,6 +66,20 @@ impl<'s> System<'s> for PlayerSystem {
         )
             .join()
         {
+            let real_pos_y = transform.translation().y - 1.0;
+            if real_pos_y <= discrete_pos.y as f32 {
+                // Check if I'm grounded.
+                // If not, set grounded to false.
+                // If so, set grounded to true and set translation.y.
+                steering.grounded = is_grounded(&discrete_pos, &tile_map);
+            }
+            if !steering.grounded {
+                discrete_pos.y = calc_discrete_pos_y(transform);
+                velocity.y = -config.player_speed;
+            } else {
+                velocity.y = 0.0;
+            }
+
             // 1: Set current discrete position.
             // 2: Set steering based on user input.
             // 3: Set velocity based on current position and desired position.
@@ -106,7 +123,20 @@ impl<'s> System<'s> for PlayerSystem {
     }
 }
 
+/// Assumes the player is two-wide.
+fn is_grounded(pos: &Pos, tile_map: &TileMap) -> bool {
+    let tile_a = tile_map.get_tile(&Pos::new(pos.x, pos.y - 1));
+    let tile_b = tile_map.get_tile(&Pos::new(pos.x + 1, pos.y - 1));
+    tile_a.map(|tile| tile.provides_platform()).unwrap_or(false)
+        || tile_b.map(|tile| tile.provides_platform()).unwrap_or(false)
+}
+
 fn calc_discrete_pos_x(transform: &Transform) -> i32 {
     let anchor_pos_x = transform.translation().x - 1.;
     anchor_pos_x.round() as i32
+}
+
+fn calc_discrete_pos_y(transform: &Transform) -> i32 {
+    let anchor_pos_y = transform.translation().y - 1.;
+    anchor_pos_y.round() as i32
 }

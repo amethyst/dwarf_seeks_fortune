@@ -77,6 +77,16 @@ impl TileDefinition {
             archetype: Archetype::NotFound,
         }
     }
+
+    /// True if and only if the tile collides at the top.
+    /// In other words, if you can stand on top of this tile.
+    pub fn provides_platform(&self) -> bool {
+        if let Some(collision) = &self.collision {
+            collision.collides_top
+        } else {
+            false
+        }
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

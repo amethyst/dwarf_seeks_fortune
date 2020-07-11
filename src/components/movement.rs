@@ -50,6 +50,7 @@ impl Pos {
 pub struct Steering {
     pub direction: f32,
     pub destination: Pos,
+    pub grounded: bool,
 }
 
 impl Steering {
@@ -57,6 +58,7 @@ impl Steering {
         Steering {
             direction: 0.0,
             destination,
+            grounded: true,
         }
     }
 }

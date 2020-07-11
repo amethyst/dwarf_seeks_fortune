@@ -83,6 +83,7 @@ impl<'s> System<'s> for RewindSystem {
                     .join()
                 {
                     transform.set_translation_x(frame.player_position.x as f32 + 1.);
+                    transform.set_translation_y(frame.player_position.y as f32 + 1.);
                     *pos = frame.player_position;
                     steering.destination = frame.player_position;
                 }

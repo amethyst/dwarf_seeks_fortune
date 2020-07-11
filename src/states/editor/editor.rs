@@ -141,7 +141,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                         key_code: VirtualKeyCode::LBracket,
                         scancode: _,
                     } => {
-                        println!("bro, it workes man.");
                         &(*data.world.write_resource::<EditorData>())
                             .brush
                             .select_previous();
@@ -150,7 +149,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                         key_code: VirtualKeyCode::RBracket,
                         scancode: _,
                     } => {
-                        println!("bro, it workes man.");
                         &(*data.world.write_resource::<EditorData>())
                             .brush
                             .select_next();

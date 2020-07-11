@@ -80,6 +80,7 @@ pub fn load_level(world: &mut World) -> Result<(), ConfigError> {
             }
         };
     });
+    world.insert(TileMap::new(level, tile_defs));
     Ok(())
 }
 
