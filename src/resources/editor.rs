@@ -18,6 +18,13 @@ impl LevelEdit {
     pub fn put_tile(&mut self, pos: Pos, tile_edit: TileEdit) {
         self.tile_map.insert(pos, tile_edit);
     }
+    pub fn is_dirty(&self, pos: &Pos) -> bool {
+        self.tile_map
+            .get(pos)
+            .map(|tile_edit| tile_edit.dirty)
+            .or(Some(false))
+            .expect("Should never panic.")
+    }
 }
 
 impl From<LevelEdit> for Level {
@@ -27,6 +34,16 @@ impl From<LevelEdit> for Level {
             map.insert(key, val.tile_def_key);
         });
         Level { tile_defs: map }
+    }
+}
+
+impl From<Level> for LevelEdit {
+    fn from(mut item: Level) -> Self {
+        let mut map = HashMap::new();
+        item.tile_defs.drain().for_each(|(key, val)| {
+            map.insert(key, TileEdit::new(val));
+        });
+        LevelEdit { tile_map: map }
     }
 }
 
@@ -70,13 +87,13 @@ pub struct Brush {
 impl Default for Brush {
     fn default() -> Self {
         Brush {
-            tile_def_key: String::from("Block1"),
+            tile_def_key: String::from("Player"),
             tile_def: TileDefinition {
                 dimens: Pos::new(1, 1),
                 unique: false,
                 mandatory: false,
                 collision: None,
-                asset: Some(AssetType::Still(SpriteType::Blocks, 0)),
+                asset: Some(AssetType::Animated(AnimType::Mob)),
                 archetype: Archetype::Block,
             },
         }

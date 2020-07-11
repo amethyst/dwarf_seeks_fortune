@@ -1,15 +1,18 @@
 use amethyst::{
+    assets::{Handle, Prefab},
     core::math::{Point2, Vector3},
     core::timing::Time,
     core::transform::Transform,
     ecs::prelude::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
     input::{InputHandler, StringBindings},
+    renderer::sprite::SpriteRender,
     window::ScreenDimensions,
 };
 
 use crate::components::*;
 use crate::levels::*;
 use crate::resources::*;
+use precompile::MyPrefabData;
 use std::cmp::min;
 
 /// Responsible for moving the cursor across the screen.
@@ -111,18 +114,20 @@ impl<'s> System<'s> for SelectionSystem {
     }
 }
 
-/// Deprecated.
+/// Clears all dirty tiles, then adds all dirty tiles back in.
+/// At the end of this system's execution, no tiles should be left dirty.
 pub struct TilePaintSystem;
 
 impl<'s> System<'s> for TilePaintSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
+        WriteStorage<'s, SpriteRender>,
+        WriteStorage<'s, Handle<Prefab<MyPrefabData>>>,
         WriteStorage<'s, Pos>,
-        WriteStorage<'s, Cursor>,
-        WriteStorage<'s, SelectionTag>,
         WriteStorage<'s, PaintedTileTag>,
-        Read<'s, InputHandler<StringBindings>>,
-        Read<'s, Time>,
+        Read<'s, TileDefinitions>,
+        Read<'s, Assets>,
+        Write<'s, EditorData>,
         Entities<'s>,
     );
 
@@ -130,18 +135,52 @@ impl<'s> System<'s> for TilePaintSystem {
         &mut self,
         (
             mut transforms,
+            mut sprite_renders,
+            mut anims,
             mut discrete_positions,
-            mut cursors,
-            mut selections,
             mut tiles,
-            input,
-            time,
+            tile_defs,
+            assets,
+            mut data,
             entities,
         ): Self::SystemData,
     ) {
-        let enter = input.action_is_down("enter").unwrap_or(false);
-        if !enter {
-            return;
+        for (_, _, entity) in (&tiles, &discrete_positions, &entities)
+            .join()
+            .filter(|(_, pos, _)| data.level.is_dirty(pos))
+        {
+            entities.delete(entity);
+        }
+
+        for (pos, tile_edit) in data
+            .level
+            .tile_map
+            .iter_mut()
+            .filter(|(pos, tile_edit)| tile_edit.dirty)
+        {
+            let tile_def = tile_defs.get(&tile_edit.tile_def_key);
+            let still_asset = load_still_asset(tile_def, &assets);
+            let anim_asset = load_anim_asset(tile_def, &assets);
+            let transform = if let Some(asset) = &tile_def.asset {
+                Some(load_transform(&pos, &tile_def.dimens, asset))
+            } else {
+                None
+            };
+            let mut builder = entities.build_entity();
+            if let Some(still_asset) = still_asset {
+                builder = builder.with(still_asset, &mut sprite_renders);
+            }
+            if let Some(anim_asset) = anim_asset {
+                builder = builder.with(anim_asset, &mut anims);
+            }
+            if let Some(transform) = transform {
+                builder = builder.with(transform, &mut transforms);
+            }
+            builder
+                .with(pos.clone(), &mut discrete_positions)
+                .with(PaintedTileTag, &mut tiles)
+                .build();
+            tile_edit.dirty = false;
         }
     }
 }

@@ -52,19 +52,9 @@ pub fn load_level(world: &mut World) -> Result<(), ConfigError> {
     let level = Level::load(level_file)?;
     // println!("Map loaded: {:?}", map);
     level.tile_defs.iter().for_each(|(pos, tile_def_key)| {
-        let tile_def = tile_defs
-            .map
-            .get(tile_def_key)
-            .or_else(|| {
-                println!(
-                    "Failed to find tile definition {:?}, using fallback: ",
-                    tile_def_key
-                );
-                Some(&fallback_def)
-            })
-            .expect("Has fallback, cannot be None, thus safe to unwrap.");
-        let still_asset = load_still_asset(tile_def, &world);
-        let anim_asset = load_anim_asset(tile_def, &world);
+        let tile_def = tile_defs.get(tile_def_key);
+        let still_asset = load_still_asset(tile_def, &world.read_resource::<Assets>());
+        let anim_asset = load_anim_asset(tile_def, &world.read_resource::<Assets>());
         let transform = if let Some(asset) = &tile_def.asset {
             Some(load_transform(&pos, &tile_def.dimens, asset))
         } else {
@@ -135,7 +125,7 @@ fn build_player(builder: EntityBuilder) -> Entity {
         .build()
 }
 
-pub(crate) fn load_transform(pos: &Pos, dimens: &Pos, asset: &AssetType) -> Transform {
+pub fn load_transform(pos: &Pos, dimens: &Pos, asset: &AssetType) -> Transform {
     let asset_dimensions = get_asset_dimensions(&asset);
     let mut transform = Transform::default();
     transform.set_translation_xyz(
@@ -151,11 +141,11 @@ pub(crate) fn load_transform(pos: &Pos, dimens: &Pos, asset: &AssetType) -> Tran
     transform
 }
 
-fn load_still_asset(tile: &TileDefinition, world: &World) -> Option<SpriteRender> {
+pub fn load_still_asset(tile: &TileDefinition, assets: &Assets) -> Option<SpriteRender> {
     match &tile.asset? {
         AssetType::Animated(anim) => None,
         AssetType::Still(spritesheet, sprite_nr) => {
-            let handle = world.read_resource::<Assets>().get_still(&spritesheet);
+            let handle = assets.get_still(&spritesheet);
             Some(SpriteRender {
                 sprite_sheet: handle,
                 sprite_number: *sprite_nr,
@@ -164,10 +154,13 @@ fn load_still_asset(tile: &TileDefinition, world: &World) -> Option<SpriteRender
     }
 }
 
-fn load_anim_asset(tile: &TileDefinition, world: &World) -> Option<Handle<Prefab<MyPrefabData>>> {
+pub fn load_anim_asset(
+    tile: &TileDefinition,
+    assets: &Assets,
+) -> Option<Handle<Prefab<MyPrefabData>>> {
     match &tile.asset? {
         AssetType::Animated(anim) => {
-            let handle = world.read_resource::<Assets>().get_animated(&anim);
+            let handle = assets.get_animated(&anim);
             Some(handle)
         }
         AssetType::Still(spritesheet, sprite_nr) => None,

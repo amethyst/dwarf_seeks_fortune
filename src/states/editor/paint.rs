@@ -26,21 +26,4 @@ pub fn paint_tiles(world: &mut World) {
             }
         }
     }
-    for (pos, tile) in created {
-        let mut transform = Transform::default();
-        transform.set_scale(Vector3::new(1. / 128., 1. / 128., 1.0));
-        transform.set_translation_xyz(pos.x as f32 + 0.5, pos.y as f32 + 0.5, 0.0);
-        let sprite_handle = world
-            .read_resource::<Assets>()
-            .get_still(&SpriteType::Blocks);
-        world
-            .create_entity()
-            .with(SpriteRender {
-                sprite_sheet: sprite_handle.clone(),
-                sprite_number: 0,
-            })
-            .with(transform)
-            .with(PaintedTileTag)
-            .build();
-    }
 }

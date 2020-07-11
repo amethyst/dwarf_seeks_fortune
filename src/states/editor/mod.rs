@@ -1,4 +1,5 @@
 mod editor;
+mod load;
 mod paint;
 mod save;
 

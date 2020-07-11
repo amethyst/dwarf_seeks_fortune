@@ -15,11 +15,34 @@ pub struct Level {
     pub tile_defs: HashMap<Pos, String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileDefinitions {
+    /// Fallback value returned if a requested value cannot be found.
+    fallback: TileDefinition,
     pub map: HashMap<String, TileDefinition>,
+}
+
+impl Default for TileDefinitions {
+    fn default() -> Self {
+        TileDefinitions {
+            fallback: TileDefinition::fallback(),
+            map: HashMap::default(),
+        }
+    }
+}
+
+impl<'a> TileDefinitions {
+    pub fn get(&'a self, key: &str) -> &'a TileDefinition {
+        self.map
+            .get(key)
+            .or_else(|| {
+                println!("Failed to find tile definition {:?}, using fallback: ", key);
+                Some(&self.fallback)
+            })
+            .expect("Should never panic, because we use a fallback!")
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

@@ -31,6 +31,7 @@ use crate::entities::*;
 use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
+use crate::states::editor::load::load;
 use crate::states::editor::paint::paint_tiles;
 use crate::states::editor::save::save;
 use crate::states::{PausedState, PlayTestState};
@@ -52,9 +53,15 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         let StateData { world, .. } = data;
         UiHandles::add_ui(&UiType::Fps, world);
         setup_debug_lines(world);
-        let cursor = init_cursor(world);
+        let _ = init_cursor(world);
         create_camera(world);
-        world.insert(EditorData::default());
+        let mut editor_data = EditorData::default();
+        if let Ok(level_edit) = load(world) {
+            editor_data.level = level_edit;
+        }
+        world.insert(editor_data);
+        let tile_defs = load_tile_definitions().expect("Tile definitions failed to load!");
+        world.insert(tile_defs);
     }
 
     fn update(
