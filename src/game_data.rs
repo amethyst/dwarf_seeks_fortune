@@ -7,6 +7,7 @@ use amethyst::{
     DataDispose, DataInit,
 };
 
+/// TODO: Evaluate the usefulness of a custom gamedata struct. Currently not really being used.
 pub struct CustomGameData<'a, 'b> {
     core_dispatcher: Option<Dispatcher<'a, 'b>>,
     running_dispatcher: Option<Dispatcher<'a, 'b>>,

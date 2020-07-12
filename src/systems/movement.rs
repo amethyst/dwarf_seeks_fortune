@@ -9,9 +9,11 @@ use amethyst::{
     window::ScreenDimensions,
 };
 
-pub struct MovementSystem;
+/// For every entity with a velocity and a transform, updates the transform according to the
+/// velocity.
+pub struct VelocitySystem;
 
-impl<'s> System<'s> for MovementSystem {
+impl<'s> System<'s> for VelocitySystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, Velocity>,
@@ -28,8 +30,9 @@ impl<'s> System<'s> for MovementSystem {
     }
 }
 
-/// TODO: Maybe split into two systems: One that sets steering, other that sets velo based on steering.
-/// Would make it reusable for AI steering as well.
+/// TODO: Maybe make discrete position part of steering?
+/// TODO: Where do we set the discrete pos? Currently split between two systems.
+/// This system checks player input for movement and adjusts the player's steering accordingly.
 pub struct PlayerSystem;
 
 impl<'s> System<'s> for PlayerSystem {
@@ -37,7 +40,6 @@ impl<'s> System<'s> for PlayerSystem {
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Pos>,
         WriteStorage<'s, Steering>,
-        WriteStorage<'s, Velocity>,
         ReadStorage<'s, PlayerTag>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, DebugConfig>,
@@ -51,7 +53,6 @@ impl<'s> System<'s> for PlayerSystem {
             mut transforms,
             mut discrete_positions,
             mut steerings,
-            mut velocities,
             player_tags,
             input,
             config,
@@ -59,12 +60,11 @@ impl<'s> System<'s> for PlayerSystem {
             mut history,
         ): Self::SystemData,
     ) {
-        for (_, transform, discrete_pos, steering, velocity) in (
+        for (_, transform, discrete_pos, steering) in (
             &player_tags,
             &mut transforms,
             &mut discrete_positions,
             &mut steerings,
-            &mut velocities,
         )
             .join()
         {
@@ -72,21 +72,16 @@ impl<'s> System<'s> for PlayerSystem {
             if real_pos_y <= discrete_pos.y as f32 {
                 // Check if I'm grounded.
                 steering.grounded = is_grounded(&discrete_pos, &tile_map);
-                if steering.grounded {
-                    // If so, correct y translation and zero out y velocity.
-                    transform.set_translation_y(discrete_pos.y as f32 + 1.0);
-                    velocity.y = 0.0;
-                } else {
-                    // If not, update discrete y pos and set y velocity.
-                    discrete_pos.y = calc_discrete_pos_y(transform);
-                    velocity.y = -config.player_speed;
-                }
             }
+
+            // TODO: Climbing ladders....
+            // let input_y = input.axis_value("move_y").unwrap_or(0.0);
+            // if input_y.abs() > f32::EPSILON && is_on_ladder() {
+            //     steering.destination.y += input_y;
+            // }
 
             // 1: Set current discrete position.
             // 2: Set steering based on user input.
-            // 3: Set velocity based on current position and desired position.
-            // 4: If necessary, adjust position, snap to grid.
 
             let old_pos = discrete_pos.clone();
             discrete_pos.x = calc_discrete_pos_x(transform);
@@ -112,6 +107,58 @@ impl<'s> System<'s> for PlayerSystem {
                     steering.destination.x = discrete_pos.x;
                 }
             }
+        }
+    }
+}
+
+/// Sets velocity for all entities with steering.
+pub struct MovementSystem;
+
+impl<'s> System<'s> for MovementSystem {
+    type SystemData = (
+        WriteStorage<'s, Transform>,
+        WriteStorage<'s, Pos>,
+        WriteStorage<'s, Steering>,
+        WriteStorage<'s, Velocity>,
+        Read<'s, InputHandler<StringBindings>>,
+        Read<'s, DebugConfig>,
+        Read<'s, TileMap>,
+        Write<'s, History>,
+    );
+
+    fn run(
+        &mut self,
+        (
+            mut transforms,
+            mut discrete_positions,
+            mut steerings,
+            mut velocities,
+            input,
+            config,
+            tile_map,
+            mut history,
+        ): Self::SystemData,
+    ) {
+        for (transform, discrete_pos, steering, velocity) in (
+            &mut transforms,
+            &mut discrete_positions,
+            &mut steerings,
+            &mut velocities,
+        )
+            .join()
+        {
+            if steering.grounded {
+                // If so, correct y translation and zero out y velocity.
+                transform.set_translation_y(discrete_pos.y as f32 + 1.0);
+                velocity.y = 0.0;
+            } else {
+                // If not, update discrete y pos and set y velocity.
+                discrete_pos.y = calc_discrete_pos_y(transform);
+                velocity.y = -config.player_speed;
+            }
+
+            // 3: Set velocity based on current position and desired position.
+            // 4: If necessary, adjust position, snap to grid.
 
             let desired_pos = steering.destination.x as f32 + 1.0;
             let delta = desired_pos - transform.translation().x;
@@ -155,11 +202,15 @@ fn is_against_wall(pos: &Pos, transform: &Transform, tile_map: &TileMap, x_offse
         2
     };
     (0..nr_blocks_to_check).any(|i| {
-        println!("i = {:?}", i);
+        // println!("i = {:?}", i);
         let tile = tile_map.get_tile(&Pos::new(pos.x + x_offset, floored_y as i32 + i));
         tile.map(|tile| tile.collides_horizontally())
             .unwrap_or(false)
     })
+}
+
+fn is_on_ladder() -> bool {
+    true
 }
 
 fn calc_discrete_pos_x(transform: &Transform) -> i32 {

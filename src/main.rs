@@ -77,14 +77,19 @@ fn make_game() -> amethyst::Result<()> {
             &[],
         )
         .with_core(
-            systems::MovementSystem.pausable(CurrentState::Running),
-            "movement_system",
-            &["input_system"],
-        )
-        .with_core(
             systems::PlayerSystem.pausable(CurrentState::Running),
             "player_system",
             &["input_system"],
+        )
+        .with_core(
+            systems::MovementSystem.pausable(CurrentState::Running),
+            "movement_system",
+            &["player_system"],
+        )
+        .with_core(
+            systems::VelocitySystem.pausable(CurrentState::Running),
+            "velocity_system",
+            &["movement_system"],
         )
         .with_core(systems::DebugSystem, "debug_system", &["input_system"])
         .with_core(systems::CameraSystem, "camera_system", &[])
