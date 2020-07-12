@@ -87,6 +87,14 @@ impl TileDefinition {
             false
         }
     }
+
+    pub fn collides_horizontally(&self) -> bool {
+        if let Some(collision) = &self.collision {
+            collision.collides_side
+        } else {
+            false
+        }
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

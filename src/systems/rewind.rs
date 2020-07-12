@@ -26,7 +26,7 @@ impl<'s> System<'s> for RewindControlSystem {
         (mut current_state, mut rewind, mut history, input, time, config, mut tints): Self::SystemData,
     ) {
         history.force_key_frame = false;
-        if input.action_is_down("rewind").unwrap_or(false) {
+        if input.action_is_down("shift").unwrap_or(false) {
             rewind.cooldown = match *current_state {
                 CurrentState::Running => config.seconds_per_rewind_frame,
                 CurrentState::Rewinding => {
