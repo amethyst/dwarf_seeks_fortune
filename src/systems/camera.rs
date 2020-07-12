@@ -82,18 +82,6 @@ impl<'s> System<'s> for CameraSystem {
                 transform.set_translation_y(player_y + frame.pan.y);
             }
         }
-        // else {
-        //     let maybe_cursor_pos = (&cursors, &transforms)
-        //         .join()
-        //         .map(|(_, transform)| (transform.translation().x, transform.translation().y))
-        //         .next();
-        //     if let Some((cursor_x, cursor_y)) = maybe_cursor_pos {
-        //         for (frame, transform) in (&camera_frames, &mut transforms).join() {
-        //             transform.set_translation_x(cursor_x + frame.pan.x);
-        //             transform.set_translation_y(cursor_y + frame.pan.y);
-        //         }
-        //     }
-        // }
     }
 }
 
@@ -136,15 +124,17 @@ impl<'s> System<'s> for ResizeSystem {
             if let Some(cam) = cam {
                 entities.delete(cam);
             }
-            entities
-                .build_entity()
-                .with(Parent { entity: frame }, &mut parents)
-                .with(
-                    Camera::standard_2d(dimens.width(), dimens.height()),
-                    &mut cameras,
-                )
-                .with(Transform::default(), &mut transforms)
-                .build();
+            if dimens.width() > f32::EPSILON && dimens.height() > f32::EPSILON {
+                entities
+                    .build_entity()
+                    .with(Parent { entity: frame }, &mut parents)
+                    .with(
+                        Camera::standard_2d(dimens.width(), dimens.height()),
+                        &mut cameras,
+                    )
+                    .with(Transform::default(), &mut transforms)
+                    .build();
+            }
         }
         *resize = ResizeState::Idle;
     }
