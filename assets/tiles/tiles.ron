@@ -32,5 +32,29 @@
             asset: Still(Blocks, 0),
             archetype: Block,
         ),
+        "Ladder":(
+            dimens: ( x:2, y:2, ),
+            unique: false,
+            mandatory: false,
+            collision: (
+                collides_top: true,
+                collides_side: false,
+                collides_bottom: false,
+            ),
+            asset: Still(Blocks, 2),
+            archetype: Ladder,
+        ),
+        "Key":(
+            dimens: ( x:2, y:2, ),
+            unique: false,
+            mandatory: false,
+            collision: (
+                collides_top: false,
+                collides_side: false,
+                collides_bottom: false,
+            ),
+            asset: Still(Blocks, 3),
+            archetype: Key,
+        ),
     }
 )
