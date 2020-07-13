@@ -73,7 +73,7 @@ pub fn load_level(world: &mut World) -> Result<(), ConfigError> {
         match tile_def.archetype {
             Archetype::Player => {
                 let player = build_player(builder, pos, tile_def);
-                build_frames(player, world);
+                build_frames(player, world, tile_def);
             }
             _ => {
                 builder.build();
@@ -84,7 +84,7 @@ pub fn load_level(world: &mut World) -> Result<(), ConfigError> {
     Ok(())
 }
 
-fn build_frames(player: Entity, world: &mut World) {
+fn build_frames(player: Entity, world: &mut World, tile_def: &TileDefinition) {
     let frame = world
         .read_resource::<Assets>()
         .get_still(&SpriteType::Frame);
@@ -94,8 +94,8 @@ fn build_frames(player: Entity, world: &mut World) {
     };
 
     let steering_ghost_transform = load_transform(
-        &Pos::new(0, 0),
-        &Pos::new(2, 2),
+        &Pos::default(),
+        &tile_def.dimens,
         &AssetType::Still(SpriteType::Frame, 0),
     );
     world
@@ -105,7 +105,7 @@ fn build_frames(player: Entity, world: &mut World) {
         .with(DebugSteeringGhostTag)
         .build();
     let pos_ghost_transform = load_transform(
-        &Pos::new(0, 0),
+        &Pos::default(),
         &Pos::new(1, 1),
         &AssetType::Still(SpriteType::Frame, 0),
     );

@@ -1,6 +1,6 @@
 use amethyst::{
     assets::PrefabData,
-    core::math::Vector2,
+    core::{math::Vector2, transform::Transform},
     derive::PrefabData,
     ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, WriteStorage},
     error::Error,
@@ -75,5 +75,28 @@ impl Steering {
             destination: pos,
             grounded: true,
         }
+    }
+
+    /// Converts the given discrete position to a translation, taking into account the dimensions
+    /// of the entity.
+    ///
+    /// The discrete position is the bottom-left corner of the entity, a translation is the
+    /// center point of the entity.
+    pub fn to_centered_coords(&self, pos: Pos) -> (f32, f32) {
+        (
+            pos.x as f32 + 0.5 * self.dimens.x as f32,
+            pos.y as f32 + 0.5 * self.dimens.y as f32,
+        )
+    }
+
+    /// Converts the given translation, which is the center-point of the entity, into a pair of
+    /// anchored coordinates, describing the bottom-left corner of the entity.
+    ///
+    /// Note that this does NOT return a discrete position: output is not rounded or floored.
+    pub fn to_anchor_coords(&self, transform: &Transform) -> (f32, f32) {
+        (
+            transform.translation().x - 0.5 * self.dimens.x as f32,
+            transform.translation().y - 0.5 * self.dimens.y as f32,
+        )
     }
 }

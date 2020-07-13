@@ -38,8 +38,9 @@ impl<'s> System<'s> for DebugSystem {
             .next();
         if let Some(steering) = maybe_steering {
             for (_, transform) in (&steering_ghost_tags, &mut transforms).join() {
-                transform.set_translation_x(steering.destination.x as f32 + 1.0);
-                transform.set_translation_y(steering.destination.y as f32 + 1.0);
+                let (centered_x, centered_y) = steering.to_centered_coords(steering.destination);
+                transform.set_translation_x(centered_x);
+                transform.set_translation_y(centered_y);
             }
             for (_, transform) in (&pos_ghost_tags, &mut transforms).join() {
                 transform.set_translation_x(steering.pos.x as f32 + 0.5);

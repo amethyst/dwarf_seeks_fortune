@@ -76,8 +76,10 @@ impl<'s> System<'s> for RewindSystem {
                 for (_, transform, steering) in
                     (&player_tags, &mut transforms, &mut steerings).join()
                 {
-                    transform.set_translation_x(frame.player_position.x as f32 + 1.);
-                    transform.set_translation_y(frame.player_position.y as f32 + 1.);
+                    let (centered_x, centered_y) =
+                        steering.to_centered_coords(frame.player_position);
+                    transform.set_translation_x(centered_x);
+                    transform.set_translation_y(centered_y);
                     steering.pos = frame.player_position;
                     steering.destination = frame.player_position;
                 }

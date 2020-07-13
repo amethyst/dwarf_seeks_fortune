@@ -44,9 +44,10 @@ impl<'s> System<'s> for MovementSystem {
     fn run(&mut self, (steerings, mut transforms, mut velocities, config): Self::SystemData) {
         for (transform, steering, velocity) in (&mut transforms, &steerings, &mut velocities).join()
         {
+            let (centered_x, centered_y) = steering.to_centered_coords(steering.pos);
             if steering.grounded {
                 // If grounded, correct y translation and zero out y velocity.
-                transform.set_translation_y(steering.pos.y as f32 + 1.0);
+                transform.set_translation_y(centered_y);
                 velocity.y = 0.0;
             } else {
                 // If not, set y velocity.
@@ -56,8 +57,8 @@ impl<'s> System<'s> for MovementSystem {
             // 1: Set velocity based on current position and desired position.
             // 2: If necessary, adjust position, snap to grid.
 
-            let desired_pos = steering.destination.x as f32 + 1.0;
-            let delta = desired_pos - transform.translation().x;
+            let (desired_pos_x, _) = steering.to_centered_coords(steering.destination);
+            let delta = desired_pos_x - transform.translation().x;
             let delta_signum = if delta.abs() < f32::EPSILON {
                 0.0
             } else {
@@ -67,7 +68,7 @@ impl<'s> System<'s> for MovementSystem {
                 velocity.x = delta_signum * config.player_speed;
             } else {
                 velocity.x = 0.0;
-                transform.set_translation_x((steering.pos.x + 1) as f32);
+                transform.set_translation_x(centered_x);
             }
         }
     }
