@@ -14,28 +14,19 @@ pub struct PlayerSystem;
 
 impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
-        WriteStorage<'s, Transform>,
-        WriteStorage<'s, Steering>,
         ReadStorage<'s, PlayerTag>,
+        ReadStorage<'s, Transform>,
+        WriteStorage<'s, Steering>,
         Read<'s, InputHandler<StringBindings>>,
-        Read<'s, DebugConfig>,
         Read<'s, TileMap>,
         Write<'s, History>,
     );
 
     fn run(
         &mut self,
-        (
-            mut transforms,
-            mut steerings,
-            player_tags,
-            input,
-            config,
-            tile_map,
-            mut history,
-        ): Self::SystemData,
+        (player_tags, transforms, mut steerings, input, tile_map, mut history): Self::SystemData,
     ) {
-        for (_, transform, steering) in (&player_tags, &mut transforms, &mut steerings).join() {
+        for (_, transform, steering) in (&player_tags, &transforms, &mut steerings).join() {
             let old_pos = steering.pos.clone();
             steering.pos.x = calc_discrete_pos_x(transform);
             steering.pos.y = calc_discrete_pos_y(transform);

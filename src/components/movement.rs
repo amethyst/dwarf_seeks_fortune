@@ -29,6 +29,7 @@ impl Velocity {
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct Pos {
+    // TODO: consider whether to replace Pos with with nalgebra's Point2?
     pub x: i32,
     pub y: i32,
 }
@@ -56,6 +57,8 @@ pub struct Steering {
     /// If an entity is wider than 1 by 1, the pos is the bottom-left most tile in the entity's
     /// body.
     pub pos: Pos,
+    /// Width and height of the entity.
+    pub dimens: Pos,
     /// TODO: Replace with enum that supports Y travel as well.
     pub direction: f32,
     pub destination: Pos,
@@ -64,9 +67,10 @@ pub struct Steering {
 }
 
 impl Steering {
-    pub fn new(pos: Pos) -> Steering {
+    pub fn new(pos: Pos, dimens: Pos) -> Steering {
         Steering {
             pos,
+            dimens,
             direction: 0.0,
             destination: pos,
             grounded: true,

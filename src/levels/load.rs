@@ -72,7 +72,7 @@ pub fn load_level(world: &mut World) -> Result<(), ConfigError> {
         }
         match tile_def.archetype {
             Archetype::Player => {
-                let player = build_player(builder);
+                let player = build_player(builder, pos, tile_def);
                 build_frames(player, world);
             }
             _ => {
@@ -117,10 +117,10 @@ fn build_frames(player: Entity, world: &mut World) {
         .build();
 }
 
-fn build_player(builder: EntityBuilder) -> Entity {
+fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) -> Entity {
     builder
         .with(Velocity::default())
-        .with(Steering::default())
+        .with(Steering::new(pos.clone(), tile_def.dimens.clone()))
         .with(PlayerTag)
         .build()
 }

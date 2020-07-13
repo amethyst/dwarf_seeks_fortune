@@ -35,41 +35,26 @@ pub struct MovementSystem;
 
 impl<'s> System<'s> for MovementSystem {
     type SystemData = (
+        ReadStorage<'s, Steering>,
         WriteStorage<'s, Transform>,
-        WriteStorage<'s, Steering>,
         WriteStorage<'s, Velocity>,
-        Read<'s, InputHandler<StringBindings>>,
         Read<'s, DebugConfig>,
-        Read<'s, TileMap>,
-        Write<'s, History>,
     );
 
-    fn run(
-        &mut self,
-        (
-            mut transforms,
-            mut steerings,
-            mut velocities,
-            input,
-            config,
-            tile_map,
-            mut history,
-        ): Self::SystemData,
-    ) {
-        for (transform, steering, velocity) in
-            (&mut transforms, &mut steerings, &mut velocities).join()
+    fn run(&mut self, (steerings, mut transforms, mut velocities, config): Self::SystemData) {
+        for (transform, steering, velocity) in (&mut transforms, &steerings, &mut velocities).join()
         {
             if steering.grounded {
-                // If so, correct y translation and zero out y velocity.
+                // If grounded, correct y translation and zero out y velocity.
                 transform.set_translation_y(steering.pos.y as f32 + 1.0);
                 velocity.y = 0.0;
             } else {
-                // If not, update discrete y pos and set y velocity.
+                // If not, set y velocity.
                 velocity.y = -config.player_speed;
             }
 
-            // 3: Set velocity based on current position and desired position.
-            // 4: If necessary, adjust position, snap to grid.
+            // 1: Set velocity based on current position and desired position.
+            // 2: If necessary, adjust position, snap to grid.
 
             let desired_pos = steering.destination.x as f32 + 1.0;
             let delta = desired_pos - transform.translation().x;
