@@ -17,12 +17,18 @@ pub struct Assets {
 }
 
 impl Assets {
-    pub fn put_still(&mut self, asset_type: SpriteType, asset: Handle<SpriteSheet>) {
+    pub fn put_still(mut self, asset_type: SpriteType, asset: Handle<SpriteSheet>) -> Self {
         self.stills.insert(asset_type, asset);
+        self
     }
 
-    pub fn put_animated(&mut self, asset_type: AnimType, asset: Handle<Prefab<MyPrefabData>>) {
+    pub fn put_animated(
+        mut self,
+        asset_type: AnimType,
+        asset: Handle<Prefab<MyPrefabData>>,
+    ) -> Self {
         self.animated.insert(asset_type, asset);
+        self
     }
 
     pub fn get_still(&self, asset_type: &SpriteType) -> Handle<SpriteSheet> {

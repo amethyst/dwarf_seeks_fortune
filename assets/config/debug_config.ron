@@ -9,6 +9,8 @@
     player_speed: 10.0,
     // Number of seconds to leave between frames when rewinding time.
     seconds_per_rewind_frame: 0.05,
-    // If true, run in level editor mode. Else, run the game itself.
-    editor_mode: true,
+    /// Enable this when debugging, to save time when rapidly iterating. It saves you from having to navigate the menu
+    /// every time you start the game.
+    /// If true, the game will open in the editor state. If false, it will open on the main menu.
+    skip_straight_to_editor: false,
 )

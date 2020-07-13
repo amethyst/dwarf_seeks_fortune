@@ -19,7 +19,7 @@ use precompile::MyPrefabData;
 
 use crate::game_data::CustomGameData;
 use crate::resources::*;
-use crate::states::{DemoState, EditorState};
+use crate::states::{DemoState, EditorState, MainMenuState};
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -33,63 +33,64 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         self.load_ui = Some(data.world.exec(|mut creator: UiCreator<'_>| {
             creator.create("ui/loading.ron", &mut self.progress)
         }));
-        let mut ui_handles = UiHandles::default();
-        ui_handles.put_handle(
-            UiType::Fps,
-            data.world
-                .exec(|loader: UiLoader<'_>| loader.load("ui/fps.ron", &mut self.progress)),
-        );
-        ui_handles.put_handle(
-            UiType::Paused,
-            data.world
-                .exec(|loader: UiLoader<'_>| loader.load("ui/paused.ron", &mut self.progress)),
-        );
+        let ui_handles = vec![
+            (UiType::Fps, "ui/fps.ron"),
+            (UiType::Paused, "ui/paused.ron"),
+            (UiType::MainMenu, "ui/main_menu.ron"),
+        ]
+        .drain(..)
+        .fold(UiHandles::default(), |mut handles, (ui_type, path)| {
+            handles.put_handle(
+                ui_type,
+                data.world
+                    .exec(|loader: UiLoader<'_>| loader.load(path, &mut self.progress)),
+            )
+        });
         data.world.insert(ui_handles);
-        let mut assets = Assets::default();
-        assets.put_still(
-            SpriteType::NotFound,
-            load_spritesheet(
+
+        let mut assets = vec![
+            (
+                SpriteType::NotFound,
                 "textures/not_found.png",
                 "prefab/still_not_found.ron",
-                data.world,
-                &mut self.progress,
             ),
-        );
-        assets.put_still(
-            SpriteType::Frame,
-            load_spritesheet(
+            (
+                SpriteType::Frame,
                 "textures/frame.png",
                 "prefab/still_frame.ron",
-                data.world,
-                &mut self.progress,
             ),
-        );
-        assets.put_still(
-            SpriteType::Blocks,
-            load_spritesheet(
+            (
+                SpriteType::Blocks,
                 "textures/blocks.png",
                 "prefab/still_blocks.ron",
-                data.world,
-                &mut self.progress,
             ),
-        );
-        assets.put_still(
-            SpriteType::Selection,
-            load_spritesheet(
+            (
+                SpriteType::Selection,
                 "textures/selection.png",
                 "prefab/still_selection.ron",
-                data.world,
-                &mut self.progress,
             ),
+        ]
+        .drain(..)
+        .fold(
+            Assets::default(),
+            |mut assets, (sprite_type, texture_path, ron_path)| {
+                assets.put_still(
+                    sprite_type,
+                    load_spritesheet(texture_path, ron_path, data.world, &mut self.progress),
+                )
+            },
         );
-        assets.put_animated(
-            AnimType::NotFound,
-            load_animation("prefab/anim_not_found.ron", data.world, &mut self.progress),
-        );
-        assets.put_animated(
-            AnimType::Mob,
-            load_animation("prefab/anim_mob.ron", data.world, &mut self.progress),
-        );
+        let assets = vec![
+            (AnimType::NotFound, "prefab/anim_not_found.ron"),
+            (AnimType::Mob, "prefab/anim_mob.ron"),
+        ]
+        .drain(..)
+        .fold(assets, |mut assets, (anim_type, prefab_path)| {
+            assets.put_animated(
+                anim_type,
+                load_animation(prefab_path, data.world, &mut self.progress),
+            )
+        });
         data.world.insert(assets);
     }
 
@@ -111,7 +112,8 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         data: StateData<'_, CustomGameData<'_, '_>>,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
         data.data.update(&data.world, true);
-        let editor_mode = (&*data.world.read_resource::<DebugConfig>()).editor_mode;
+        let skip_straight_to_editor =
+            (&*data.world.read_resource::<DebugConfig>()).skip_straight_to_editor;
         match self.progress.complete() {
             Completion::Failed => {
                 eprintln!("Failed loading assets");
@@ -122,10 +124,10 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                 if let Some(entity) = self.load_ui {
                     let _ = data.world.delete_entity(entity);
                 }
-                if editor_mode {
+                if skip_straight_to_editor {
                     Trans::Switch(Box::new(EditorState))
                 } else {
-                    Trans::Switch(Box::new(DemoState))
+                    Trans::Switch(Box::new(MainMenuState::new()))
                 }
             }
             Completion::Loading => Trans::None,

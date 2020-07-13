@@ -24,8 +24,9 @@ pub struct UiHandles {
 }
 
 impl UiHandles {
-    pub fn put_handle(&mut self, key: UiType, handle: Handle<UiPrefab>) {
+    pub fn put_handle(mut self, key: UiType, handle: Handle<UiPrefab>) -> Self {
         self.map.insert(key, handle);
+        self
     }
 
     /// TODO: Get rid of expect call.
@@ -49,4 +50,6 @@ pub enum UiType {
     Fps,
     /// The paused menu.
     Paused,
+    /// The main menu.
+    MainMenu,
 }
