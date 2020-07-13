@@ -123,8 +123,7 @@ impl<'s> System<'s> for TilePaintSystem {
         WriteStorage<'s, Transform>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Handle<Prefab<MyPrefabData>>>,
-        WriteStorage<'s, Pos>,
-        WriteStorage<'s, PaintedTileTag>,
+        WriteStorage<'s, PaintedTile>,
         Read<'s, TileDefinitions>,
         Read<'s, Assets>,
         Write<'s, EditorData>,
@@ -137,7 +136,6 @@ impl<'s> System<'s> for TilePaintSystem {
             mut transforms,
             mut sprite_renders,
             mut anims,
-            mut discrete_positions,
             mut tiles,
             tile_defs,
             assets,
@@ -145,9 +143,9 @@ impl<'s> System<'s> for TilePaintSystem {
             entities,
         ): Self::SystemData,
     ) {
-        for (_, _, entity) in (&tiles, &discrete_positions, &entities)
+        for (_, entity) in (&tiles, &entities)
             .join()
-            .filter(|(_, pos, _)| data.level.is_dirty(pos))
+            .filter(|(tile, _)| data.level.is_dirty(&tile.pos))
         {
             entities.delete(entity);
         }
@@ -177,8 +175,7 @@ impl<'s> System<'s> for TilePaintSystem {
                 builder = builder.with(transform, &mut transforms);
             }
             builder
-                .with(pos.clone(), &mut discrete_positions)
-                .with(PaintedTileTag, &mut tiles)
+                .with(PaintedTile::new(pos.clone()), &mut tiles)
                 .build();
             tile_edit.dirty = false;
         }

@@ -119,7 +119,6 @@ fn build_frames(player: Entity, world: &mut World) {
 
 fn build_player(builder: EntityBuilder) -> Entity {
     builder
-        .with(Pos::default())
         .with(Velocity::default())
         .with(Steering::default())
         .with(PlayerTag)

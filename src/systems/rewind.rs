@@ -60,7 +60,6 @@ pub struct RewindSystem;
 impl<'s> System<'s> for RewindSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
-        WriteStorage<'s, Pos>,
         WriteStorage<'s, Steering>,
         ReadStorage<'s, PlayerTag>,
         Read<'s, Rewind>,
@@ -69,22 +68,17 @@ impl<'s> System<'s> for RewindSystem {
 
     fn run(
         &mut self,
-        (mut transforms, mut positions, mut steerings, player_tags, rewind, mut history): Self::SystemData,
+        (mut transforms, mut steerings, player_tags, rewind, mut history): Self::SystemData,
     ) {
         if rewind.is_ready() {
             if let Some(frame) = history.pop_frame() {
                 println!("Rewinding player to {:?}", frame);
-                for (_, transform, pos, steering) in (
-                    &player_tags,
-                    &mut transforms,
-                    &mut positions,
-                    &mut steerings,
-                )
-                    .join()
+                for (_, transform, steering) in
+                    (&player_tags, &mut transforms, &mut steerings).join()
                 {
                     transform.set_translation_x(frame.player_position.x as f32 + 1.);
                     transform.set_translation_y(frame.player_position.y as f32 + 1.);
-                    *pos = frame.player_position;
+                    steering.pos = frame.player_position;
                     steering.destination = frame.player_position;
                 }
             }

@@ -82,13 +82,17 @@ impl Default for LineDirection {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
-pub struct PaintedTileTag;
+pub struct PaintedTile {
+    pub pos: Pos,
+}
 
-impl Component for PaintedTileTag {
-    type Storage = NullStorage<Self>;
+impl PaintedTile {
+    pub fn new(pos: Pos) -> Self {
+        PaintedTile { pos }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
