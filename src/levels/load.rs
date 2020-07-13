@@ -29,6 +29,7 @@ use crate::levels::{Archetype, Level, TileDefinition, TileDefinitions};
 use crate::resources::*;
 use crate::states::PausedState;
 use std::error::Error;
+use std::path::PathBuf;
 
 pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
     let file = application_root_dir()
@@ -41,14 +42,9 @@ pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
     tile_defs
 }
 
-pub fn load_level(world: &mut World) -> Result<(), ConfigError> {
+pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
     let fallback_def = TileDefinition::fallback();
     let tile_defs = load_tile_definitions()?;
-    let level_file = application_root_dir()
-        .expect("Root dir not found!")
-        .join("assets/")
-        .join("levels/")
-        .join("generated.ron");
     let level = Level::load(level_file)?;
     // println!("Map loaded: {:?}", map);
     level.tile_defs.iter().for_each(|(pos, tile_def_key)| {

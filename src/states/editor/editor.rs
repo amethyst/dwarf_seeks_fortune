@@ -34,7 +34,7 @@ use crate::resources::*;
 use crate::states::editor::load::load;
 use crate::states::editor::paint::paint_tiles;
 use crate::states::editor::save::save;
-use crate::states::{PausedState, PlayTestState};
+use crate::states::{PausedState, PlayState};
 
 pub struct EditorState;
 
@@ -63,6 +63,82 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         editor_data.brush.set_palette(&tile_defs);
         world.insert(editor_data);
         world.insert(tile_defs);
+    }
+
+    fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        println!("EditorState on_stop");
+        data.world.delete_all();
+    }
+
+    fn handle_event(
+        &mut self,
+        data: StateData<'_, CustomGameData<'_, '_>>,
+        event: StateEvent,
+    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+        match event {
+            // Events related to the window and inputs.
+            StateEvent::Window(event) => {
+                if let Event::WindowEvent {
+                    window_id: _,
+                    event: WindowEvent::Resized(_),
+                } = event
+                {
+                    *data.world.write_resource::<ResizeState>() = ResizeState::Resizing;
+                };
+                if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
+                    save(data.world);
+                    Trans::Pop
+                } else {
+                    Trans::None
+                }
+            }
+            // Ui event. Button presses, mouse hover, etc...
+            StateEvent::Ui(_) => Trans::None,
+            StateEvent::Input(input_event) => match input_event {
+                InputEvent::KeyReleased {
+                    key_code: VirtualKeyCode::Return,
+                    scancode: _,
+                } => {
+                    paint_tiles(data.world);
+                    Trans::None
+                }
+                InputEvent::KeyReleased {
+                    key_code: VirtualKeyCode::F5,
+                    scancode: _,
+                } => {
+                    save(data.world);
+                    let level_file = application_root_dir()
+                        .expect("Root dir not found!")
+                        .join("assets/")
+                        .join("levels/")
+                        .join("generated.ron");
+                    Trans::Switch(Box::new(PlayState::new(level_file, true)))
+                }
+                InputEvent::KeyReleased {
+                    key_code: VirtualKeyCode::LBracket,
+                    scancode: _,
+                } => {
+                    &(*data.world.write_resource::<EditorData>())
+                        .brush
+                        .select_previous();
+                    Trans::None
+                }
+                InputEvent::KeyReleased {
+                    key_code: VirtualKeyCode::RBracket,
+                    scancode: _,
+                } => {
+                    &(*data.world.write_resource::<EditorData>())
+                        .brush
+                        .select_next();
+                    Trans::None
+                }
+                InputEvent::ActionPressed(action) => {
+                    self.handle_action(&action, data.world);
+                    Trans::None
+                }
+                _ => Trans::None,
+            },
+        }
     }
 
     fn update(
@@ -94,73 +170,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         );
         data.data.update(&world, true);
         Trans::None
-    }
-
-    fn handle_event(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-        event: StateEvent,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        match event {
-            // Events related to the window and inputs.
-            StateEvent::Window(event) => {
-                if let Event::WindowEvent {
-                    window_id: _,
-                    event: WindowEvent::Resized(_),
-                } = event
-                {
-                    *data.world.write_resource::<ResizeState>() = ResizeState::Resizing;
-                };
-                if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {
-                    Trans::Quit
-                } else if is_key_down(&event, VirtualKeyCode::Escape) {
-                    save(data.world);
-                    data.world.delete_all();
-                    Trans::Replace(Box::new(PlayTestState))
-                } else {
-                    Trans::None
-                }
-            }
-            // Ui event. Button presses, mouse hover, etc...
-            StateEvent::Ui(_) => Trans::None,
-            StateEvent::Input(input_event) => {
-                match input_event {
-                    InputEvent::KeyReleased {
-                        key_code: VirtualKeyCode::Return,
-                        scancode: _,
-                    } => {
-                        paint_tiles(data.world);
-                    }
-                    InputEvent::KeyReleased {
-                        key_code: VirtualKeyCode::F5,
-                        scancode: _,
-                    } => {
-                        save(data.world);
-                    }
-                    InputEvent::KeyReleased {
-                        key_code: VirtualKeyCode::LBracket,
-                        scancode: _,
-                    } => {
-                        &(*data.world.write_resource::<EditorData>())
-                            .brush
-                            .select_previous();
-                    }
-                    InputEvent::KeyReleased {
-                        key_code: VirtualKeyCode::RBracket,
-                        scancode: _,
-                    } => {
-                        &(*data.world.write_resource::<EditorData>())
-                            .brush
-                            .select_next();
-                    }
-                    InputEvent::ActionPressed(action) => {
-                        self.handle_action(&action, data.world);
-                    }
-                    _ => (),
-                };
-                Trans::None
-            }
-        }
     }
 }
 

@@ -1,9 +1,5 @@
-use crate::components::*;
-use crate::entities::*;
-use crate::game_data::CustomGameData;
-use crate::levels::*;
-use crate::resources::*;
-use crate::states::PausedState;
+use std::path::{Path, PathBuf};
+
 use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
 use amethyst::ui::UiPrefab;
@@ -29,9 +25,37 @@ use amethyst::{
 };
 use precompile::AnimationId;
 
-pub struct DemoState;
+use crate::components::*;
+use crate::entities::*;
+use crate::game_data::CustomGameData;
+use crate::levels::*;
+use crate::resources::*;
+use crate::states::{EditorState, PausedState};
 
-impl<'a, 'b> DemoState {
+pub struct PlayState {
+    level_file: PathBuf,
+    editor_mode: bool,
+}
+
+impl<'a, 'b> PlayState {
+    /// Starts the PlayState in demo mode. It loads the demo level.
+    pub fn demo() -> Self {
+        let level_file = application_root_dir()
+            .expect("Root dir not found!")
+            .join("assets/")
+            .join("levels/")
+            .join("demo_level.ron");
+        PlayState {
+            level_file,
+            editor_mode: false,
+        }
+    }
+    pub fn new(level_file: PathBuf, editor_mode: bool) -> Self {
+        PlayState {
+            level_file,
+            editor_mode,
+        }
+    }
     fn handle_action(
         &mut self,
         action: &str,
@@ -52,13 +76,59 @@ impl<'a, 'b> DemoState {
     }
 }
 
-impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
+impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         let StateData { world, .. } = data;
+        UiHandles::add_ui(&UiType::Fps, world);
         create_camera(world);
-        setup_debug_lines(world);
+        // setup_debug_lines(world, &self.root.unwrap());
         world.write_resource::<History>().force_key_frame = true;
-        load_level(world);
+        load_level(&self.level_file, world);
+    }
+
+    fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        println!("PlayState on_stop");
+        data.world.delete_all();
+    }
+
+    fn handle_event(
+        &mut self,
+        data: StateData<'_, CustomGameData<'_, '_>>,
+        event: StateEvent,
+    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+        match event {
+            // Events related to the window and inputs.
+            StateEvent::Window(event) => {
+                if let Event::WindowEvent {
+                    window_id: _,
+                    event: WindowEvent::Resized(_),
+                } = event
+                {
+                    *data.world.write_resource::<ResizeState>() = ResizeState::Resizing;
+                };
+                if is_close_requested(&event) {
+                    Trans::Quit
+                } else if is_key_down(&event, VirtualKeyCode::Escape) {
+                    if self.editor_mode {
+                        Trans::Switch(Box::new(EditorState))
+                    } else {
+                        Trans::Pop
+                    }
+                } else {
+                    Trans::None
+                }
+            }
+            // Ui event. Button presses, mouse hover, etc...
+            StateEvent::Ui(_) => Trans::None,
+            StateEvent::Input(input_event) => {
+                // println!("Input event detected! {:?}", input_event);
+                if let InputEvent::ActionPressed(action) = input_event {
+                    self.handle_action(&action, data.world)
+                } else {
+                    Trans::None
+                }
+            }
+        }
     }
 
     fn update(
@@ -90,42 +160,5 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for DemoState {
         );
         data.data.update(&world, true);
         Trans::None
-    }
-
-    fn handle_event(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-        event: StateEvent,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        match event {
-            // Events related to the window and inputs.
-            StateEvent::Window(event) => {
-                if let Event::WindowEvent {
-                    window_id: _,
-                    event: WindowEvent::Resized(_),
-                } = event
-                {
-                    *data.world.write_resource::<ResizeState>() = ResizeState::Resizing;
-                };
-                if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::F1) {
-                    Trans::Quit
-                } else if is_key_down(&event, VirtualKeyCode::Escape) {
-                    // Pause the game by going to the `PausedState`.
-                    Trans::Push(Box::new(PausedState::new()))
-                } else {
-                    Trans::None
-                }
-            }
-            // Ui event. Button presses, mouse hover, etc...
-            StateEvent::Ui(_) => Trans::None,
-            StateEvent::Input(input_event) => {
-                // println!("Input event detected! {:?}", input_event);
-                if let InputEvent::ActionPressed(action) = input_event {
-                    self.handle_action(&action, data.world)
-                } else {
-                    Trans::None
-                }
-            }
-        }
     }
 }

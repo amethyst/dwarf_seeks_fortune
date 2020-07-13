@@ -19,7 +19,7 @@ use precompile::MyPrefabData;
 
 use crate::game_data::CustomGameData;
 use crate::resources::*;
-use crate::states::{DemoState, EditorState, MainMenuState};
+use crate::states::{EditorState, MainMenuState};
 
 #[derive(Default)]
 pub struct LoadingState {

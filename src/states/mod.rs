@@ -1,11 +1,11 @@
-mod demo;
 mod editor;
 mod loading;
 mod main_menu;
 mod paused;
-mod play_test;
+mod play;
 
 pub use self::editor::*;
+pub use self::loading::*;
 pub use self::main_menu::*;
-pub use self::play_test::*;
-pub use self::{demo::DemoState, loading::LoadingState, paused::PausedState};
+pub use self::paused::*;
+pub use self::play::*;

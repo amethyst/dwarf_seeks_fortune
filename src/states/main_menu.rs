@@ -1,26 +1,62 @@
 use crate::game_data::CustomGameData;
 use crate::resources::*;
-use amethyst::prelude::Builder;
+use crate::states::*;
+use amethyst::prelude::{Builder, World};
 use amethyst::{
     ecs::prelude::{Entity, WorldExt},
-    input::{is_key_down, VirtualKeyCode},
+    input::{is_close_requested, is_key_down, VirtualKeyCode},
+    ui::{UiEvent, UiEventType, UiFinder},
     State, StateData, StateEvent, Trans,
 };
 
+const PLAY_BUTTON_ID: &str = "play";
+const EDITOR_BUTTON_ID: &str = "editor";
+const EXIT_BUTTON_ID: &str = "exit";
+
+#[derive(Default)]
 pub struct MainMenuState {
     ui: Option<Entity>,
+    play_button: Option<Entity>,
+    editor_button: Option<Entity>,
+    exit_button: Option<Entity>,
 }
 
 impl MainMenuState {
     pub fn new() -> MainMenuState {
-        MainMenuState { ui: None }
+        MainMenuState::default()
+    }
+
+    fn init_ui(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        UiHandles::add_ui(&UiType::Fps, data.world);
+        self.ui = UiHandles::add_ui(&UiType::MainMenu, data.world);
+        // invoke a world update to finish creating our ui entities
+        data.data.update(&data.world, false);
+        // look up our buttons
+        data.world.exec(|ui_finder: UiFinder<'_>| {
+            self.play_button = ui_finder.find(PLAY_BUTTON_ID);
+            self.editor_button = ui_finder.find(EDITOR_BUTTON_ID);
+            self.exit_button = ui_finder.find(EXIT_BUTTON_ID);
+        });
     }
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         println!("MainMenuState on_start");
-        self.ui = UiHandles::add_ui(&UiType::MainMenu, data.world);
+        self.init_ui(data);
+    }
+
+    fn on_pause(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        println!("MainMenuState on_pause");
+        data.world.delete_all();
+        self.play_button = None;
+        self.editor_button = None;
+        self.exit_button = None;
+    }
+
+    fn on_resume(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        println!("MainMenuState on_resume");
+        self.init_ui(data);
     }
 
     fn handle_event(
@@ -28,17 +64,30 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
         data: StateData<'_, CustomGameData<'_, '_>>,
         event: StateEvent,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        if let StateEvent::Window(event) = &event {
-            if is_key_down(&event, VirtualKeyCode::Escape) {
-                if let Some(ui) = self.ui {
-                    let _ = data.world.delete_entity(ui);
+        match event {
+            StateEvent::Window(event) => {
+                if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
+                    Trans::Quit
+                } else {
+                    Trans::None
                 }
-                return Trans::Pop;
             }
+            StateEvent::Ui(UiEvent {
+                event_type: UiEventType::Click,
+                target,
+            }) => {
+                if Some(target) == self.play_button {
+                    Trans::Push(Box::new(PlayState::demo()))
+                } else if Some(target) == self.editor_button {
+                    Trans::Push(Box::new(EditorState))
+                } else if Some(target) == self.exit_button {
+                    Trans::Quit
+                } else {
+                    Trans::None
+                }
+            }
+            _ => Trans::None,
         }
-
-        // Escape isn't pressed, so we stay in this `State`.
-        Trans::None
     }
 
     fn update(
