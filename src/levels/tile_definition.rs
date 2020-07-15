@@ -45,7 +45,8 @@ impl<'a> TileDefinitions {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileDefinition {
     /// How wide and high is the tile?
@@ -57,6 +58,8 @@ pub struct TileDefinition {
     /// with this definition. Examples are the player and the exit door. Note that in combination
     /// with 'unique', a tile can be required to appear EXACTLY once in each level.
     pub mandatory: bool,
+    /// Whether you can climb up and down on this block. For ladders, this is true.
+    pub climbable: bool,
     /// Collision data for the tile. Is optional, because not all tiles collide.
     pub collision: Option<CollisionDefinition>,
     /// The graphical asset to use for this tile. Is optional, because not all tiles have an asset.
@@ -72,6 +75,7 @@ impl TileDefinition {
             dimens: Pos::new(1, 1),
             unique: false,
             mandatory: false,
+            climbable: false,
             collision: None,
             asset: Some(AssetType::Still(SpriteType::NotFound, 0)),
             archetype: Archetype::NotFound,
@@ -113,12 +117,16 @@ pub enum Archetype {
     Key,
     /// After collecting all keys, finish level by reaching this door.
     Door,
-    /// Use these to climb up or down.
-    Ladder,
     /// Spawns mobs from this location.
     MobSpawner,
     /// A fallback archetype used when an archetype lookup failed.
     NotFound,
+}
+
+impl Default for Archetype {
+    fn default() -> Self {
+        Archetype::Block
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

@@ -55,6 +55,11 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                 "prefab/still_not_found.ron",
             ),
             (
+                SpriteType::Ladder,
+                "textures/ladder.png",
+                "prefab/still_ladder.ron",
+            ),
+            (
                 SpriteType::Frame,
                 "textures/frame.png",
                 "prefab/still_frame.ron",

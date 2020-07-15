@@ -33,16 +33,17 @@
             archetype: Block,
         ),
         "Ladder":(
-            dimens: ( x:2, y:2, ),
+            dimens: ( x:2, y:1, ),
             unique: false,
             mandatory: false,
+            climbable: true,
             collision: (
                 collides_top: true,
                 collides_side: false,
                 collides_bottom: false,
             ),
-            asset: Still(Blocks, 2),
-            archetype: Ladder,
+            asset: Still(Ladder, 0),
+            archetype: Block,
         ),
         "Key":(
             dimens: ( x:2, y:2, ),

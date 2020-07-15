@@ -69,6 +69,7 @@ pub enum AssetType {
 pub enum SpriteType {
     /// This is the fallback sprite to use if the desired sprite cannot be found.
     NotFound,
+    Ladder,
     Background,
     Frame,
     Blocks,
@@ -89,6 +90,7 @@ pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
         AssetType::Still(sprite_type, _) => match sprite_type {
             SpriteType::Background => Pos::new(2449, 1632),
             SpriteType::Frame => Pos::new(50, 50),
+            SpriteType::Ladder => Pos::new(128, 64),
             _ => Pos::new(128, 128),
         },
         AssetType::Animated(anim_type) => match anim_type {
