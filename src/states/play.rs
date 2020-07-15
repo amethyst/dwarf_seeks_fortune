@@ -82,7 +82,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
         UiHandles::add_ui(&UiType::Fps, world);
         create_camera(world);
         // setup_debug_lines(world, &self.root.unwrap());
-        world.write_resource::<History>().force_key_frame = true;
+        world.insert(History::default());
         load_level(&self.level_file, world);
     }
 
