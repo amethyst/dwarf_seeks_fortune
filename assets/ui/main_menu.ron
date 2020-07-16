@@ -8,6 +8,17 @@ Container(
         height: 960.0,
     ),
     children: [
+        Image(
+            transform: (
+                id: "logo",
+                width: 256.,
+                height: 512.,
+                x: 128.,
+                y: -32.,
+                anchor: MiddleLeft,
+            ),
+            image: Texture(File("textures/legend.png", ("IMAGE", ()))),
+        ),
         Label(
             transform: (
                 id: "title",

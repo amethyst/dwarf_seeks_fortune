@@ -12,5 +12,5 @@
     /// Enable this when debugging, to save time when rapidly iterating. It saves you from having to navigate the menu
     /// every time you start the game.
     /// If true, the game will open in the editor state. If false, it will open on the main menu.
-    skip_straight_to_editor: true,
+    skip_straight_to_editor: false,
 )

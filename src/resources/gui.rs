@@ -48,6 +48,8 @@ impl UiHandles {
 pub enum UiType {
     /// Small debug FPS meter.
     Fps,
+    /// Ui for the level editor.
+    Editor,
     /// The paused menu.
     Paused,
     /// The main menu.
