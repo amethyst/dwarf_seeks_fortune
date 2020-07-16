@@ -28,6 +28,7 @@ impl<'s> System<'s> for CursorSystem {
         Write<'s, EditorData>,
     );
 
+    // TODO: Some code duplication here.
     fn run(
         &mut self,
         (mut transforms, mut cursors, input, time, config, mut editor_data): Self::SystemData,
@@ -41,8 +42,8 @@ impl<'s> System<'s> for CursorSystem {
                 editor_data.selector.end.x += input_x as i32;
                 editor_data.selector.end.y += input_y as i32;
                 transform.set_translation_xyz(
-                    editor_data.selector.end.x as f32 + 0.5,
-                    editor_data.selector.end.y as f32 + 0.5,
+                    editor_data.selector.end.x as f32,
+                    editor_data.selector.end.y as f32,
                     2.0,
                 );
                 cursor.cooldown = config.cursor_move_high_cooldown;
@@ -58,13 +59,33 @@ impl<'s> System<'s> for CursorSystem {
                     editor_data.selector.end.x += input_x as i32;
                     editor_data.selector.end.y += input_y as i32;
                     transform.set_translation_xyz(
-                        editor_data.selector.end.x as f32 + 0.5,
-                        editor_data.selector.end.y as f32 + 0.5,
+                        editor_data.selector.end.x as f32,
+                        editor_data.selector.end.y as f32,
                         2.0,
                     );
                 }
             }
             cursor.last_direction = new_direction;
+        }
+    }
+}
+
+/// Responsible for animating the cursor preview (IE the ghost of the block on the brush
+/// that is displayed at the cursor position).
+pub struct CursorPreviewSystem;
+
+impl<'s> System<'s> for CursorPreviewSystem {
+    type SystemData = (
+        ReadStorage<'s, CursorPreviewTag>,
+        WriteStorage<'s, Transform>,
+        Read<'s, Time>,
+        Read<'s, EditorData>,
+    );
+
+    fn run(&mut self, (tags, mut transforms, time, editor_data): Self::SystemData) {
+        for (_, transform) in (&tags, &mut transforms).join() {
+            let scale_factor = 1. - 0.1 * (time.absolute_time_seconds() * 3.14).sin().abs();
+            transform.set_scale(Vector3::new(scale_factor, scale_factor, 1.0));
         }
     }
 }
@@ -101,7 +122,16 @@ impl<'s> System<'s> for SelectionSystem {
                 // TODO: set scale requires knowledge about dimensions of sprite.
                 // Maybe solve with child entity.
                 // Or accept hardcoded nature, because sprite unlikely to change?
-                transform.set_scale(Vector3::new(width as f32 / 128., height as f32 / 128., 1.0));
+                if width == 1 && height == 1 {
+                    transform.set_scale(Vector3::new(0., 0., 1.0));
+                } else {
+                    transform.set_scale(Vector3::new(
+                        width as f32 / 128.,
+                        height as f32 / 128.,
+                        1.0,
+                    ));
+                }
+
                 transform.set_translation_xyz(
                     (width as f32 * 0.5)
                         + min(editor_data.selector.start.x, editor_data.selector.end.x) as f32,

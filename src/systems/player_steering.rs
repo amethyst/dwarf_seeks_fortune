@@ -85,19 +85,31 @@ impl<'s> System<'s> for PlayerSystem {
     }
 }
 
-fn check_climbing(input_y: f32, anchored_y: f32, steering: &mut Steering, tile_map: &TileMap) -> bool {
+fn check_climbing(
+    input_y: f32,
+    anchored_y: f32,
+    steering: &mut Steering,
+    tile_map: &TileMap,
+) -> bool {
     let offset_from_discrete_pos = steering.pos.y as f32 - anchored_y;
-    if offset_from_discrete_pos < f32::EPSILON && input_y > f32::EPSILON && can_climb_up(steering, &tile_map) {
+    if offset_from_discrete_pos < f32::EPSILON
+        && input_y > f32::EPSILON
+        && can_climb_up(steering, &tile_map)
+    {
         steering.mode = SteeringMode::Climbing;
         steering.destination.y = steering.pos.y + 1;
         steering.direction = (0., 1.);
         true
-    } else if offset_from_discrete_pos > -f32::EPSILON && input_y < -f32::EPSILON && can_climb_down(steering, &tile_map) {
+    } else if offset_from_discrete_pos > -f32::EPSILON
+        && input_y < -f32::EPSILON
+        && can_climb_down(steering, &tile_map)
+    {
         steering.mode = SteeringMode::Climbing;
         steering.destination.y = steering.pos.y - 1;
         steering.direction = (0., -1.);
         true
-    } else if input_y.abs() > f32::EPSILON && ((steering.destination.y - steering.pos.y) * input_y as i32).is_negative()
+    } else if input_y.abs() > f32::EPSILON
+        && ((steering.destination.y - steering.pos.y) * input_y as i32).is_negative()
     {
         // Player wants to go back where they came from.
         steering.destination.y = steering.pos.y;

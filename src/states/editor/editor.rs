@@ -35,6 +35,7 @@ use crate::states::editor::load::load;
 use crate::states::editor::paint::paint_tiles;
 use crate::states::editor::save::save;
 use crate::states::{PausedState, PlayState};
+use std::io::Read;
 
 pub struct EditorState;
 
@@ -53,7 +54,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         let StateData { world, .. } = data;
         UiHandles::add_ui(&UiType::Fps, world);
         setup_debug_lines(world);
-        let _ = init_cursor(world);
+        init_cursor(world);
         create_camera(world);
         let mut editor_data = EditorData::default();
         if let Ok(level_edit) = load(world) {
@@ -118,18 +119,20 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                     key_code: VirtualKeyCode::LBracket,
                     scancode: _,
                 } => {
-                    &(*data.world.write_resource::<EditorData>())
+                    let new_key = (*data.world.write_resource::<EditorData>())
                         .brush
                         .select_previous();
+                    add_cursor_preview_tag(data.world, new_key);
                     Trans::None
                 }
                 InputEvent::KeyReleased {
                     key_code: VirtualKeyCode::RBracket,
                     scancode: _,
                 } => {
-                    &(*data.world.write_resource::<EditorData>())
+                    let new_key = (*data.world.write_resource::<EditorData>())
                         .brush
                         .select_next();
+                    add_cursor_preview_tag(data.world, new_key);
                     Trans::None
                 }
                 InputEvent::ActionPressed(action) => {
@@ -173,7 +176,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     }
 }
 
-fn init_cursor(world: &mut World) -> Entity {
+fn init_cursor(world: &mut World) {
     let sprite_handle = world
         .read_resource::<Assets>()
         .get_still(&SpriteType::Selection);
@@ -191,20 +194,105 @@ fn init_cursor(world: &mut World) -> Entity {
         .with(SelectionTag)
         .build();
     let mut transform = Transform::default();
-    transform.set_translation_xyz(0.5, 0.5, 2.0);
-    transform.set_scale(Vector3::new(
-        1. / asset_dimensions.x as f32,
-        1. / asset_dimensions.y as f32,
-        1.0,
-    ));
-    world
+    // transform.set_translation_xyz(0.5, 0.5, 2.0);
+    let cursor = world
         .create_entity()
-        .with(SpriteRender {
-            sprite_sheet: sprite_handle,
-            sprite_number: 0,
-        })
-        .with(Transparent)
         .with(transform)
         .with(Cursor::default())
-        .build()
+        .build();
+    add_cursor_preview_tag(world, None);
+}
+
+//TODO: Very crappy code.
+fn add_cursor_preview_tag(world: &mut World, key: Option<String>) {
+    let cursor = lookup_cursor_entity(world);
+    delete_cursor_preview(world);
+    if key.is_none() {
+        let sprite_sheet = world
+            .read_resource::<Assets>()
+            .get_still(&SpriteType::Selection);
+        let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 2));
+        let mut transform = Transform::default();
+        transform.set_translation_xyz(0.5, 0.5, 2.0);
+        transform.set_scale(Vector3::new(
+            1. / asset_dimensions.x as f32,
+            1. / asset_dimensions.y as f32,
+            1.0,
+        ));
+        let parent = world
+            .create_entity()
+            .with(CursorPreviewParentTag)
+            .with(Parent { entity: cursor })
+            .with(transform)
+            .build();
+        world
+            .create_entity()
+            .with(SpriteRender {
+                sprite_sheet,
+                sprite_number: 2,
+            })
+            .with(Transparent)
+            .with(Transform::default())
+            .with(CursorPreviewTag)
+            .with(Parent { entity: parent })
+            .build();
+    } else {
+        let tile_def = world
+            .read_resource::<TileDefinitions>()
+            .get(&key.unwrap())
+            .clone();
+        println!("hey: {:?}", tile_def);
+        let still_asset = load_still_asset(&tile_def, &world.read_resource::<Assets>());
+        let anim_asset = load_anim_asset(&tile_def, &world.read_resource::<Assets>());
+        let transform = if let Some(asset) = &tile_def.asset {
+            Some(load_transform(&Pos::default(), &tile_def.dimens, asset))
+        } else {
+            panic!("Not implemented yet! Tiles with no graphics asset."); //TODO;...
+        };
+        let parent = world
+            .create_entity()
+            .with(CursorPreviewParentTag)
+            .with(transform.unwrap())
+            .with(Parent { entity: cursor })
+            .build();
+        let mut builder = world.create_entity();
+        if let Some(still_asset) = still_asset {
+            builder = builder.with(still_asset);
+        }
+        if let Some(anim_asset) = anim_asset {
+            builder = builder.with(anim_asset);
+        }
+        builder
+            .with(Transform::default())
+            .with(Transparent)
+            .with(Tint(Srgba::new(0.4, 0.4, 0.4, 0.8)))
+            .with(CursorPreviewTag)
+            .with(Parent { entity: parent })
+            .build();
+    }
+}
+
+fn lookup_cursor_entity(world: &mut World) -> Entity {
+    world.exec(|mut data: (ReadStorage<Cursor>, Entities)| {
+        let (cursors, entities) = data;
+        let (entity, _) = (&entities, &cursors)
+            .join()
+            .next()
+            .expect("Help! Cursor entity does not exist!");
+        entity
+    })
+}
+
+fn delete_cursor_preview(world: &mut World) {
+    world.exec(
+        |mut data: (ReadStorage<CursorPreviewParentTag>, Entities)| {
+            let (previews, entities) = data;
+            (&entities, &previews)
+                .join()
+                .map(|(entity, _)| entity)
+                .for_each(|preview| {
+                    entities.delete(preview);
+                });
+        },
+    );
 }

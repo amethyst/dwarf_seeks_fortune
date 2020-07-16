@@ -45,13 +45,13 @@ impl<'s> System<'s> for RewindControlSystem {
             *current_state = CurrentState::Running;
         }
 
-        for tint in (&mut tints).join() {
-            tint.0 = if *current_state == CurrentState::Running {
-                Srgba::new(1.0, 1.0, 1.0, 1.0)
-            } else {
-                Srgba::new(0.1, 0.1, 0.1, 1.0)
-            };
-        }
+        // for tint in (&mut tints).join() {
+        //     tint.0 = if *current_state == CurrentState::Running {
+        //         Srgba::new(1.0, 1.0, 1.0, 1.0)
+        //     } else {
+        //         Srgba::new(0.1, 0.1, 0.1, 1.0)
+        //     };
+        // }
     }
 }
 

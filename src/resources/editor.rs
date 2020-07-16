@@ -97,17 +97,19 @@ impl Brush {
             self.palette.push(Some(key.clone()));
         });
     }
-    pub fn select_previous(&mut self) {
-        self.select(-1);
+    pub fn select_previous(&mut self) -> Option<String> {
+        self.select(-1)
     }
-    pub fn select_next(&mut self) {
-        self.select(1);
+    pub fn select_next(&mut self) -> Option<String> {
+        self.select(1)
     }
 
-    fn select(&mut self, offset: i32) {
+    fn select(&mut self, offset: i32) -> Option<String> {
         self.palette_index =
             (self.palette_index as i32 + offset).rem_euclid(self.palette.len() as i32) as usize;
-        println!("Selected brush: {:?}", self.get_key());
+        let new_key = self.get_key();
+        println!("Selected brush: {:?}", new_key);
+        new_key.clone()
     }
 
     pub fn get_key(&self) -> &Option<String> {

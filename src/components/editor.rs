@@ -18,6 +18,24 @@ impl Component for SelectionTag {
     type Storage = NullStorage<Self>;
 }
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub struct CursorPreviewParentTag;
+
+impl Component for CursorPreviewParentTag {
+    type Storage = NullStorage<Self>;
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub struct CursorPreviewTag;
+
+impl Component for CursorPreviewTag {
+    type Storage = NullStorage<Self>;
+}
+
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
