@@ -45,26 +45,39 @@ impl<'s> System<'s> for MovementSystem {
         for (transform, steering, velocity) in (&mut transforms, &steerings, &mut velocities).join()
         {
             let (centered_x, centered_y) = steering.to_centered_coords(steering.pos);
-            if steering.grounded {
+            let (desired_pos_x, desired_pos_y) = steering.to_centered_coords(steering.destination);
+            if steering.is_grounded() {
                 // If grounded, correct y translation and zero out y velocity.
                 transform.set_translation_y(centered_y);
                 velocity.y = 0.0;
-            } else {
-                // If not, set y velocity.
+            } else if steering.is_jumping() {
+                // If falling, set y velocity.
                 velocity.y = -config.player_speed;
+            } else {
+                // If climbing:
+                let delta = desired_pos_y - transform.translation().y;
+                let delta_signum = if delta.abs() < f32::EPSILON {
+                    0.0
+                } else {
+                    delta.signum()
+                };
+                if (delta_signum * steering.direction.1).is_sign_positive() {
+                    velocity.y = delta_signum * config.player_speed;
+                } else {
+                    velocity.y = 0.0;
+                    transform.set_translation_y(centered_y);
+                }
             }
 
             // 1: Set velocity based on current position and desired position.
             // 2: If necessary, adjust position, snap to grid.
-
-            let (desired_pos_x, _) = steering.to_centered_coords(steering.destination);
             let delta = desired_pos_x - transform.translation().x;
             let delta_signum = if delta.abs() < f32::EPSILON {
                 0.0
             } else {
                 delta.signum()
             };
-            if (delta_signum * steering.direction).is_sign_positive() {
+            if (delta_signum * steering.direction.0).is_sign_positive() {
                 velocity.x = delta_signum * config.player_speed;
             } else {
                 velocity.x = 0.0;

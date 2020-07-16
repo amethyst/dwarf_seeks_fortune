@@ -59,11 +59,28 @@ pub struct Steering {
     pub pos: Pos,
     /// Width and height of the entity.
     pub dimens: Pos,
-    /// TODO: Replace with enum that supports Y travel as well.
-    pub direction: f32,
+    /// Direction the player is travelling along the x-axis and y-axis.
+    pub direction: (f32, f32),
     pub destination: Pos,
-    /// TODO: replace with enum?
-    pub grounded: bool,
+    pub mode: SteeringMode,
+}
+
+/// SteeringMode influences max speeds, ability to jump, ability to move, etc.
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+pub enum SteeringMode {
+    /// Standard mode. There is flat ground beneath the entity and the entity can either move
+    /// horizontally or initiate a jump.
+    Grounded,
+    /// Climbing on a ladder. The entity can either climb up or down.
+    Climbing,
+    /// The entity is either in the middle of a jump, or is simply falling.
+    Jumping,
+}
+
+impl Default for SteeringMode {
+    fn default() -> Self {
+        SteeringMode::Grounded
+    }
 }
 
 impl Steering {
@@ -71,10 +88,21 @@ impl Steering {
         Steering {
             pos,
             dimens,
-            direction: 0.0,
+            direction: (0.0, 0.0),
             destination: pos,
-            grounded: true,
+            mode: SteeringMode::Grounded,
         }
+    }
+
+    pub fn is_grounded(&self) -> bool {
+        self.mode == SteeringMode::Grounded
+    }
+
+    pub fn is_jumping(&self) -> bool {
+        self.mode == SteeringMode::Jumping
+    }
+    pub fn is_climbing(&self) -> bool {
+        self.mode == SteeringMode::Climbing
     }
 
     /// Converts the given discrete position to a translation, taking into account the dimensions

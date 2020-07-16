@@ -103,7 +103,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                     Trans::None
                 }
                 InputEvent::KeyReleased {
-                    key_code: VirtualKeyCode::F5,
+                    key_code: VirtualKeyCode::F1,
                     scancode: _,
                 } => {
                     save(data.world);

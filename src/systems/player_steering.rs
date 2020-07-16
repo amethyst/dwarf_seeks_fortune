@@ -27,47 +27,83 @@ impl<'s> System<'s> for PlayerSystem {
         (player_tags, transforms, mut steerings, input, tile_map, mut history): Self::SystemData,
     ) {
         for (_, transform, steering) in (&player_tags, &transforms, &mut steerings).join() {
+            let input_x = input.axis_value("move_x").unwrap_or(0.0);
+            let input_y = input.axis_value("move_y").unwrap_or(0.0);
+
             let old_pos = steering.pos.clone();
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             steering.pos = Pos::new(anchored_x.round() as i32, anchored_y.round() as i32);
 
-            if anchored_y <= steering.pos.y as f32 {
-                // Check if I'm grounded.
-                steering.grounded = is_grounded(&steering, &tile_map);
+            let has_ground_beneath_feet = is_grounded(&steering, &tile_map);
+            if steering.is_jumping()
+                && anchored_y <= steering.pos.y as f32
+                && has_ground_beneath_feet
+            {
+                // If falling and you reached the floor, set to grounded.
+                steering.mode = SteeringMode::Grounded;
+                steering.destination.y = steering.pos.y;
+            } else if steering.is_grounded() && !has_ground_beneath_feet {
+                steering.mode = SteeringMode::Jumping; //Fall straight down.
             }
-
-            // TODO: Climbing ladders....
-            // let input_y = input.axis_value("move_y").unwrap_or(0.0);
-            // if input_y.abs() > f32::EPSILON && is_on_ladder() {
-            //     steering.destination.y += input_y;
-            // }
 
             // 1: Set current discrete position.
             // 2: Set steering based on user input.
+            // TODO: Prioritise getting off the ladder when climbing.
 
-            // TODO: history frames .......
-            if old_pos != steering.pos || history.force_key_frame {
-                history.push_frame(Frame::new(steering.pos.clone()));
-            }
-
-            let input_x = input.axis_value("move_x").unwrap_or(0.0);
-            if steering.grounded && input_x.abs() > f32::EPSILON {
-                steering.direction = input_x;
+            if steering.is_grounded() && input_x.abs() > f32::EPSILON {
+                steering.direction = (input_x, 0.);
                 let offset_from_discrete_pos = steering.pos.x as f32 - anchored_x;
                 if offset_from_discrete_pos < f32::EPSILON && input_x > f32::EPSILON {
-                    if !is_against_wall_right(&steering, anchored_y, &tile_map) {
+                    let climbing = check_climbing(input_y, anchored_y, steering, &tile_map);
+                    if !climbing && !is_against_wall_right(&steering, anchored_y, &tile_map) {
                         steering.destination.x = steering.pos.x + 1;
                     }
                 } else if offset_from_discrete_pos > -f32::EPSILON && input_x < f32::EPSILON {
-                    if !is_against_wall_left(&steering, anchored_y, &tile_map) {
+                    let climbing = check_climbing(input_y, anchored_y, steering, &tile_map);
+                    if !climbing && !is_against_wall_left(&steering, anchored_y, &tile_map) {
                         steering.destination.x = steering.pos.x - 1;
                     }
                 } else if ((steering.destination.x - steering.pos.x) * input_x as i32).is_negative()
                 {
+                    // Player wants to go back where they came from.
                     steering.destination.x = steering.pos.x;
                 }
+            } else if (steering.is_grounded() || steering.is_climbing())
+                && (anchored_x - steering.pos.x as f32).abs() < f32::EPSILON
+            {
+                let climbing = check_climbing(input_y, anchored_y, steering, &tile_map);
+                if (anchored_y - steering.pos.y as f32).abs() < f32::EPSILON && !climbing {
+                    steering.mode = SteeringMode::Grounded;
+                }
+            }
+
+            // Push frame on history if player position changed.
+            if old_pos != steering.pos || history.force_key_frame {
+                history.push_frame(Frame::new(steering.pos.clone()));
             }
         }
+    }
+}
+
+fn check_climbing(input_y: f32, anchored_y: f32, steering: &mut Steering, tile_map: &TileMap) -> bool {
+    let offset_from_discrete_pos = steering.pos.y as f32 - anchored_y;
+    if offset_from_discrete_pos < f32::EPSILON && input_y > f32::EPSILON && can_climb_up(steering, &tile_map) {
+        steering.mode = SteeringMode::Climbing;
+        steering.destination.y = steering.pos.y + 1;
+        steering.direction = (0., 1.);
+        true
+    } else if offset_from_discrete_pos > -f32::EPSILON && input_y < -f32::EPSILON && can_climb_down(steering, &tile_map) {
+        steering.mode = SteeringMode::Climbing;
+        steering.destination.y = steering.pos.y - 1;
+        steering.direction = (0., -1.);
+        true
+    } else if input_y.abs() > f32::EPSILON && ((steering.destination.y - steering.pos.y) * input_y as i32).is_negative()
+    {
+        // Player wants to go back where they came from.
+        steering.destination.y = steering.pos.y;
+        true
+    } else {
+        false
     }
 }
 
@@ -105,6 +141,22 @@ fn is_against_wall(
     })
 }
 
-fn is_on_ladder() -> bool {
-    true
+fn can_climb_up(steering: &Steering, tile_map: &TileMap) -> bool {
+    can_climb(steering, tile_map, (0, 1))
+}
+
+fn can_climb_down(steering: &Steering, tile_map: &TileMap) -> bool {
+    can_climb(steering, tile_map, (-1, 0))
+}
+
+fn can_climb(steering: &Steering, tile_map: &TileMap, y_range: (i32, i32)) -> bool {
+    (0..steering.dimens.x).all(|x_offset| {
+        (y_range.0..y_range.1).all(|y_offset| {
+            let tile = tile_map.get_tile(&Pos::new(
+                steering.pos.x + x_offset,
+                steering.pos.y + y_offset,
+            ));
+            tile.map(|tile| tile.climbable).unwrap_or(false)
+        })
+    })
 }
