@@ -21,3 +21,6 @@ You're a dwarf, digging through the ancient ruins of your ancestors. Each level 
 - [ ] Derpy movement mechanics akin to those of the game this is based on. This game purposely refrains from using a full physics simulation, opting instead for deterministic and predictable grid-based movements suitable for a puzzle game.
 - [ ] Multiple playable levels.
 - [ ] Sound effects and music.
+
+## Art
+At the moment, everything is temporary, placeholder, programmer art. There will be some real art assets soon.

@@ -92,6 +92,7 @@ impl TileDefinition {
         }
     }
 
+    /// True if and only if the tile collides on the right and left sides.
     pub fn collides_horizontally(&self) -> bool {
         if let Some(collision) = &self.collision {
             collision.collides_side
@@ -138,19 +139,4 @@ pub struct CollisionDefinition {
     pub collides_side: bool,
     /// When standing underneath a two-high ledge of these tiles, the player cannot jump.
     pub collides_bottom: bool,
-    // TODO: Add special collision?
 }
-
-// Colliding:
-// - Top collider: (blocks, ladders) Player can stand on them
-// - Sides collider: (blocks) Player cannot move through them horizontally
-// - Bottom collider: (blocks) Player cannot jump when under a 2-high overhang
-// - Special:
-//      - Ladder: Player can climb them.
-//      - Key: Player collects them when moving through them.
-//      - Tool: Player equips them when moving through if they don't already have tool.
-//      - Door: Player wins level when moving through if they collected all keys.
-//      - Trap wall: Wall appears if player moves through this.
-//      - enemy: Player dies when moving through this collider.
-//      - Trap floor: Will disappear when player moves across twice.
-//      - Trap ladder: Will disappear when player moves through twice.
