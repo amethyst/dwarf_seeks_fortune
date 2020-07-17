@@ -182,7 +182,7 @@ fn init_cursor(world: &mut World) {
         .get_still(&SpriteType::Selection);
     let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 0));
     let mut selection_transform = Transform::default();
-    selection_transform.set_translation_z(1.0);
+    selection_transform.set_translation_z((&DepthLayer::UiElements).z());
     world
         .create_entity()
         .with(SpriteRender {
@@ -213,7 +213,7 @@ fn add_cursor_preview_tag(world: &mut World, key: Option<String>) {
             .get_still(&SpriteType::Selection);
         let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 2));
         let mut transform = Transform::default();
-        transform.set_translation_xyz(0.5, 0.5, 2.0);
+        transform.set_translation_xyz(0.5, 0.5, (&DepthLayer::UiElements).z());
         transform.set_scale(Vector3::new(
             1. / asset_dimensions.x as f32,
             1. / asset_dimensions.y as f32,
@@ -245,7 +245,12 @@ fn add_cursor_preview_tag(world: &mut World, key: Option<String>) {
         let still_asset = load_still_asset(&tile_def, &world.read_resource::<Assets>());
         let anim_asset = load_anim_asset(&tile_def, &world.read_resource::<Assets>());
         let transform = if let Some(asset) = &tile_def.asset {
-            Some(load_transform(&Pos::default(), &tile_def.dimens, asset))
+            Some(load_transform(
+                &Pos::default(),
+                &DepthLayer::UiElements,
+                &tile_def.dimens,
+                asset,
+            ))
         } else {
             panic!("Not implemented yet! Tiles with no graphics asset."); //TODO;...
         };

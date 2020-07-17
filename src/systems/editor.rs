@@ -44,7 +44,7 @@ impl<'s> System<'s> for CursorSystem {
                 transform.set_translation_xyz(
                     editor_data.selector.end.x as f32,
                     editor_data.selector.end.y as f32,
-                    2.0,
+                    0.0,
                 );
                 cursor.cooldown = config.cursor_move_high_cooldown;
             } else if cursor.last_direction.is_opposite(&new_direction) {
@@ -61,7 +61,7 @@ impl<'s> System<'s> for CursorSystem {
                     transform.set_translation_xyz(
                         editor_data.selector.end.x as f32,
                         editor_data.selector.end.y as f32,
-                        2.0,
+                        0.0,
                     );
                 }
             }
@@ -137,7 +137,7 @@ impl<'s> System<'s> for SelectionSystem {
                         + min(editor_data.selector.start.x, editor_data.selector.end.x) as f32,
                     (height as f32 * 0.5)
                         + min(editor_data.selector.start.y, editor_data.selector.end.y) as f32,
-                    1.0,
+                    (&DepthLayer::UiElements).z(),
                 );
             }
         }
@@ -190,7 +190,12 @@ impl<'s> System<'s> for TilePaintSystem {
             let still_asset = load_still_asset(tile_def, &assets);
             let anim_asset = load_anim_asset(tile_def, &assets);
             let transform = if let Some(asset) = &tile_def.asset {
-                Some(load_transform(&pos, &tile_def.dimens, asset))
+                Some(load_transform(
+                    &pos,
+                    &tile_def.depth,
+                    &tile_def.dimens,
+                    asset,
+                ))
             } else {
                 None
             };

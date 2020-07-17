@@ -25,7 +25,7 @@ use precompile::{AnimationId, MyPrefabData};
 
 use crate::components::*;
 use crate::game_data::CustomGameData;
-use crate::levels::{Archetype, Level, TileDefinition, TileDefinitions};
+use crate::levels::{Archetype, DepthLayer, Level, TileDefinition, TileDefinitions};
 use crate::resources::*;
 use crate::states::PausedState;
 use std::error::Error;
@@ -52,7 +52,12 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
         let still_asset = load_still_asset(tile_def, &world.read_resource::<Assets>());
         let anim_asset = load_anim_asset(tile_def, &world.read_resource::<Assets>());
         let transform = if let Some(asset) = &tile_def.asset {
-            Some(load_transform(&pos, &tile_def.dimens, asset))
+            Some(load_transform(
+                &pos,
+                &tile_def.depth,
+                &tile_def.dimens,
+                asset,
+            ))
         } else {
             None
         };
@@ -91,6 +96,7 @@ fn build_frames(player: Entity, world: &mut World, tile_def: &TileDefinition) {
 
     let steering_ghost_transform = load_transform(
         &Pos::default(),
+        &DepthLayer::UiElements,
         &tile_def.dimens,
         &AssetType::Still(SpriteType::Frame, 0),
     );
@@ -102,6 +108,7 @@ fn build_frames(player: Entity, world: &mut World, tile_def: &TileDefinition) {
         .build();
     let pos_ghost_transform = load_transform(
         &Pos::default(),
+        &DepthLayer::UiElements,
         &Pos::new(1, 1),
         &AssetType::Still(SpriteType::Frame, 0),
     );
@@ -121,13 +128,13 @@ fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) ->
         .build()
 }
 
-pub fn load_transform(pos: &Pos, dimens: &Pos, asset: &AssetType) -> Transform {
+pub fn load_transform(pos: &Pos, depth: &DepthLayer, dimens: &Pos, asset: &AssetType) -> Transform {
     let asset_dimensions = get_asset_dimensions(&asset);
     let mut transform = Transform::default();
     transform.set_translation_xyz(
         pos.x as f32 + dimens.x as f32 * 0.5,
         pos.y as f32 + dimens.y as f32 * 0.5,
-        0.0,
+        depth.z(),
     );
     transform.set_scale(Vector3::new(
         dimens.x as f32 / asset_dimensions.x as f32,

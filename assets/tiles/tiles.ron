@@ -2,6 +2,7 @@
 (
     map: {
         "Player":(
+            depth: Player,
             dimens: ( x:2, y:2, ),
             unique: true,
             mandatory: true,
@@ -9,6 +10,7 @@
             archetype: Player,
         ),
         "Block1":(
+            depth: Blocks,
             dimens: ( x:1, y:1, ),
             unique: false,
             mandatory: false,
@@ -21,6 +23,7 @@
             archetype: Block,
         ),
         "BigBlock":(
+            depth: Blocks,
             dimens: ( x:2, y:2, ),
             unique: false,
             mandatory: false,
@@ -33,6 +36,7 @@
             archetype: Block,
         ),
         "Ladder":(
+            depth: Blocks,
             dimens: ( x:2, y:1, ),
             unique: false,
             mandatory: false,
@@ -46,6 +50,7 @@
             archetype: Block,
         ),
         "Key":(
+            depth: FloatingBlocks,
             dimens: ( x:2, y:2, ),
             unique: false,
             mandatory: false,

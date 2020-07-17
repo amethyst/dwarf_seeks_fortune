@@ -45,10 +45,16 @@ impl<'a> TileDefinitions {
     }
 }
 
+///TODO:
+/// Name of struct. Tile?Block? What do we call the dimens unit? Tile? Meter? Grid space?
+/// asset not necessarily the same as the asset in editor. (Mob spawn)
+/// this tile map resource that is created, doesn't need to contain ALL tiles.
+///
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileDefinition {
+    pub depth: DepthLayer,
     /// How wide and high is the tile?
     pub dimens: Pos,
     /// This tile is unique in the level. Only one tile with this definition can appear in the level.
@@ -72,6 +78,7 @@ impl TileDefinition {
     /// This avoids the game having to panic if a level file is slightly corrupted or out of date.
     pub fn fallback() -> Self {
         TileDefinition {
+            depth: DepthLayer::Blocks,
             dimens: Pos::new(1, 1),
             unique: false,
             mandatory: false,
@@ -103,12 +110,49 @@ impl TileDefinition {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+pub enum DepthLayer {
+    Background,
+    // Leave room to expand background into multiple parallax layers here
+    Blocks,
+    FloatingBlocks,
+    Enemies,
+    Player,
+    Particles,
+    /// Any UI elements that exist in world space. If we'd want a health bar above an enemy's head,
+    /// this is the z-layer we'd use.
+    /// Currently, it is used for some debugging elements, such as the player frames.
+    /// In the editor, it is used for the cursor and selection.
+    UiElements,
+    Camera,
+}
+
+impl Default for DepthLayer {
+    fn default() -> Self {
+        DepthLayer::Blocks
+    }
+}
+
+impl DepthLayer {
+    pub fn z(&self) -> f32 {
+        match self {
+            DepthLayer::Background => 0.,
+            DepthLayer::Blocks => 100.,
+            DepthLayer::FloatingBlocks => 110.,
+            DepthLayer::Enemies => 120.,
+            DepthLayer::Player => 130.,
+            DepthLayer::Particles => 140.,
+            DepthLayer::UiElements => 200.,
+            DepthLayer::Camera => 300.,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 /// If there are any special rules that apply to this tile, the archetype signals this.
 /// For example: a tile with the Archetype Player will be targeted by player input, etc.
 ///
-/// TODO: Maybe change how this is defined. It's not complete and maybe too restricted.
-///         For example, MobSpawner doesn't define which mobs it will spawn.
+/// Use a different archetype to attach special components or sub-entities to an entity.
 pub enum Archetype {
     /// ordinary block. Does nothing.
     Block,
