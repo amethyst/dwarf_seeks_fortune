@@ -45,7 +45,7 @@ impl Pos {
 ///
 /// Any non-particle entity that has movement should have steering.
 /// Examples of entities with steering include the Player, enemies and projectiles.
-#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
 pub struct Steering {
@@ -66,7 +66,7 @@ pub struct Steering {
 }
 
 /// SteeringMode influences max speeds, ability to jump, ability to move, etc.
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub enum SteeringMode {
     /// Standard mode. There is flat ground beneath the entity and the entity can either move
     /// horizontally or initiate a jump.
@@ -74,7 +74,21 @@ pub enum SteeringMode {
     /// Climbing on a ladder. The entity can either climb up or down.
     Climbing,
     /// The entity is either in the middle of a jump, or is simply falling.
-    Jumping,
+    MidAir(JumpCurve),
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+pub enum JumpCurve {
+    /// The entity is falling straight down.
+    Falling,
+    /// The entity is jumping. The character may have an x-velocity.
+    /// While jumping, the character's y-coordinate describes a certain curve.
+    /// This also takes the start time. This is necessary to be able to interpolate the
+    /// y-coordinate.
+    ///TODO:
+    /// let t = time - start_time;
+    /// 6. * (t - 0.619).powf(2.) + 2.3
+    Jumping(f32),
 }
 
 impl Default for SteeringMode {
@@ -98,8 +112,12 @@ impl Steering {
         self.mode == SteeringMode::Grounded
     }
 
-    pub fn is_jumping(&self) -> bool {
-        self.mode == SteeringMode::Jumping
+    pub fn is_mid_air(&self) -> bool {
+        if let SteeringMode::MidAir(_) = self.mode {
+            true
+        } else {
+            false
+        }
     }
     pub fn is_climbing(&self) -> bool {
         self.mode == SteeringMode::Climbing

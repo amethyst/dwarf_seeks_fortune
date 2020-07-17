@@ -35,7 +35,7 @@ impl<'s> System<'s> for PlayerSystem {
             steering.pos = Pos::new(anchored_x.round() as i32, anchored_y.round() as i32);
 
             let has_ground_beneath_feet = is_grounded(&steering, &tile_map);
-            if steering.is_jumping()
+            if steering.is_mid_air()
                 && anchored_y <= steering.pos.y as f32
                 && has_ground_beneath_feet
             {
@@ -43,7 +43,7 @@ impl<'s> System<'s> for PlayerSystem {
                 steering.mode = SteeringMode::Grounded;
                 steering.destination.y = steering.pos.y;
             } else if steering.is_grounded() && !has_ground_beneath_feet {
-                steering.mode = SteeringMode::Jumping; //Fall straight down.
+                steering.mode = SteeringMode::MidAir(JumpCurve::Falling);
             }
 
             // 1: Set current discrete position.

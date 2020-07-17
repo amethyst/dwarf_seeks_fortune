@@ -50,7 +50,7 @@ impl<'s> System<'s> for MovementSystem {
                 // If grounded, correct y translation and zero out y velocity.
                 transform.set_translation_y(centered_y);
                 velocity.y = 0.0;
-            } else if steering.is_jumping() {
+            } else if steering.is_mid_air() {
                 // If falling, set y velocity.
                 velocity.y = -config.player_speed;
             } else {
