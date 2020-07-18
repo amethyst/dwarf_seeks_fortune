@@ -41,19 +41,27 @@ impl<'s> System<'s> for PlayerSystem {
             if steering.is_falling()
                 && anchored_y <= steering.pos.y as f32
                 && has_ground_beneath_feet
+                && on_solid_ground(steering, &tile_map)
             {
                 // If falling and you reached the floor, set to grounded.
                 steering.mode = SteeringMode::Grounded;
-                steering.destination.y = steering.pos.y;
-            } else if steering.is_grounded() && !has_ground_beneath_feet {
-                steering.mode = SteeringMode::Falling;
+                steering.destination = steering.pos;
+            } else if (steering.is_grounded() && !has_ground_beneath_feet)
+                || (steering.is_climbing() && jump)
+            {
+                steering.mode = SteeringMode::Falling {
+                    x_movement: 0.,
+                    starting_y_pos: transform.translation().y,
+                    starting_time: time.absolute_time_seconds(),
+                };
             } else if steering.is_grounded() && jump {
-                steering.mode = SteeringMode::Jumping(
-                    transform.translation().y,
-                    time.absolute_time_seconds() as f32,
-                );
-            } else if steering.jump_has_peaked(time.absolute_time_seconds() as f32) {
-                steering.mode = SteeringMode::Falling;
+                steering.mode = SteeringMode::Jumping {
+                    x_movement: input_x,
+                    starting_y_pos: transform.translation().y,
+                    starting_time: time.absolute_time_seconds(),
+                };
+            } else if steering.jump_has_peaked(time.absolute_time_seconds()) {
+                steering.mode = steering.mode.jump_to_fall();
             }
 
             // 1: Set current discrete position.
@@ -127,6 +135,28 @@ fn check_climbing(
     } else {
         false
     }
+}
+
+/// You cannot jump onto the middle of a ladder, so use this function to check if you
+/// should set steering to Grounded.
+/// Returns true iff entity is on solid ground; meaning the very top of a ladder or a proper,
+/// solid block that is not climbable.
+///
+/// This definition excludes the middle of a ladder. While the middle of a ladder can be walked on,
+/// it cannot be landed on from a jump or fall.
+fn on_solid_ground(steering: &Steering, tile_map: &TileMap) -> bool {
+    (0..steering.dimens.x).any(|i| {
+        let tile = tile_map.get_tile(&Pos::new(steering.pos.x + i, steering.pos.y - 1));
+        let tile_above = tile_map.get_tile(&Pos::new(steering.pos.x + i, steering.pos.y));
+        tile.map(|tile| {
+            tile.provides_platform()
+                && (!tile.climbable
+                    || !tile_above
+                        .map(|tile_above| tile_above.climbable)
+                        .unwrap_or(false))
+        })
+        .unwrap_or(false)
+    })
 }
 
 fn is_grounded(steering: &Steering, tile_map: &TileMap) -> bool {

@@ -74,17 +74,79 @@ pub enum SteeringMode {
     /// Climbing on a ladder. The entity can either climb up or down.
     Climbing,
     /// The entity is falling straight down.
-    Falling,
+    Falling {
+        /// The x-movement that the entity has while falling. This will remain constant.
+        /// It is either a -1 (move to left) 0 (don't move along x-axis) or 1 (move right).
+        x_movement: f32,
+        /// The y-coordinate that the entity had when it  first started falling.
+        starting_y_pos: f32,
+        /// A time in seconds since the start of the game. This is the time at which the entity
+        /// started falling.
+        starting_time: f64,
+    },
     /// The entity is jumping. The character may have an x-velocity.
     /// While jumping, the character's y-coordinate describes a certain curve.
     /// This also takes the original y-coordinate and the start time.
     /// These are necessary to be able to interpolate the y-coordinate.
-    Jumping(f32, f32),
+    Jumping {
+        /// The x-movement that the entity has while jumping. This will remain constant.
+        /// It is either a -1 (move to left) 0 (don't move along x-axis) or 1 (move right).
+        x_movement: f32,
+        /// The y-coordinate that the entity had when it started the jump.
+        starting_y_pos: f32,
+        /// A time in seconds since the start of the game. This is the time at which the entity
+        /// started jumping.
+        starting_time: f64,
+    },
 }
 
 impl Default for SteeringMode {
     fn default() -> Self {
         SteeringMode::Grounded
+    }
+}
+
+impl SteeringMode {
+    /// Calculate the y offset from the initial y-position at the time this movement began.
+    /// This method is only valid for SteeringMode::Falling and SteeringMode::Jumping. It will
+    /// return 0. otherwise.
+    pub fn calc_delta_y(&self, time: f64) -> f32 {
+        match self {
+            SteeringMode::Jumping {
+                starting_y_pos,
+                starting_time,
+                ..
+            } => {
+                let t = time - starting_time;
+                (-50. * (t - 0.209).powf(2.) + 2.2) as f32
+            }
+            SteeringMode::Falling {
+                starting_y_pos,
+                starting_time,
+                ..
+            } => {
+                let t = time - starting_time;
+                (t * -15.) as f32
+            }
+            _ => 0.,
+        }
+    }
+
+    pub fn jump_to_fall(&self) -> Self {
+        if let SteeringMode::Jumping {
+            x_movement,
+            starting_y_pos,
+            starting_time,
+        } = *self
+        {
+            SteeringMode::Falling {
+                x_movement,
+                starting_y_pos: starting_y_pos + self.calc_delta_y(starting_time + 0.209),
+                starting_time: starting_time + 0.209,
+            }
+        } else {
+            panic!("Not allowed.");
+        }
     }
 }
 
@@ -105,22 +167,26 @@ impl Steering {
 
     pub fn is_mid_air(&self) -> bool {
         match self.mode {
-            SteeringMode::Falling => true,
-            SteeringMode::Jumping(_, _) => true,
+            SteeringMode::Falling { .. } => true,
+            SteeringMode::Jumping { .. } => true,
             _ => false,
         }
     }
 
     pub fn is_jumping(&self) -> bool {
-        if let SteeringMode::Jumping(_, _) = self.mode {
+        if let SteeringMode::Jumping { .. } = self.mode {
             true
         } else {
             false
         }
     }
 
-    pub fn jump_has_peaked(&self, time: f32) -> bool {
-        if let SteeringMode::Jumping(_, start_time) = self.mode {
+    pub fn jump_has_peaked(&self, time: f64) -> bool {
+        if let SteeringMode::Jumping {
+            starting_time: start_time,
+            ..
+        } = self.mode
+        {
             time - start_time > 0.209
         } else {
             false
@@ -128,7 +194,7 @@ impl Steering {
     }
 
     pub fn is_falling(&self) -> bool {
-        if let SteeringMode::Falling = self.mode {
+        if let SteeringMode::Falling { .. } = self.mode {
             true
         } else {
             false

@@ -68,19 +68,31 @@ impl<'s> System<'s> for MovementSystem {
                         transform.set_translation_y(centered_y);
                     }
                 }
-                SteeringMode::Falling => {
-                    // If falling, set y velocity.
-                    velocity.y = -config.player_speed;
-                }
-                SteeringMode::Jumping(start_y, start_time) => {
+                SteeringMode::Falling {
+                    x_movement,
+                    starting_y_pos,
+                    starting_time,
+                } => {
+                    velocity.x = x_movement * config.player_speed;
                     velocity.y = 0.0;
-                    let t = time.absolute_time_seconds() as f32 - start_time;
-                    let delta_y = -50. * (t - 0.209).powf(2.) + 2.2;
-                    transform.set_translation_y(start_y + delta_y);
+                    transform.set_translation_y(
+                        starting_y_pos + steering.mode.calc_delta_y(time.absolute_time_seconds()),
+                    );
+                }
+                SteeringMode::Jumping {
+                    x_movement,
+                    starting_y_pos,
+                    starting_time,
+                } => {
+                    velocity.x = x_movement * config.player_speed;
+                    velocity.y = 0.0;
+                    transform.set_translation_y(
+                        starting_y_pos + steering.mode.calc_delta_y(time.absolute_time_seconds()),
+                    );
                 }
             }
 
-            if !steering.is_jumping() {
+            if !steering.is_mid_air() {
                 // 1: Set velocity based on current position and desired position.
                 // 2: If necessary, adjust position, snap to grid.
                 let delta = desired_pos_x - transform.translation().x;

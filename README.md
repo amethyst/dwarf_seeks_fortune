@@ -24,3 +24,9 @@ You're a dwarf, digging through the ancient ruins of your ancestors. Each level 
 
 ## Art
 At the moment, everything is temporary, placeholder, programmer art. There will be some real art assets soon.
+
+ - [ ] Key (Amethyst crystal) (128x128)
+ - [ ] Running dwarf (128x128 per image)
+ - [ ] Blocks (64x64)
+ - [ ] Exit door (256x256)
+ - [ ] Ladder (128x64)
