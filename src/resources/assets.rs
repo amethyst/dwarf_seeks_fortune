@@ -94,8 +94,8 @@ pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
             _ => Pos::new(128, 128),
         },
         AssetType::Animated(anim_type) => match anim_type {
-            AnimType::NotFound => Pos::new(128, 128),
             AnimType::Mob => Pos::new(32, 32),
+            _ => Pos::new(128, 128),
         },
     }
 }

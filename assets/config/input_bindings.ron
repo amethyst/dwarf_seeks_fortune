@@ -10,5 +10,6 @@
       "speedUp": [[Key(Add)]],
       "slowDown": [[Key(Subtract)]],
       "shift": [[Key(LShift)]],
+      "jump": [[Key(Space)]],
   },
 )

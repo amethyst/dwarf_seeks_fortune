@@ -39,49 +39,62 @@ impl<'s> System<'s> for MovementSystem {
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Velocity>,
         Read<'s, DebugConfig>,
+        Read<'s, Time>,
     );
 
-    fn run(&mut self, (steerings, mut transforms, mut velocities, config): Self::SystemData) {
+    fn run(&mut self, (steerings, mut transforms, mut velocities, config, time): Self::SystemData) {
         for (transform, steering, velocity) in (&mut transforms, &steerings, &mut velocities).join()
         {
             let (centered_x, centered_y) = steering.to_centered_coords(steering.pos);
             let (desired_pos_x, desired_pos_y) = steering.to_centered_coords(steering.destination);
-            if steering.is_grounded() {
-                // If grounded, correct y translation and zero out y velocity.
-                transform.set_translation_y(centered_y);
-                velocity.y = 0.0;
-            } else if steering.is_mid_air() {
-                // If falling, set y velocity.
-                velocity.y = -config.player_speed;
-            } else {
-                // If climbing:
-                let delta = desired_pos_y - transform.translation().y;
+            match steering.mode {
+                SteeringMode::Grounded => {
+                    // If grounded, correct y translation and zero out y velocity.
+                    transform.set_translation_y(centered_y);
+                    velocity.y = 0.0;
+                }
+                SteeringMode::Climbing => {
+                    // If climbing:
+                    let delta = desired_pos_y - transform.translation().y;
+                    let delta_signum = if delta.abs() < f32::EPSILON {
+                        0.0
+                    } else {
+                        delta.signum()
+                    };
+                    if (delta_signum * steering.direction.1).is_sign_positive() {
+                        velocity.y = delta_signum * config.player_speed;
+                    } else {
+                        velocity.y = 0.0;
+                        transform.set_translation_y(centered_y);
+                    }
+                }
+                SteeringMode::Falling => {
+                    // If falling, set y velocity.
+                    velocity.y = -config.player_speed;
+                }
+                SteeringMode::Jumping(start_y, start_time) => {
+                    velocity.y = 0.0;
+                    let t = time.absolute_time_seconds() as f32 - start_time;
+                    let delta_y = -50. * (t - 0.209).powf(2.) + 2.2;
+                    transform.set_translation_y(start_y + delta_y);
+                }
+            }
+
+            if !steering.is_jumping() {
+                // 1: Set velocity based on current position and desired position.
+                // 2: If necessary, adjust position, snap to grid.
+                let delta = desired_pos_x - transform.translation().x;
                 let delta_signum = if delta.abs() < f32::EPSILON {
                     0.0
                 } else {
                     delta.signum()
                 };
-                if (delta_signum * steering.direction.1).is_sign_positive() {
-                    velocity.y = delta_signum * config.player_speed;
+                if (delta_signum * steering.direction.0).is_sign_positive() {
+                    velocity.x = delta_signum * config.player_speed;
                 } else {
-                    velocity.y = 0.0;
-                    transform.set_translation_y(centered_y);
+                    velocity.x = 0.0;
+                    transform.set_translation_x(centered_x);
                 }
-            }
-
-            // 1: Set velocity based on current position and desired position.
-            // 2: If necessary, adjust position, snap to grid.
-            let delta = desired_pos_x - transform.translation().x;
-            let delta_signum = if delta.abs() < f32::EPSILON {
-                0.0
-            } else {
-                delta.signum()
-            };
-            if (delta_signum * steering.direction.0).is_sign_positive() {
-                velocity.x = delta_signum * config.player_speed;
-            } else {
-                velocity.x = 0.0;
-                transform.set_translation_x(centered_x);
             }
         }
     }

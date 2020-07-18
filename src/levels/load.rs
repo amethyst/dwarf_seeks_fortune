@@ -14,7 +14,7 @@ use amethyst::{
     prelude::*,
     renderer::{
         formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
-        Camera, SpriteSheet, Texture,
+        Camera, SpriteSheet, Texture, Transparent,
     },
     utils::application_root_dir,
     window::ScreenDimensions,
@@ -74,7 +74,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
         match tile_def.archetype {
             Archetype::Player => {
                 let player = build_player(builder, pos, tile_def);
-                build_frames(player, world, tile_def);
+                // build_frames(player, world, tile_def);
             }
             _ => {
                 builder.build();
@@ -122,6 +122,7 @@ fn build_frames(player: Entity, world: &mut World, tile_def: &TileDefinition) {
 
 fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) -> Entity {
     builder
+        .with(Transparent)
         .with(Velocity::default())
         .with(Steering::new(pos.clone(), tile_def.dimens.clone()))
         .with(PlayerTag)

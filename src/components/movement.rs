@@ -73,22 +73,13 @@ pub enum SteeringMode {
     Grounded,
     /// Climbing on a ladder. The entity can either climb up or down.
     Climbing,
-    /// The entity is either in the middle of a jump, or is simply falling.
-    MidAir(JumpCurve),
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
-pub enum JumpCurve {
     /// The entity is falling straight down.
     Falling,
     /// The entity is jumping. The character may have an x-velocity.
     /// While jumping, the character's y-coordinate describes a certain curve.
-    /// This also takes the start time. This is necessary to be able to interpolate the
-    /// y-coordinate.
-    ///TODO:
-    /// let t = time - start_time;
-    /// 6. * (t - 0.619).powf(2.) + 2.3
-    Jumping(f32),
+    /// This also takes the original y-coordinate and the start time.
+    /// These are necessary to be able to interpolate the y-coordinate.
+    Jumping(f32, f32),
 }
 
 impl Default for SteeringMode {
@@ -113,12 +104,37 @@ impl Steering {
     }
 
     pub fn is_mid_air(&self) -> bool {
-        if let SteeringMode::MidAir(_) = self.mode {
+        match self.mode {
+            SteeringMode::Falling => true,
+            SteeringMode::Jumping(_, _) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_jumping(&self) -> bool {
+        if let SteeringMode::Jumping(_, _) = self.mode {
             true
         } else {
             false
         }
     }
+
+    pub fn jump_has_peaked(&self, time: f32) -> bool {
+        if let SteeringMode::Jumping(_, start_time) = self.mode {
+            time - start_time > 0.209
+        } else {
+            false
+        }
+    }
+
+    pub fn is_falling(&self) -> bool {
+        if let SteeringMode::Falling = self.mode {
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn is_climbing(&self) -> bool {
         self.mode == SteeringMode::Climbing
     }

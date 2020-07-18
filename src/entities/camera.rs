@@ -33,7 +33,8 @@ pub fn create_camera_under_parent(world: &mut World, parent: Entity) {
 pub fn initialise_camera_frame(world: &mut World) -> Entity {
     let mut transform = Transform::default();
     transform.set_translation_xyz(0.0, 0.0, (&DepthLayer::Camera).z());
-    transform.set_scale(Vector3::new(1. / 50., 1. / 50., 1.0));
+    let scale = 1. / 32.;
+    transform.set_scale(Vector3::new(scale, scale, 1.0));
     world
         .create_entity()
         .with(CameraFrame::default())

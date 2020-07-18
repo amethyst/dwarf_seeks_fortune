@@ -20,22 +20,25 @@ impl<'s> System<'s> for PlayerSystem {
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, TileMap>,
         Write<'s, History>,
+        Read<'s, Time>,
     );
 
     fn run(
         &mut self,
-        (player_tags, transforms, mut steerings, input, tile_map, mut history): Self::SystemData,
+        (player_tags, transforms, mut steerings, input, tile_map, mut history, time): Self::SystemData,
     ) {
         for (_, transform, steering) in (&player_tags, &transforms, &mut steerings).join() {
+            println!("Steering: {:?}", steering);
             let input_x = input.axis_value("move_x").unwrap_or(0.0);
             let input_y = input.axis_value("move_y").unwrap_or(0.0);
+            let jump = input.action_is_down("jump").unwrap_or(false);
 
             let old_pos = steering.pos.clone();
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             steering.pos = Pos::new(anchored_x.round() as i32, anchored_y.round() as i32);
 
             let has_ground_beneath_feet = is_grounded(&steering, &tile_map);
-            if steering.is_mid_air()
+            if steering.is_falling()
                 && anchored_y <= steering.pos.y as f32
                 && has_ground_beneath_feet
             {
@@ -43,7 +46,14 @@ impl<'s> System<'s> for PlayerSystem {
                 steering.mode = SteeringMode::Grounded;
                 steering.destination.y = steering.pos.y;
             } else if steering.is_grounded() && !has_ground_beneath_feet {
-                steering.mode = SteeringMode::MidAir(JumpCurve::Falling);
+                steering.mode = SteeringMode::Falling;
+            } else if steering.is_grounded() && jump {
+                steering.mode = SteeringMode::Jumping(
+                    transform.translation().y,
+                    time.absolute_time_seconds() as f32,
+                );
+            } else if steering.jump_has_peaked(time.absolute_time_seconds() as f32) {
+                steering.mode = SteeringMode::Falling;
             }
 
             // 1: Set current discrete position.
