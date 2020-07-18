@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/Jazarro/towerdef.svg?branch=master)](https://travis-ci.com/Jazarro/towerdef)
+[![Build Status](https://travis-ci.com/Jazarro/dwarf_seeks_fortune.svg?branch=master)](https://travis-ci.com/Jazarro/dwarf_seeks_fortune)
 
 # Dwarf Seeks Fortune (Working title)
 A 2D puzzle platformer made with the Amethyst game engine. This game is an homage to the 1988 classic [King's Valley II](https://en.wikipedia.org/wiki/King%27s_Valley_II). 
