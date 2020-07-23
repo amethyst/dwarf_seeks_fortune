@@ -4,10 +4,22 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct DebugConfig {
+    /// An array of values that 'time_scale' can have.
+    /// Debug controls will allow switching between these values,
+    /// to slow time down or speed it up.
     pub time_scale_presets: Vec<f32>,
+    /// How fast the clock is ticking. A value of 1.0 means time is
+    /// behaving normally, higher values mean time is sped up and
+    /// 0.0 means time is frozen.
     pub time_scale: f32,
+    /// The max speed of the player in meters per second.
     pub player_speed: f32,
+    /// Number of seconds to leave between frames when rewinding time.
     pub seconds_per_rewind_frame: f32,
+    /// Enable this when debugging, to save time when rapidly iterating.
+    /// It saves you from having to navigate the menu every time you start the game.
+    /// If true, the game will open in the editor state.
+    /// If false, it will open on the main menu.
     pub skip_straight_to_editor: bool,
 }
 

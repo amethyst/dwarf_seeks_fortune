@@ -38,7 +38,7 @@ pub struct PlayState {
 }
 
 impl<'a, 'b> PlayState {
-    /// Starts the PlayState in demo mode. It loads the demo level.
+    /// Creates a PlayState that starts in demo mode. It loads the demo level.
     pub fn demo() -> Self {
         let level_file = application_root_dir()
             .expect("Root dir not found!")
@@ -50,12 +50,15 @@ impl<'a, 'b> PlayState {
             editor_mode: false,
         }
     }
+
+    /// Creates a new PlayState that will load the given level.
     pub fn new(level_file: PathBuf, editor_mode: bool) -> Self {
         PlayState {
             level_file,
             editor_mode,
         }
     }
+
     fn handle_action(
         &mut self,
         action: &str,
@@ -87,7 +90,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
         let StateData { world, .. } = data;
         UiHandles::add_ui(&UiType::Fps, world);
         create_camera(world);
-        // setup_debug_lines(world, &self.root.unwrap());
         world.insert(History::default());
         load_level(&self.level_file, world);
     }

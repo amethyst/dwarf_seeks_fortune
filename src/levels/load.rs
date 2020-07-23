@@ -71,7 +71,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
         match tile_def.archetype {
             Archetype::Player => {
                 let player = build_player(builder, pos, tile_def);
-                // build_frames(player, world, tile_def);
+                build_frames(player, world, tile_def);
             }
             _ => {
                 builder.build();

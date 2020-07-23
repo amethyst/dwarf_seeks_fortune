@@ -1,5 +1,3 @@
-//! Displays debug lines using an orthographic camera.
-
 use amethyst::{
     core::{
         transform::{Transform, TransformBundle},
@@ -20,15 +18,13 @@ use amethyst::{
     window::ScreenDimensions,
 };
 
+/// Sets up a grid of grey debug lines, spaced 2 meters apart.
+/// The x and y axes are drawn in red to make them stand out.
 pub fn setup_debug_lines(world: &mut World) {
-    // Setup debug lines as a resource
-    // world.insert(DebugLines::new());
-    // Configure width of lines. Optional step
-    // world.insert(DebugLinesParams { line_width: 2.0 });
-
-    // Setup debug lines as a component and add lines to render axis&grid
     let mut debug_lines_component = DebugLinesComponent::new();
 
+    // Adds all the horizontal lines, spaced 2 meters apart.
+    // No line is drawn at y=0, the x-axis will be added later in a different colour.
     for y in (0..(100 as u16)).step_by(2).skip(1).map(f32::from) {
         debug_lines_component.add_line(
             [-100., y, 0.0].into(),
@@ -42,6 +38,8 @@ pub fn setup_debug_lines(world: &mut World) {
         );
     }
 
+    // Adds all the vertical lines, spaced 2 meters apart.
+    // No line is drawn at x=0, the y-axis will be added later in a different colour.
     for x in (0..(100 as u16)).step_by(2).skip(1).map(f32::from) {
         debug_lines_component.add_line(
             [x, -100., 0.0].into(),
@@ -55,6 +53,7 @@ pub fn setup_debug_lines(world: &mut World) {
         );
     }
 
+    // Adds the x-axis and the y-axis as red lines.
     debug_lines_component.add_line(
         [-5000., 0.0, 0.0].into(),
         [5000., 0.0, 0.0].into(),

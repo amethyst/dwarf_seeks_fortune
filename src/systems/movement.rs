@@ -54,6 +54,9 @@ impl<'s> System<'s> for MovementSystem {
                     velocity.y = 0.0;
                 }
                 SteeringMode::Climbing => {
+                    // If climbing, correct x translation and zero out x velocity.
+                    transform.set_translation_x(centered_x);
+                    velocity.x = 0.0;
                     // If climbing:
                     let delta = desired_pos_y - transform.translation().y;
                     let delta_signum = if delta.abs() < f32::EPSILON {
@@ -73,7 +76,7 @@ impl<'s> System<'s> for MovementSystem {
                     starting_y_pos,
                     starting_time,
                 } => {
-                    velocity.x = x_movement * config.player_speed;
+                    // Set y-position directly, based on movement function. We don't use velocity for this.
                     velocity.y = 0.0;
                     transform.set_translation_y(
                         starting_y_pos + steering.mode.calc_delta_y(time.absolute_time_seconds()),
@@ -84,7 +87,7 @@ impl<'s> System<'s> for MovementSystem {
                     starting_y_pos,
                     starting_time,
                 } => {
-                    velocity.x = x_movement * config.player_speed;
+                    // Set y-position directly, based on movement function. We don't use velocity for this.
                     velocity.y = 0.0;
                     transform.set_translation_y(
                         starting_y_pos + steering.mode.calc_delta_y(time.absolute_time_seconds()),
@@ -92,21 +95,19 @@ impl<'s> System<'s> for MovementSystem {
                 }
             }
 
-            if !steering.is_mid_air() {
-                // 1: Set velocity based on current position and desired position.
-                // 2: If necessary, adjust position, snap to grid.
-                let delta = desired_pos_x - transform.translation().x;
-                let delta_signum = if delta.abs() < f32::EPSILON {
-                    0.0
-                } else {
-                    delta.signum()
-                };
-                if (delta_signum * steering.direction.0).is_sign_positive() {
-                    velocity.x = delta_signum * config.player_speed;
-                } else {
-                    velocity.x = 0.0;
-                    transform.set_translation_x(centered_x);
-                }
+            // Set x-velocity based on current and desired position.
+            // If necessary, adjust x-position, snap to grid.
+            let delta = desired_pos_x - transform.translation().x;
+            let delta_signum = if delta.abs() < f32::EPSILON {
+                0.0
+            } else {
+                delta.signum()
+            };
+            if (delta_signum * steering.direction.0).is_sign_positive() {
+                velocity.x = delta_signum * config.player_speed;
+            } else {
+                velocity.x = 0.0;
+                transform.set_translation_x(centered_x);
             }
         }
     }
