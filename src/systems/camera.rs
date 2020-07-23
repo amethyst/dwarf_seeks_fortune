@@ -107,7 +107,7 @@ impl<'s> System<'s> for ResizeSystem {
         if *resize != ResizeState::Resizing {
             return;
         }
-        println!(
+        debug!(
             "Resizing camera. Camera entity will be destroyed and recreated. ({:?}, {:?})",
             dimens.width(),
             dimens.height()

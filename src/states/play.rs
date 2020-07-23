@@ -62,13 +62,14 @@ impl<'a, 'b> PlayState {
         world: &mut World,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
         let mut config = world.fetch_mut::<DebugConfig>();
+        // TODO: Replace with time manipulation?
         if action == "speedUp" {
             let (old_speed, new_speed) = (*config).increase_speed();
-            println!("Speeding up, from {:?} to {:?}", old_speed, new_speed);
+            info!("Speeding up, from {:?} to {:?}", old_speed, new_speed);
             Trans::None
         } else if action == "slowDown" {
             let (old_speed, new_speed) = (*config).decrease_speed();
-            println!("Slowing down, from {:?} to {:?}", old_speed, new_speed);
+            info!("Slowing down, from {:?} to {:?}", old_speed, new_speed);
             Trans::None
         } else {
             Trans::None
@@ -78,6 +79,7 @@ impl<'a, 'b> PlayState {
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        info!("PlayState on_start");
         let StateData { world, .. } = data;
         UiHandles::add_ui(&UiType::Fps, world);
         create_camera(world);
@@ -87,7 +89,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
     }
 
     fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-        println!("PlayState on_stop");
+        info!("PlayState on_stop");
         data.world.delete_all();
     }
 
@@ -121,7 +123,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
             // Ui event. Button presses, mouse hover, etc...
             StateEvent::Ui(_) => Trans::None,
             StateEvent::Input(input_event) => {
-                // println!("Input event detected! {:?}", input_event);
                 if let InputEvent::ActionPressed(action) = input_event {
                     self.handle_action(&action, data.world)
                 } else {

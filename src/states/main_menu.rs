@@ -42,12 +42,12 @@ impl MainMenuState {
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-        println!("MainMenuState on_start");
+        info!("MainMenuState on_start");
         self.init_ui(data);
     }
 
     fn on_pause(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-        println!("MainMenuState on_pause");
+        info!("MainMenuState on_pause");
         data.world.delete_all();
         self.play_button = None;
         self.editor_button = None;
@@ -55,7 +55,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
     }
 
     fn on_resume(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-        println!("MainMenuState on_resume");
+        info!("MainMenuState on_resume");
         self.init_ui(data);
     }
 

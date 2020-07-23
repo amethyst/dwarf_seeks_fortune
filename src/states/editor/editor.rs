@@ -51,6 +51,7 @@ impl<'a, 'b> EditorState {
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        info!("EditorState on_start");
         let StateData { world, .. } = data;
         UiHandles::add_ui(&UiType::Fps, world);
         setup_debug_lines(world);
@@ -67,7 +68,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     }
 
     fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-        println!("EditorState on_stop");
+        info!("EditorState on_stop");
         data.world.delete_all();
     }
 
@@ -241,7 +242,6 @@ fn add_cursor_preview_tag(world: &mut World, key: Option<String>) {
             .read_resource::<TileDefinitions>()
             .get(&key.unwrap())
             .clone();
-        println!("hey: {:?}", tile_def);
         let still_asset = load_still_asset(&tile_def, &world.read_resource::<Assets>());
         let anim_asset = load_anim_asset(&tile_def, &world.read_resource::<Assets>());
         let transform = if let Some(asset) = &tile_def.asset {

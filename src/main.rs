@@ -8,6 +8,9 @@
 )]
 #![forbid(unsafe_code)]
 
+#[macro_use]
+extern crate log;
+
 mod components;
 mod entities;
 mod game_data;
@@ -23,22 +26,16 @@ use amethyst::{
     audio::Source,
     core::SystemDesc,
     utils::application_root_dir,
-    Application,
+    Application, LoggerConfig,
 };
 use game_data::CustomGameDataBuilder;
+use log::LevelFilter;
 use precompile::MyPrefabData;
 use precompile::PrecompiledDefaultsBundle;
 use precompile::PrecompiledRenderBundle;
 
-fn main() {
-    let result = make_game();
-    if let Err(e) = result {
-        println!("Error starting game: {:?}", e);
-    }
-}
-
-fn make_game() -> amethyst::Result<()> {
-    amethyst::Logger::from_config(Default::default()).start();
+fn main() -> amethyst::Result<()> {
+    amethyst::Logger::from_config(LoggerConfig::default()).start();
     let app_root = application_root_dir()?;
     let assets_dir = app_root.join("assets/");
     let config_dir = assets_dir.join("config/");

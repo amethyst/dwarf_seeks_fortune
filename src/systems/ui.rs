@@ -73,7 +73,7 @@ impl<'a> System<'a> for UiEventHandlerSystem {
 
         // Reader id was just initialized above if empty
         for ev in events.read(reader_id) {
-            info!("[SYSTEM] You just interacted with a ui element: {:?}", ev);
+            debug!("[SYSTEM] You just interacted with a ui element: {:?}", ev);
         }
     }
 }

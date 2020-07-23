@@ -121,11 +121,11 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
             (&*data.world.read_resource::<DebugConfig>()).skip_straight_to_editor;
         match self.progress.complete() {
             Completion::Failed => {
-                eprintln!("Failed loading assets");
+                error!("Failed loading assets");
                 Trans::Quit
             }
             Completion::Complete => {
-                println!("Assets loaded, swapping state");
+                info!("Assets loaded, swapping state");
                 if let Some(entity) = self.load_ui {
                     let _ = data.world.delete_entity(entity);
                 }

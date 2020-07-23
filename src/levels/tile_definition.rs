@@ -38,7 +38,7 @@ impl<'a> TileDefinitions {
         self.map
             .get(key)
             .or_else(|| {
-                println!("Failed to find tile definition {:?}, using fallback: ", key);
+                error!("Failed to find tile definition {:?}, using fallback: ", key);
                 Some(&self.fallback)
             })
             .expect("Should never panic, because we use a fallback!")

@@ -108,7 +108,7 @@ impl Brush {
         self.palette_index =
             (self.palette_index as i32 + offset).rem_euclid(self.palette.len() as i32) as usize;
         let new_key = self.get_key();
-        println!("Selected brush: {:?}", new_key);
+        info!("Selected brush: {:?}", new_key);
         new_key.clone()
     }
 

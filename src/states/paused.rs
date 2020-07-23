@@ -1,11 +1,12 @@
-use crate::game_data::CustomGameData;
-use crate::resources::*;
 use amethyst::prelude::Builder;
 use amethyst::{
     ecs::prelude::{Entity, WorldExt},
     input::{is_key_down, VirtualKeyCode},
     State, StateData, StateEvent, Trans,
 };
+
+use crate::game_data::CustomGameData;
+use crate::resources::*;
 
 pub struct PausedState {
     ui: Option<Entity>,
@@ -19,7 +20,7 @@ impl PausedState {
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PausedState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-        println!("PausedState on_start");
+        info!("PausedState on_start");
         self.ui = UiHandles::add_ui(&UiType::Paused, data.world);
     }
 

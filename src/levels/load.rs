@@ -37,16 +37,13 @@ pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
         .join("assets/")
         .join("tiles/")
         .join("tiles.ron");
-    let tile_defs = TileDefinitions::load(file);
-    // println!("Tile definitions loaded: {:?}", tile_defs);
-    tile_defs
+    TileDefinitions::load(file)
 }
 
 pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
     let fallback_def = TileDefinition::fallback();
     let tile_defs = load_tile_definitions()?;
     let level = Level::load(level_file)?;
-    // println!("Map loaded: {:?}", map);
     level.tile_defs.iter().for_each(|(pos, tile_def_key)| {
         let tile_def = tile_defs.get(tile_def_key);
         let still_asset = load_still_asset(tile_def, &world.read_resource::<Assets>());

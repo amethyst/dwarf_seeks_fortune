@@ -32,7 +32,7 @@ impl TileMap {
                         Tile::Dummy(pos.clone())
                     };
                     if let Some(replaced_value) = tiles.insert(Pos::new(pos.x + x, pos.y + y), tile) {
-                        println!("Error! At pos ({:?},{:?}), there are multiple tiles! {:?} replaces {:?}",
+                        error!("Error! At pos ({:?},{:?}), there are multiple tiles! {:?} replaces {:?}",
                                  x,
                                  y,
                                  (pos, key),
@@ -50,7 +50,7 @@ impl TileMap {
                 Tile::Dummy(pos) => match self.tiles.get(pos) {
                     Some(Tile::Key(key)) => Some(key),
                     _ => {
-                        println!("Error! Dummy position lookup failed for tile {:?}", tile);
+                        error!("Error! Dummy position lookup failed for tile {:?}", tile);
                         None
                     }
                 },

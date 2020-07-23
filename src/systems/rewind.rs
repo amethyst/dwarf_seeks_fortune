@@ -72,7 +72,7 @@ impl<'s> System<'s> for RewindSystem {
     ) {
         if rewind.is_ready() {
             if let Some(frame) = history.pop_frame() {
-                println!("Rewinding player to {:?}", frame);
+                info!("Rewinding player to {:?}", frame);
                 for (_, transform, steering) in
                     (&player_tags, &mut transforms, &mut steerings).join()
                 {

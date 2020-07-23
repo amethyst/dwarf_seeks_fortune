@@ -36,7 +36,7 @@ impl Assets {
             .stills
             .get(asset_type)
             .or_else(|| {
-                println!("Spritesheet asset {:?} is missing!", asset_type);
+                error!("Spritesheet asset {:?} is missing!", asset_type);
                 self.stills.get(&SpriteType::NotFound)
             })
             .expect(&format!("Fallback asset also missing.")))
@@ -48,7 +48,7 @@ impl Assets {
             .animated
             .get(asset_type)
             .or_else(|| {
-                println!("Animation asset {:?} is missing!", asset_type);
+                error!("Animation asset {:?} is missing!", asset_type);
                 self.animated.get(&AnimType::NotFound)
             })
             .expect(&format!("Fallback asset also missing!")))
