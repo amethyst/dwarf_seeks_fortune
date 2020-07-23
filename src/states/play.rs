@@ -10,7 +10,7 @@ use amethyst::{
         get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
     },
     assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{transform::Transform, Parent},
+    core::{timing::Time, transform::Transform, Parent},
     ecs::{prelude::World, Entities, Entity, Join, ReadStorage, WriteStorage},
     input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
     prelude::*,
@@ -61,19 +61,23 @@ impl<'a, 'b> PlayState {
         action: &str,
         world: &mut World,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        let mut config = world.fetch_mut::<DebugConfig>();
-        // TODO: Replace with time manipulation?
         if action == "speedUp" {
-            let (old_speed, new_speed) = (*config).increase_speed();
-            info!("Speeding up, from {:?} to {:?}", old_speed, new_speed);
+            let (old_scale, new_scale) = (*world.fetch_mut::<DebugConfig>()).increase_speed();
+            info!("Speeding up time, from x{:?} to x{:?}. This feature exists for debugging purposes only.", old_scale, new_scale);
+            self.update_time_scale(world, new_scale);
             Trans::None
         } else if action == "slowDown" {
-            let (old_speed, new_speed) = (*config).decrease_speed();
-            info!("Slowing down, from {:?} to {:?}", old_speed, new_speed);
+            let (old_scale, new_scale) = (*world.fetch_mut::<DebugConfig>()).decrease_speed();
+            info!("Slowing down time, from x{:?} to x{:?}. This feature exists for debugging purposes only.", old_scale, new_scale);
+            self.update_time_scale(world, new_scale);
             Trans::None
         } else {
             Trans::None
         }
+    }
+
+    fn update_time_scale(&self, world: &mut World, time_scale: f32) {
+        world.write_resource::<Time>().set_time_scale(time_scale);
     }
 }
 
