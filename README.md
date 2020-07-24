@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/Jazarro/dwarf_seeks_fortune.svg?branch=master)](https://travis-ci.com/Jazarro/dwarf_seeks_fortune)
 
-# Dwarf Seeks Fortune (Working title)
+# Dwarf Seeks Fortune
 A 2D puzzle platformer made with the Amethyst game engine. This game is an homage to the 1988 classic [King's Valley II](https://en.wikipedia.org/wiki/King%27s_Valley_II). 
 
 The aim of this project is to be a helpful resource to anyone learning Amethyst for the first time. It is my intention to write guides explaining how certain features are implemented in this game. I'll not claim that this is the only way or even the best way to do things, but to someone just starting out it may prove helpful regardless.
@@ -24,9 +24,3 @@ You're a dwarf, digging through the ancient ruins of your ancestors. Each level 
 
 ## Art
 At the moment, everything is temporary, placeholder, programmer art. There will be some real art assets soon.
-
- - [ ] Key (Amethyst crystal) (128x128)
- - [ ] Running dwarf (128x128 per image)
- - [ ] Blocks (64x64)
- - [ ] Exit door (256x256)
- - [ ] Ladder (128x64)
