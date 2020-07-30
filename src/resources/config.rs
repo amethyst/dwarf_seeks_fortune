@@ -21,6 +21,8 @@ pub struct DebugConfig {
     /// If true, the game will open in the editor state.
     /// If false, it will open on the main menu.
     pub skip_straight_to_editor: bool,
+    /// Whether or not to display debug frames indicating the player's discrete position.
+    pub display_debug_frames: bool,
 }
 
 impl DebugConfig {

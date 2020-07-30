@@ -41,6 +41,7 @@ pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
 }
 
 pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
+    let display_debug_frames = world.read_resource::<DebugConfig>().display_debug_frames;
     let fallback_def = TileDefinition::fallback();
     let tile_defs = load_tile_definitions()?;
     let level = Level::load(level_file)?;
@@ -71,7 +72,9 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
         match tile_def.archetype {
             Archetype::Player => {
                 let player = build_player(builder, pos, tile_def);
-                build_frames(player, world, tile_def);
+                if display_debug_frames {
+                    build_frames(player, world, tile_def);
+                }
             }
             Archetype::Key => {
                 builder.with(KeyTag).build();
