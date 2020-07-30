@@ -269,11 +269,17 @@ fn is_grounded(steering: &Steering, tile_map: &TileMap) -> bool {
 }
 
 fn is_against_wall_left(steering: &Steering, anchored_y: f32, tile_map: &TileMap) -> bool {
-    is_against_wall(&steering, anchored_y, &tile_map, -1)
+    is_against_wall(&steering, anchored_y, &tile_map, -1, 0)
 }
 
 fn is_against_wall_right(steering: &Steering, anchored_y: f32, tile_map: &TileMap) -> bool {
-    is_against_wall(&steering, anchored_y, &tile_map, steering.dimens.x)
+    is_against_wall(
+        &steering,
+        anchored_y,
+        &tile_map,
+        steering.dimens.x,
+        steering.dimens.x - 1,
+    )
 }
 
 fn is_against_wall(
@@ -281,6 +287,7 @@ fn is_against_wall(
     anchored_y: f32,
     tile_map: &TileMap,
     x_offset: i32,
+    x_offset_for_tile_in_front: i32,
 ) -> bool {
     let floored_y = anchored_y.floor();
     let nr_blocks_to_check = if (floored_y - anchored_y).abs() > f32::EPSILON {
@@ -290,8 +297,17 @@ fn is_against_wall(
     };
     (0..nr_blocks_to_check).any(|i| {
         let tile = tile_map.get_tile(&Pos::new(steering.pos.x + x_offset, floored_y as i32 + i));
-        tile.map(|tile| tile.collides_horizontally())
-            .unwrap_or(false)
+        let tile_in_front = tile_map.get_tile(&Pos::new(
+            steering.pos.x + x_offset_for_tile_in_front,
+            floored_y as i32 + i,
+        ));
+        tile.map(|tile| {
+            tile.collides_horizontally()
+                && tile_in_front
+                    .map(|tile_in_front| !tile_in_front.collides_horizontally())
+                    .unwrap_or(true)
+        })
+        .unwrap_or(false)
     })
 }
 
