@@ -72,6 +72,7 @@ impl<'s> System<'s> for PlayerSystem {
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             steering.pos = Pos::new(anchored_x.round() as i32, anchored_y.round() as i32);
 
+            // The following if-else construction checks if the steering mode should be changed.
             let has_ground_beneath_feet = is_grounded(&steering, &tile_map);
             if steering.is_falling()
                 && anchored_y <= steering.pos.y as f32
@@ -116,6 +117,7 @@ impl<'s> System<'s> for PlayerSystem {
                 steering.mode = SteeringMode::Grounded;
             }
 
+            // This match will adjust the steering based on the current steering mode.
             match steering.mode {
                 SteeringMode::Grounded => {
                     if input_x.abs() > f32::EPSILON {
@@ -167,22 +169,42 @@ impl<'s> System<'s> for PlayerSystem {
                         }
                     }
                 }
-                SteeringMode::Falling { x_movement, .. } => {
+                SteeringMode::Falling {
+                    x_movement,
+                    starting_y_pos,
+                    starting_time,
+                } => {
                     if x_movement.abs() < f32::EPSILON {
                         // No horizontal movement.
                         steering.destination.x = steering.pos.x;
                     } else if x_movement > f32::EPSILON {
                         // Moving towards the right.
-                        if aligned_with_grid(steering.destination.x as f32, anchored_x, x_movement)
-                            && !is_against_wall_right(steering, anchored_y, &tile_map)
-                        {
+                        if is_against_wall_right(steering, anchored_y, &tile_map) {
+                            steering.mode = SteeringMode::Falling {
+                                x_movement: 0.,
+                                starting_y_pos,
+                                starting_time,
+                            };
+                        } else if aligned_with_grid(
+                            steering.destination.x as f32,
+                            anchored_x,
+                            x_movement,
+                        ) {
                             steering.destination.x += 1;
                         }
                     } else {
                         // Moving towards the left.
-                        if aligned_with_grid(steering.destination.x as f32, anchored_x, x_movement)
-                            && !is_against_wall_left(steering, anchored_y, &tile_map)
-                        {
+                        if is_against_wall_left(steering, anchored_y, &tile_map) {
+                            steering.mode = SteeringMode::Falling {
+                                x_movement: 0.,
+                                starting_y_pos,
+                                starting_time,
+                            };
+                        } else if aligned_with_grid(
+                            steering.destination.x as f32,
+                            anchored_x,
+                            x_movement,
+                        ) {
                             steering.destination.x += -1;
                         }
                     }
@@ -205,14 +227,14 @@ impl<'s> System<'s> for PlayerSystem {
                     } else if x_movement > f32::EPSILON {
                         // Moving towards the right.
                         if aligned_with_grid(steering.destination.x as f32, anchored_x, x_movement)
-                            && !is_against_wall_right(steering, anchored_y, &tile_map)
+                            && !is_against_wall_right(steering, steering.pos.y as f32, &tile_map)
                         {
                             steering.destination.x += 1;
                         }
                     } else {
                         // Moving towards the left.
                         if aligned_with_grid(steering.destination.x as f32, anchored_x, x_movement)
-                            && !is_against_wall_left(steering, anchored_y, &tile_map)
+                            && !is_against_wall_left(steering, steering.pos.y as f32, &tile_map)
                         {
                             steering.destination.x += -1;
                         }
