@@ -13,4 +13,7 @@ serde = { version = "1.0", features = ["derive"] }
 derive-new = "0.5"
 specs-derive = "0.4"
 precompile = { path = "precompile" }
+# Windows / Linux users, use the following line:
 amethyst = {version = "0.15.0", features = ["vulkan"]}
+# Mac users, use the following line:
+#amethyst = {version = "0.15.0", features = ["metal"]}
