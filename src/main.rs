@@ -74,7 +74,7 @@ fn main() -> amethyst::Result<()> {
             &[],
         )
         .with_core(
-            systems::PlayerSystem.pausable(CurrentState::Running),
+            systems::PlayerSystem::default().pausable(CurrentState::Running),
             "player_system",
             &["input_system"],
         )

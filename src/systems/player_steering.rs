@@ -10,7 +10,10 @@ use amethyst::{
 };
 
 /// This system checks player input for movement and adjusts the player's steering accordingly.
-pub struct PlayerSystem;
+#[derive(Default)]
+pub struct PlayerSystem {
+    pressing_jump: bool,
+}
 
 impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
@@ -31,7 +34,9 @@ impl<'s> System<'s> for PlayerSystem {
             println!("Steering: {:?}", steering); // TODO: Remove later.
             let input_x = input.axis_value("move_x").unwrap_or(0.0);
             let input_y = input.axis_value("move_y").unwrap_or(0.0);
-            let jump = input.action_is_down("jump").unwrap_or(false);
+            let jump_down = input.action_is_down("jump").unwrap_or(false);
+            let jump = jump_down && !self.pressing_jump;
+            self.pressing_jump = jump_down;
 
             let old_pos = steering.pos.clone();
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
@@ -113,9 +118,16 @@ impl<'s> System<'s> for PlayerSystem {
                             steering.destination.y = steering.pos.y + 1;
                         } else if offset_from_discrete_pos > -f32::EPSILON
                             && input_y < -f32::EPSILON
-                            && can_climb_down(steering, &tile_map)
                         {
-                            steering.destination.y = steering.pos.y - 1;
+                            if can_climb_down(steering, &tile_map) {
+                                steering.destination.y = steering.pos.y - 1;
+                            } else if above_air(steering, &tile_map) {
+                                steering.mode = SteeringMode::Falling {
+                                    x_movement: 0.,
+                                    starting_y_pos: transform.translation().y,
+                                    starting_time: time.absolute_time_seconds(),
+                                };
+                            }
                         } else if ((steering.destination.y - steering.pos.y) * input_y as i32)
                             .is_negative()
                         {
@@ -259,5 +271,12 @@ fn can_climb(steering: &Steering, tile_map: &TileMap, y_range: (i32, i32)) -> bo
             ));
             tile.map(|tile| tile.climbable).unwrap_or(false)
         })
+    })
+}
+
+fn above_air(steering: &Steering, tile_map: &TileMap) -> bool {
+    (0..steering.dimens.x).all(|x_offset| {
+        let tile = tile_map.get_tile(&Pos::new(steering.pos.x + x_offset, steering.pos.y - 1));
+        tile.map(|tile| !tile.provides_platform()).unwrap_or(true)
     })
 }
