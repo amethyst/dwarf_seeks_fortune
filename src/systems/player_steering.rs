@@ -91,7 +91,8 @@ impl<'s> System<'s> for PlayerSystem {
                     starting_y_pos: transform.translation().y,
                     starting_time: time.absolute_time_seconds(),
                 };
-            } else if steering.is_grounded() && jump {
+            } else if steering.is_grounded() && jump && !is_underneath_ceiling(steering, &tile_map)
+            {
                 steering.mode = SteeringMode::Jumping {
                     x_movement: input_x,
                     starting_y_pos: transform.translation().y,
@@ -265,6 +266,18 @@ fn is_grounded(steering: &Steering, tile_map: &TileMap) -> bool {
     (0..steering.dimens.x).any(|i| {
         let tile = tile_map.get_tile(&Pos::new(steering.pos.x + i, steering.pos.y - 1));
         tile.map(|tile| tile.provides_platform()).unwrap_or(false)
+    })
+}
+
+/// The player cannot jump when underneath a 2-high ceiling.
+/// This function returns true iff the player is underneath a 2-high ceiling.
+fn is_underneath_ceiling(steering: &Steering, tile_map: &TileMap) -> bool {
+    (0..steering.dimens.x).any(|i| {
+        let tile = tile_map.get_tile(&Pos::new(
+            steering.pos.x + i,
+            steering.pos.y + steering.dimens.y,
+        ));
+        tile.map(|tile| tile.collides_bottom()).unwrap_or(false)
     })
 }
 

@@ -107,6 +107,15 @@ impl TileDefinition {
             false
         }
     }
+
+    /// True if and only if the tile collides on the bottom.
+    pub fn collides_bottom(&self) -> bool {
+        if let Some(collision) = &self.collision {
+            collision.collides_bottom
+        } else {
+            false
+        }
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
