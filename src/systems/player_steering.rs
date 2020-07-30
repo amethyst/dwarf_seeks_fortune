@@ -9,10 +9,28 @@ use amethyst::{
     window::ScreenDimensions,
 };
 
+/// How many seconds can pass between starting your jump and starting to move sideways for it to
+/// still register. If you start moving sideways later than that, it will not work and the
+/// character will simply jump straight up into the air instead.
+const JUMP_ALLOWANCE: f32 = 0.1;
+
 /// This system checks player input for movement and adjusts the player's steering accordingly.
+/// TODO: Move the values in this struct to a component?
 #[derive(Default)]
 pub struct PlayerSystem {
+    /// Whether the jump key is currently down. Needed to figure out if the player wants to jump
+    /// this frame. (Jump is only executed if this value changes from false to true.)
     pressing_jump: bool,
+    /// How many seconds have passed since the character started jumping?
+    ///
+    /// This value is usually None. When the character starts jumping, it is assigned Some(0.0).
+    /// The delta_seconds is added to this value every tick. Once it surpasses a threshold, it is
+    /// set back to None.
+    ///
+    /// As long as the grace timer hasn't run out yet, the player can give their jump horizontal
+    /// speed. This fixes the problem that if the player presses jump and move at the same time,
+    /// jump is sometimes registered before move and the character only jumps up, not sideways.
+    jump_grace_timer: Option<f32>,
 }
 
 impl<'s> System<'s> for PlayerSystem {
@@ -37,6 +55,18 @@ impl<'s> System<'s> for PlayerSystem {
             let jump_down = input.action_is_down("jump").unwrap_or(false);
             let jump = jump_down && !self.pressing_jump;
             self.pressing_jump = jump_down;
+            self.jump_grace_timer = if jump {
+                Some(0.)
+            } else if let Some(time_passed) = self.jump_grace_timer {
+                let time_passed = time_passed + time.delta_seconds();
+                if time_passed < JUMP_ALLOWANCE {
+                    Some(time_passed)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
 
             let old_pos = steering.pos.clone();
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
@@ -156,7 +186,18 @@ impl<'s> System<'s> for PlayerSystem {
                         }
                     }
                 }
-                SteeringMode::Jumping { x_movement, .. } => {
+                SteeringMode::Jumping {
+                    x_movement,
+                    starting_y_pos,
+                    starting_time,
+                } => {
+                    if self.jump_grace_timer.is_some() && input_x.abs() > f32::EPSILON {
+                        steering.mode = SteeringMode::Jumping {
+                            x_movement: input_x,
+                            starting_y_pos,
+                            starting_time,
+                        };
+                    }
                     if x_movement.abs() < f32::EPSILON {
                         // No horizontal movement.
                         steering.destination.x = steering.pos.x;
