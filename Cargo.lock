@@ -998,6 +998,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 
 [[package]]
+name = "dwarf_seeks_fortune"
+version = "0.1.0"
+dependencies = [
+ "amethyst",
+ "derive-new",
+ "log",
+ "precompile",
+ "rand 0.7.3",
+ "serde",
+ "specs-derive",
+]
+
+[[package]]
 name = "dwrote"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3455,19 +3468,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ffc92d160b1eef40665be3a05630d003936a3bc7da7421277846c2613e92c71a"
 dependencies = [
  "serde",
-]
-
-[[package]]
-name = "towerdef"
-version = "0.1.0"
-dependencies = [
- "amethyst",
- "derive-new",
- "log",
- "precompile",
- "rand 0.7.3",
- "serde",
- "specs-derive",
 ]
 
 [[package]]

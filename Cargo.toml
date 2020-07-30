@@ -1,5 +1,5 @@
 [package]
-name = "towerdef"
+name = "dwarf_seeks_fortune"
 version = "0.1.0"
 authors = ["Jazarro <nospam.git@boschman.io>"]
 edition = "2018"
