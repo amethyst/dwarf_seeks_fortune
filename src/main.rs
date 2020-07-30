@@ -118,6 +118,7 @@ fn main() -> amethyst::Result<()> {
             "tile_paint_system",
             &["selection_system"],
         )
+        .with_core(systems::WinSystem, "win_system", &[])
         .with_base_bundle(
             &mut app_builder.world,
             PrecompiledRenderBundle {

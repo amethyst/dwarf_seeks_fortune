@@ -73,6 +73,9 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
                 let player = build_player(builder, pos, tile_def);
                 build_frames(player, world, tile_def);
             }
+            Archetype::Key => {
+                builder.with(KeyTag).build();
+            }
             _ => {
                 builder.build();
             }
