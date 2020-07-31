@@ -7,6 +7,7 @@ use amethyst::{
 
 use crate::game_data::CustomGameData;
 use crate::resources::*;
+use crate::states::window_event_handler;
 
 pub struct PausedState {
     ui: Option<Entity>,
@@ -29,6 +30,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PausedState {
         data: StateData<'_, CustomGameData<'_, '_>>,
         event: StateEvent,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+        window_event_handler::handle(&event, data.world);
         if let StateEvent::Window(event) = &event {
             if is_key_down(&event, VirtualKeyCode::Escape) {
                 if let Some(ui) = self.ui {

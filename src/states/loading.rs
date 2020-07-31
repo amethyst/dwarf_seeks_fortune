@@ -19,7 +19,7 @@ use precompile::MyPrefabData;
 
 use crate::game_data::CustomGameData;
 use crate::resources::*;
-use crate::states::{EditorState, MainMenuState};
+use crate::states::{window_event_handler, EditorState, MainMenuState};
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -35,6 +35,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         }));
         let ui_handles = vec![
             (UiType::Fps, "ui/fps.ron"),
+            (UiType::Editor, "ui/editor.ron"),
             (UiType::Paused, "ui/paused.ron"),
             (UiType::MainMenu, "ui/main_menu.ron"),
         ]
@@ -101,9 +102,10 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
 
     fn handle_event(
         &mut self,
-        _: StateData<'_, CustomGameData<'_, '_>>,
+        data: StateData<'_, CustomGameData<'_, '_>>,
         event: StateEvent,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+        window_event_handler::handle(&event, data.world);
         if let StateEvent::Window(event) = event {
             if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
                 return Trans::Quit;

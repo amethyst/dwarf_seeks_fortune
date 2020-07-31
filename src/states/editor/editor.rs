@@ -34,7 +34,7 @@ use crate::resources::*;
 use crate::states::editor::load::load;
 use crate::states::editor::paint::paint_tiles;
 use crate::states::editor::save::save;
-use crate::states::{PausedState, PlayState};
+use crate::states::{window_event_handler, PausedState, PlayState};
 use std::io::Read;
 
 pub struct EditorState;
@@ -77,16 +77,10 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         data: StateData<'_, CustomGameData<'_, '_>>,
         event: StateEvent,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+        window_event_handler::handle(&event, data.world);
         match event {
             // Events related to the window and inputs.
             StateEvent::Window(event) => {
-                if let Event::WindowEvent {
-                    window_id: _,
-                    event: WindowEvent::Resized(_),
-                } = event
-                {
-                    *data.world.write_resource::<ResizeState>() = ResizeState::Resizing;
-                };
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
                     save(data.world);
                     Trans::Pop

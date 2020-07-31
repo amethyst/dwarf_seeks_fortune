@@ -7,6 +7,7 @@
     "pan_y":Emulated(pos: Key(Up),neg:Key(Down)),
   },
   actions: {
+      "toggleFullscreen": [[Key(F11)]],
       "speedUp": [[Key(Add)]],
       "slowDown": [[Key(Subtract)]],
       "shift": [[Key(LShift)]],

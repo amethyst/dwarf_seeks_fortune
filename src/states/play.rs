@@ -19,10 +19,11 @@ use amethyst::{
         Camera, SpriteSheet, Texture,
     },
     utils::application_root_dir,
-    window::ScreenDimensions,
+    window::{MonitorIdent, ScreenDimensions, Window},
     winit::{Event, WindowEvent},
     StateData, Trans,
 };
+
 use precompile::AnimationId;
 
 use crate::components::*;
@@ -30,7 +31,7 @@ use crate::entities::*;
 use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
-use crate::states::{EditorState, PausedState};
+use crate::states::{window_event_handler, EditorState, PausedState};
 
 pub struct PlayState {
     level_file: PathBuf,
@@ -104,16 +105,10 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
         data: StateData<'_, CustomGameData<'_, '_>>,
         event: StateEvent,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+        window_event_handler::handle(&event, data.world);
         match event {
             // Events related to the window and inputs.
             StateEvent::Window(event) => {
-                if let Event::WindowEvent {
-                    window_id: _,
-                    event: WindowEvent::Resized(_),
-                } = event
-                {
-                    *data.world.write_resource::<ResizeState>() = ResizeState::Resizing;
-                };
                 if is_close_requested(&event) {
                     Trans::Quit
                 } else if is_key_down(&event, VirtualKeyCode::Escape) {

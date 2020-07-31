@@ -64,6 +64,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
         data: StateData<'_, CustomGameData<'_, '_>>,
         event: StateEvent,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+        window_event_handler::handle(&event, data.world);
         match event {
             StateEvent::Window(event) => {
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
