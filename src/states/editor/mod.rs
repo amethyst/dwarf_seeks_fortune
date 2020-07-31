@@ -1,6 +1,5 @@
 mod editor;
-mod load;
+mod file_actions;
 mod paint;
-mod save;
 
 pub use self::editor::EditorState;

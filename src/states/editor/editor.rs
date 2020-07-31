@@ -31,9 +31,8 @@ use crate::entities::*;
 use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
-use crate::states::editor::load::load;
+use crate::states::editor::file_actions::{auto_save, auto_save_file, load_auto_save, save};
 use crate::states::editor::paint::paint_tiles;
-use crate::states::editor::save::save;
 use crate::states::{window_event_handler, PausedState, PlayState};
 use std::io::Read;
 
@@ -54,11 +53,12 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         info!("EditorState on_start");
         let StateData { world, .. } = data;
         UiHandles::add_ui(&UiType::Fps, world);
+        UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
         init_cursor(world);
         create_camera(world);
         let mut editor_data = EditorData::default();
-        if let Ok(level_edit) = load(world) {
+        if let Ok(level_edit) = load_auto_save() {
             editor_data.level = level_edit;
         }
         let tile_defs = load_tile_definitions().expect("Tile definitions failed to load!");
@@ -82,7 +82,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
             // Events related to the window and inputs.
             StateEvent::Window(event) => {
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
-                    save(data.world);
+                    auto_save(data.world);
                     Trans::Pop
                 } else {
                     Trans::None
@@ -102,13 +102,8 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                     key_code: VirtualKeyCode::F1,
                     scancode: _,
                 } => {
-                    save(data.world);
-                    let level_file = application_root_dir()
-                        .expect("Root dir not found!")
-                        .join("assets/")
-                        .join("levels/")
-                        .join("generated.ron");
-                    Trans::Switch(Box::new(PlayState::new(level_file, true)))
+                    auto_save(data.world);
+                    Trans::Switch(Box::new(PlayState::new(auto_save_file(), true)))
                 }
                 InputEvent::KeyReleased {
                     key_code: VirtualKeyCode::LBracket,

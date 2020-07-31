@@ -1,9 +1,0 @@
-(
-    tile_defs: {
-        (x: 0, y: 0, ): "Player",
-        (x: 0, y: -1, ): "Block1",
-        (x: 1, y: -1, ): "Block1",
-        (x: 2, y: -1, ): "Block1",
-        (x: 3, y: -1, ): "Block1",
-    },
-)
