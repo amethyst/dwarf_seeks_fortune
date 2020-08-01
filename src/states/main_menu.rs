@@ -11,6 +11,7 @@ use amethyst::{
 
 const PLAY_BUTTON_ID: &str = "play";
 const EDITOR_BUTTON_ID: &str = "editor";
+const MOVEMENT_TEST_BUTTON_ID: &str = "movement_test";
 const EXIT_BUTTON_ID: &str = "exit";
 
 #[derive(Default)]
@@ -18,6 +19,7 @@ pub struct MainMenuState {
     ui: Option<Entity>,
     play_button: Option<Entity>,
     editor_button: Option<Entity>,
+    movement_test_button: Option<Entity>,
     exit_button: Option<Entity>,
 }
 
@@ -35,6 +37,7 @@ impl MainMenuState {
         data.world.exec(|ui_finder: UiFinder<'_>| {
             self.play_button = ui_finder.find(PLAY_BUTTON_ID);
             self.editor_button = ui_finder.find(EDITOR_BUTTON_ID);
+            self.movement_test_button = ui_finder.find(MOVEMENT_TEST_BUTTON_ID);
             self.exit_button = ui_finder.find(EXIT_BUTTON_ID);
         });
     }
@@ -51,6 +54,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
         data.world.delete_all();
         self.play_button = None;
         self.editor_button = None;
+        self.movement_test_button = None;
         self.exit_button = None;
     }
 
@@ -81,6 +85,8 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
                     Trans::Push(Box::new(PlayState::demo()))
                 } else if Some(target) == self.editor_button {
                     Trans::Push(Box::new(EditorState))
+                } else if Some(target) == self.movement_test_button {
+                    Trans::Push(Box::new(MovementTestState))
                 } else if Some(target) == self.exit_button {
                     Trans::Quit
                 } else {
