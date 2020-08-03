@@ -103,6 +103,7 @@ impl<'s> System<'s> for MovementSystem {
             } else {
                 delta.signum()
             };
+            //TODO: rewrite
             if (delta_signum * steering.direction.0).is_sign_positive() {
                 velocity.x = delta_signum * config.player_speed;
             } else {

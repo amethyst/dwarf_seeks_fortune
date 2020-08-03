@@ -48,26 +48,24 @@ impl<'s> System<'s> for PlayerSystem {
         &mut self,
         (player_tags, transforms, mut steerings, input, tile_map, mut history, time): Self::SystemData,
     ) {
-        for (_, transform, steering) in (&player_tags, &transforms, &mut steerings).join() {
-            // println!("Steering: {:?}", steering); // TODO: Remove later.
-            let input_x = input.axis_value("move_x").unwrap_or(0.0);
-            let input_y = input.axis_value("move_y").unwrap_or(0.0);
-            let jump_down = input.action_is_down("jump").unwrap_or(false);
-            let jump = jump_down && !self.pressing_jump;
-            self.pressing_jump = jump_down;
-            self.jump_grace_timer = if jump {
-                Some(0.)
-            } else if let Some(time_passed) = self.jump_grace_timer {
-                let time_passed = time_passed + time.delta_seconds();
-                if time_passed < JUMP_ALLOWANCE {
-                    Some(time_passed)
-                } else {
-                    None
-                }
+        let input_x = input.axis_value("move_x").unwrap_or(0.0);
+        let input_y = input.axis_value("move_y").unwrap_or(0.0);
+        let jump_down = input.action_is_down("jump").unwrap_or(false);
+        let initiate_jump = jump_down && !self.pressing_jump;
+        self.pressing_jump = jump_down;
+        self.jump_grace_timer = if initiate_jump {
+            Some(0.)
+        } else if let Some(time_passed) = self.jump_grace_timer {
+            let time_passed = time_passed + time.delta_seconds();
+            if time_passed < JUMP_ALLOWANCE {
+                Some(time_passed)
             } else {
                 None
-            };
-
+            }
+        } else {
+            None
+        };
+        for (_, transform, steering) in (&player_tags, &transforms, &mut steerings).join() {
             let old_pos = steering.pos.clone();
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             steering.pos = Pos::new(anchored_x.round() as i32, anchored_y.round() as i32);
@@ -85,20 +83,23 @@ impl<'s> System<'s> for PlayerSystem {
             } else if (steering.is_grounded()
                 && !has_ground_beneath_feet
                 && aligned_with_grid(steering.destination.x as f32, anchored_x, input_x))
-                || (steering.is_climbing() && jump)
+                || (steering.is_climbing() && initiate_jump)
             {
                 steering.mode = SteeringMode::Falling {
                     x_movement: 0.,
                     starting_y_pos: transform.translation().y,
                     starting_time: time.absolute_time_seconds(),
                 };
-            } else if steering.is_grounded() && jump && !is_underneath_ceiling(steering, &tile_map)
+            } else if steering.is_grounded()
+                && initiate_jump
+                && !is_underneath_ceiling(steering, &tile_map)
             {
                 steering.mode = SteeringMode::Jumping {
                     x_movement: input_x,
                     starting_y_pos: transform.translation().y,
                     starting_time: time.absolute_time_seconds(),
                 };
+                steering.direction = (input_x, 0.);
             } else if steering.jump_has_peaked(time.absolute_time_seconds()) {
                 steering.mode = steering.mode.jump_to_fall();
             } else if steering.is_grounded()
@@ -220,6 +221,7 @@ impl<'s> System<'s> for PlayerSystem {
                             starting_y_pos,
                             starting_time,
                         };
+                        steering.direction = (input_x, 0.);
                     }
                     if x_movement.abs() < f32::EPSILON {
                         // No horizontal movement.
