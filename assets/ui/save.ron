@@ -1,0 +1,52 @@
+#![enable(implicit_some)]
+Container(
+    transform: (
+        id: "background",
+        anchor: Middle,
+        stretch: XY( x_margin: 0., y_margin: 0., keep_aspect_ratio: false),
+        width: 20.,
+        height: 20.,
+    ),
+    background: SolidColor(0.6, 0.6, 1.0, 0.8),
+    children: [
+        // Editable text single line.
+        Container(
+            transform: (
+                id: "editable_container",
+                x: 270.0,
+                y: 50.,
+                width: 500.,
+                height: 75.,
+                tab_order: 1,
+                anchor: BottomLeft,
+            ),
+            background: SolidColor(0.09, 0.02, 0.25, 1.0),
+            children: [
+                Label(
+                    transform: (
+                        id: "editable",
+                        width: 500.,
+                        height: 75.,
+                        tab_order: 1,
+                        anchor: Middle,
+                        stretch: XY(x_margin: 0., y_margin: 0., keep_aspect_ratio: false),
+                        mouse_reactive: true,
+                        selectable: 0,
+                    ),
+                    text: (
+                        text: "Editable",
+                        font: File("font/square.ttf", ("TTF", ())),
+                        font_size: 75.,
+                        color: (0.2, 0.2, 1.0, 1.0),
+                        align: MiddleLeft,
+                        editable: (
+                            max_length: 2000,
+                            selected_text_color: (0.09, 0.02, 0.25, 1.0),
+                            selected_background_color: (1.0, 0.5, 0.8, 1.0),
+                        ),
+                    )
+                ),
+            ]
+        ),
+    ],
+)

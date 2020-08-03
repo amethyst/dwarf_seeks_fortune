@@ -1,3 +1,4 @@
+use crate::levels::ToolType;
 use amethyst::{
     assets::PrefabData,
     core::math::Vector2,
@@ -8,11 +9,18 @@ use amethyst::{
 use serde::{Deserialize, Serialize};
 
 /// The entity with this component is the player.
+#[derive(Clone, Copy, Debug, Component, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct Player {
+    pub equipped: Option<ToolType>,
+}
+
+/// The entity with this component is a tool equipped by the player.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
-pub struct PlayerTag;
+pub struct EquippedTag;
 
-impl Component for PlayerTag {
+impl Component for EquippedTag {
     type Storage = NullStorage<Self>;
 }
 

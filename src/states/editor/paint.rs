@@ -12,6 +12,14 @@ use std::cmp::min;
 
 pub fn paint_tiles(world: &mut World) {
     let (key, tile_def) = get_brush(world);
+    set_tiles(world, key, tile_def);
+}
+
+pub fn erase_tiles(world: &mut World) {
+    set_tiles(world, None, None);
+}
+
+fn set_tiles(world: &mut World, key: Option<String>, tile_def: Option<TileDefinition>) {
     let brush_dimens = tile_def
         .as_ref()
         .map(|def| def.dimens)

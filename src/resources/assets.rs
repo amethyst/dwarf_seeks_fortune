@@ -73,6 +73,8 @@ pub enum SpriteType {
     Background,
     Frame,
     Blocks,
+    Tools,
+    Door,
     Selection,
 }
 
@@ -81,6 +83,7 @@ pub enum AnimType {
     /// The fallback animated asset to use if the desired asset could not be found.
     NotFound,
     Mob,
+    Miner,
 }
 
 /// Matches a still or animated asset to its dimensions in pixels. Required to calculate the
@@ -91,6 +94,7 @@ pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
             SpriteType::Background => Pos::new(2449, 1632),
             SpriteType::Frame => Pos::new(50, 50),
             SpriteType::Ladder => Pos::new(128, 64),
+            SpriteType::Door => Pos::new(256, 256),
             _ => Pos::new(128, 128),
         },
         AssetType::Animated(anim_type) => match anim_type {

@@ -79,6 +79,9 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
             Archetype::Key => {
                 builder.with(KeyTag).build();
             }
+            Archetype::Tool(tool_type) => {
+                builder.with(Tool::new(tool_type)).build();
+            }
             _ => {
                 builder.build();
             }
@@ -128,7 +131,7 @@ fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) ->
         .with(Transparent)
         .with(Velocity::default())
         .with(Steering::new(pos.clone(), tile_def.dimens.clone()))
-        .with(PlayerTag)
+        .with(Player::default())
         .build()
 }
 
@@ -158,6 +161,18 @@ pub fn load_still_asset(tile: &TileDefinition, assets: &Assets) -> Option<Sprite
                 sprite_number: *sprite_nr,
             })
         }
+    }
+}
+
+pub fn load_asset_from_world(
+    sprite: &SpriteType,
+    sprite_nr: usize,
+    world: &mut World,
+) -> SpriteRender {
+    let assets = world.read_resource::<Assets>();
+    SpriteRender {
+        sprite_sheet: assets.get_still(sprite),
+        sprite_number: sprite_nr,
     }
 }
 

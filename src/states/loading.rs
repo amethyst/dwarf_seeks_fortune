@@ -35,6 +35,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         }));
         let ui_handles = vec![
             (UiType::Fps, "ui/fps.ron"),
+            (UiType::Save, "ui/save.ron"),
             (UiType::Editor, "ui/editor.ron"),
             (UiType::Paused, "ui/paused.ron"),
             (UiType::MainMenu, "ui/main_menu.ron"),
@@ -71,6 +72,16 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                 "prefab/still_blocks.ron",
             ),
             (
+                SpriteType::Tools,
+                "textures/tools.png",
+                "prefab/still_tools.ron",
+            ),
+            (
+                SpriteType::Door,
+                "textures/door.png",
+                "prefab/still_door.ron",
+            ),
+            (
                 SpriteType::Selection,
                 "textures/selection.png",
                 "prefab/still_selection.ron",
@@ -89,6 +100,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         let assets = vec![
             (AnimType::NotFound, "prefab/anim_not_found.ron"),
             (AnimType::Mob, "prefab/anim_mob.ron"),
+            (AnimType::Miner, "prefab/anim_miner.ron"),
         ]
         .drain(..)
         .fold(assets, |mut assets, (anim_type, prefab_path)| {

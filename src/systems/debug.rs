@@ -14,7 +14,7 @@ impl<'s> System<'s> for DebugSystem {
         WriteStorage<'s, Transform>,
         ReadStorage<'s, EditorRootTag>,
         ReadStorage<'s, Steering>,
-        ReadStorage<'s, PlayerTag>,
+        ReadStorage<'s, Player>,
         ReadStorage<'s, DebugPosGhostTag>,
         ReadStorage<'s, DebugSteeringGhostTag>,
     );

@@ -6,7 +6,7 @@
             dimens: ( x:2, y:2, ),
             unique: true,
             mandatory: true,
-            asset: Animated(Mob),
+            asset: Animated(Miner),
             archetype: Player,
         ),
         "Block1":(
@@ -20,6 +20,19 @@
                 collides_bottom: true,
             ),
             asset: Still(Blocks, 0),
+            archetype: Block,
+        ),
+        "Block2":(
+            depth: Blocks,
+            dimens: ( x:1, y:1, ),
+            unique: false,
+            mandatory: false,
+            collision: (
+                collides_top: true,
+                collides_side: true,
+                collides_bottom: true,
+            ),
+            asset: Still(Blocks, 1),
             archetype: Block,
         ),
         "BigBlock":(
@@ -61,6 +74,45 @@
             ),
             asset: Still(Blocks, 3),
             archetype: Key,
+        ),
+        "Pickaxe":(
+            depth: FloatingBlocks,
+            dimens: ( x:2, y:2, ),
+            unique: false,
+            mandatory: false,
+            collision: (
+                collides_top: false,
+                collides_side: false,
+                collides_bottom: false,
+            ),
+            asset: Still(Tools, 0),
+            archetype: Tool(PickAxe),
+        ),
+        "Hammer":(
+            depth: FloatingBlocks,
+            dimens: ( x:2, y:2, ),
+            unique: false,
+            mandatory: false,
+            collision: (
+                collides_top: false,
+                collides_side: false,
+                collides_bottom: false,
+            ),
+            asset: Still(Tools, 2),
+            archetype: Tool(Hammer),
+        ),
+        "Door":(
+            depth: Blocks,
+            dimens: ( x:4, y:4, ),
+            unique: true,
+            mandatory: true,
+            collision: (
+                collides_top: false,
+                collides_side: false,
+                collides_bottom: false,
+            ),
+            asset: Still(Door, 0),
+            archetype: Door,
         ),
     }
 )

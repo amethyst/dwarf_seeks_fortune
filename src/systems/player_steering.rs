@@ -35,7 +35,7 @@ pub struct PlayerSystem {
 
 impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
-        ReadStorage<'s, PlayerTag>,
+        ReadStorage<'s, Player>,
         ReadStorage<'s, Transform>,
         WriteStorage<'s, Steering>,
         Read<'s, InputHandler<StringBindings>>,

@@ -23,7 +23,7 @@ pub struct WinSystem;
 
 impl<'s> System<'s> for WinSystem {
     type SystemData = (
-        ReadStorage<'s, PlayerTag>,
+        ReadStorage<'s, Player>,
         ReadStorage<'s, Steering>,
         ReadStorage<'s, KeyTag>,
         ReadStorage<'s, Transform>,

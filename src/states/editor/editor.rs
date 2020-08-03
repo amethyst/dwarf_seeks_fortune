@@ -32,6 +32,7 @@ use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
 use crate::states::editor::file_actions::{auto_save, auto_save_file, load_auto_save, save};
+use crate::states::editor::paint::erase_tiles;
 use crate::states::editor::paint::paint_tiles;
 use crate::states::{window_event_handler, PausedState, PlayState};
 use std::io::Read;
@@ -96,6 +97,13 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                     scancode: _,
                 } => {
                     paint_tiles(data.world);
+                    Trans::None
+                }
+                InputEvent::KeyReleased {
+                    key_code: VirtualKeyCode::Delete,
+                    scancode: _,
+                } => {
+                    erase_tiles(data.world);
                     Trans::None
                 }
                 InputEvent::KeyReleased {

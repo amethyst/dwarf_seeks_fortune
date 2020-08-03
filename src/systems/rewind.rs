@@ -61,7 +61,7 @@ impl<'s> System<'s> for RewindSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Steering>,
-        ReadStorage<'s, PlayerTag>,
+        ReadStorage<'s, Player>,
         Read<'s, Rewind>,
         Write<'s, History>,
     );

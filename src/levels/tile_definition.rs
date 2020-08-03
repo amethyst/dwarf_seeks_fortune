@@ -175,11 +175,25 @@ pub enum Archetype {
     MobSpawner,
     /// A fallback archetype used when an archetype lookup failed.
     NotFound,
+    Tool(ToolType),
 }
 
 impl Default for Archetype {
     fn default() -> Self {
         Archetype::Block
+    }
+}
+
+#[derive(Debug, Copy, Clone, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub enum ToolType {
+    PickAxe,
+    Hammer,
+}
+
+impl Default for ToolType {
+    fn default() -> Self {
+        ToolType::PickAxe
     }
 }
 

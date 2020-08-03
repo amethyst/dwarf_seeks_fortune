@@ -6,6 +6,7 @@ mod movement;
 mod movement_test;
 mod player_steering;
 mod rewind;
+mod tools;
 mod ui;
 
 pub use self::camera::*;
@@ -16,4 +17,5 @@ pub use self::movement::*;
 pub use self::movement_test::*;
 pub use self::player_steering::*;
 pub use self::rewind::*;
+pub use self::tools::*;
 pub use self::ui::*;
