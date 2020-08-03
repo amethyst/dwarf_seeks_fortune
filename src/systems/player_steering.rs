@@ -49,7 +49,7 @@ impl<'s> System<'s> for PlayerSystem {
         (player_tags, transforms, mut steerings, input, tile_map, mut history, time): Self::SystemData,
     ) {
         for (_, transform, steering) in (&player_tags, &transforms, &mut steerings).join() {
-            println!("Steering: {:?}", steering); // TODO: Remove later.
+            // println!("Steering: {:?}", steering); // TODO: Remove later.
             let input_x = input.axis_value("move_x").unwrap_or(0.0);
             let input_y = input.axis_value("move_y").unwrap_or(0.0);
             let jump_down = input.action_is_down("jump").unwrap_or(false);

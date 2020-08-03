@@ -31,7 +31,7 @@ use crate::entities::*;
 use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
-use crate::states::{window_event_handler, EditorState, PausedState};
+use crate::states::{setup_test, window_event_handler, EditorState, PausedState};
 
 pub struct MovementTestState;
 
@@ -73,35 +73,16 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MovementTestState {
                     InputEvent::KeyPressed {
                         key_code: VirtualKeyCode::Key1,
                         ..
-                    } => {
-                        let level_file = application_root_dir()
-                            .expect("Root dir not found!")
-                            .join("assets/")
-                            .join("tests/")
-                            .join("jump_2_wide.ron");
-                        load_level(&level_file, data.world);
-                    }
+                    } => setup_test(MovementTest::Jump2Wide, data.world),
                     InputEvent::KeyPressed {
                         key_code: VirtualKeyCode::Key2,
                         ..
-                    } => {
-                        let level_file = application_root_dir()
-                            .expect("Root dir not found!")
-                            .join("assets/")
-                            .join("tests/")
-                            .join("jump_3_wide.ron");
-                        load_level(&level_file, data.world);
-                    }
+                    } => setup_test(MovementTest::Jump4Wide, data.world),
                     InputEvent::KeyPressed {
                         key_code: VirtualKeyCode::Key3,
                         ..
                     } => {
-                        let level_file = application_root_dir()
-                            .expect("Root dir not found!")
-                            .join("assets/")
-                            .join("tests/")
-                            .join("jump_4_wide.ron");
-                        load_level(&level_file, data.world);
+                        //TODO:...
                     }
                     _ => (),
                 };
