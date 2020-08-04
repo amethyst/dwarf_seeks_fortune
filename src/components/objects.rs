@@ -1,4 +1,5 @@
 use crate::levels::ToolType;
+use crate::resources::{AssetType, SpriteType};
 use amethyst::{
     assets::PrefabData,
     core::math::Vector2,
@@ -20,10 +21,16 @@ impl Component for KeyTag {
 #[prefab(Component)]
 pub struct Tool {
     pub tool_type: ToolType,
+    pub sprite: SpriteType,
+    pub sprite_nr: usize,
 }
 
 impl Tool {
-    pub fn new(tool_type: ToolType) -> Self {
-        Tool { tool_type }
+    pub fn new(tool_type: ToolType, sprite: SpriteType, sprite_nr: usize) -> Self {
+        Tool {
+            tool_type,
+            sprite,
+            sprite_nr,
+        }
     }
 }

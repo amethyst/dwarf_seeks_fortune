@@ -116,6 +116,10 @@ impl TileDefinition {
             false
         }
     }
+
+    pub fn is_breakable(&self) -> bool {
+        Archetype::Block(Sturdiness::Breakable) == self.archetype
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -156,7 +160,7 @@ impl DepthLayer {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 /// If there are any special rules that apply to this tile, the archetype signals this.
 /// For example: a tile with the Archetype Player will be targeted by player input, etc.
@@ -164,7 +168,7 @@ impl DepthLayer {
 /// Use a different archetype to attach special components or sub-entities to an entity.
 pub enum Archetype {
     /// ordinary block. Does nothing.
-    Block,
+    Block(Sturdiness),
     /// Spawn a player here.
     Player,
     /// Level key. The objective is to collect them all. Each level should contain at least one.
@@ -180,11 +184,26 @@ pub enum Archetype {
 
 impl Default for Archetype {
     fn default() -> Self {
-        Archetype::Block
+        Archetype::NotFound
     }
 }
 
-#[derive(Debug, Copy, Clone, Deserialize, Serialize)]
+/// What it takes to break this block.
+/// This enum has two varieties now (breakable or not breakable) but further nuances could be added later.
+/// For example: more/less resistant to explosions, etc.
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+pub enum Sturdiness {
+    Invulnerable,
+    Breakable,
+}
+
+impl Default for Sturdiness {
+    fn default() -> Self {
+        Sturdiness::Invulnerable
+    }
+}
+
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum ToolType {
     PickAxe,

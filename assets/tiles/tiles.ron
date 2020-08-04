@@ -20,7 +20,7 @@
                 collides_bottom: true,
             ),
             asset: Still(Blocks, 0),
-            archetype: Block,
+            archetype: Block(Breakable),
         ),
         "Block2":(
             depth: Blocks,
@@ -33,7 +33,7 @@
                 collides_bottom: true,
             ),
             asset: Still(Blocks, 1),
-            archetype: Block,
+            archetype: Block(Breakable),
         ),
         "BigBlock":(
             depth: Blocks,
@@ -46,7 +46,7 @@
                 collides_bottom: true,
             ),
             asset: Still(Blocks, 1),
-            archetype: Block,
+            archetype: Block(Invulnerable),
         ),
         "Ladder":(
             depth: Blocks,
@@ -60,7 +60,7 @@
                 collides_bottom: false,
             ),
             asset: Still(Ladder, 0),
-            archetype: Block,
+            archetype: Block(Invulnerable),
         ),
         "Key":(
             depth: FloatingBlocks,

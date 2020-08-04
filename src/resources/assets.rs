@@ -78,6 +78,12 @@ pub enum SpriteType {
     Selection,
 }
 
+impl Default for SpriteType {
+    fn default() -> Self {
+        SpriteType::NotFound
+    }
+}
+
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum AnimType {
     /// The fallback animated asset to use if the desired asset could not be found.

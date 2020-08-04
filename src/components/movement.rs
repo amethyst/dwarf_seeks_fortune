@@ -80,6 +80,13 @@ impl Direction1D {
             Direction1D::Neutral => 0.,
         }
     }
+    pub fn signum_i(&self) -> i32 {
+        match self {
+            Direction1D::Positive => 1,
+            Direction1D::Negative => -1,
+            Direction1D::Neutral => 0,
+        }
+    }
 }
 
 impl Default for Direction1D {
@@ -140,8 +147,15 @@ pub struct Steering {
     pub pos: Pos,
     /// Width and height of the entity.
     pub dimens: Pos,
-    /// Direction the player is travelling along the x-axis and y-axis.
+    /// Direction the entity is travelling along the x-axis and y-axis.
+    /// This is always Neutral if the entity is not moving.
     pub direction: Direction2D,
+    /// Almost the same as direction, except that after the entity stops moving, direction becomes
+    /// Neutral and facing remains Positive or Negative.
+    ///
+    /// Facing is always equal to direction, except if the entity is not moving. In that case,
+    /// facing is equal to the last value that direction had before it became neutral.
+    pub facing: Direction2D,
     pub destination: Pos,
     pub mode: SteeringMode,
 }
@@ -256,6 +270,7 @@ impl Steering {
             pos,
             dimens,
             direction: Direction2D::default(),
+            facing: Direction2D::new(1., 0.),
             destination: pos,
             mode: SteeringMode::Grounded,
         }

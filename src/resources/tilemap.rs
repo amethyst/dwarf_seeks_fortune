@@ -59,4 +59,7 @@ impl TileMap {
             .flatten()
             .map(|tile_def_key| self.tile_defs.get(tile_def_key))
     }
+    pub fn remove_tile(&mut self, pos: &Pos) {
+        self.tiles.remove(pos);
+    }
 }

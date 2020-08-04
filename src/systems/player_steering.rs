@@ -42,7 +42,7 @@ impl<'s> System<'s> for PlayerSystem {
             };
             steering_intent.walk = Direction1D::new(input_x);
             steering_intent.climb = Direction1D::new(input_y);
-            steering_intent.jump = initiate_jump;
+            steering_intent.jump = player.equipped.is_none() && initiate_jump;
             steering_intent.jump_direction = if player.jump_grace_timer.is_some() {
                 steering_intent.walk
             } else {
@@ -254,6 +254,10 @@ impl<'s> System<'s> for SteeringSystem {
                     }
                 }
             };
+
+            if steering.direction.is_opposite(&steering.facing) {
+                steering.facing = steering.direction;
+            }
 
             // Push frame on history if player position changed.
             if old_pos != steering.pos || history.force_key_frame {

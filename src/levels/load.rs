@@ -80,7 +80,16 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
                 builder.with(KeyTag).build();
             }
             Archetype::Tool(tool_type) => {
-                builder.with(Tool::new(tool_type)).build();
+                if let Some(AssetType::Still(sprite, sprite_nr)) = tile_def.asset {
+                    builder
+                        .with(Tool::new(tool_type, sprite, sprite_nr))
+                        .build();
+                } else {
+                    error!(
+                        "Tool definition {:?} did not have still asset.",
+                        tile_def_key
+                    );
+                }
             }
             _ => {
                 builder.build();
