@@ -130,6 +130,7 @@ fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) ->
     builder
         .with(Transparent)
         .with(Velocity::default())
+        .with(SteeringIntent::default())
         .with(Steering::new(pos.clone(), tile_def.dimens.clone()))
         .with(Player::default())
         .build()

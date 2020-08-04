@@ -9,36 +9,57 @@ use amethyst::{
     window::ScreenDimensions,
 };
 
-/// How many seconds can pass between starting your jump and starting to move sideways for it to
-/// still register. If you start moving sideways later than that, it will not work and the
-/// character will simply jump straight up into the air instead.
-const JUMP_ALLOWANCE: f32 = 0.1;
-
-/// This system checks player input for movement and adjusts the player's steering accordingly.
-/// TODO: Move the values in this struct to a component?
 #[derive(Default)]
-pub struct PlayerSystem {
-    /// Whether the jump key is currently down. Needed to figure out if the player wants to jump
-    /// this frame. (Jump is only executed if this value changes from false to true.)
-    pressing_jump: bool,
-    /// How many seconds have passed since the character started jumping?
-    ///
-    /// This value is usually None. When the character starts jumping, it is assigned Some(0.0).
-    /// The delta_seconds is added to this value every tick. Once it surpasses a threshold, it is
-    /// set back to None.
-    ///
-    /// As long as the grace timer hasn't run out yet, the player can give their jump horizontal
-    /// speed. This fixes the problem that if the player presses jump and move at the same time,
-    /// jump is sometimes registered before move and the character only jumps up, not sideways.
-    jump_grace_timer: Option<f32>,
-}
+pub struct PlayerSystem;
 
 impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
-        ReadStorage<'s, Player>,
+        WriteStorage<'s, Player>,
+        WriteStorage<'s, SteeringIntent>,
+        Read<'s, InputHandler<StringBindings>>,
+        Read<'s, MovementConfig>,
+        Read<'s, Time>,
+    );
+
+    fn run(&mut self, (mut players, mut steering_intents, input, config, time): Self::SystemData) {
+        let input_x = input.axis_value("move_x").unwrap_or(0.0);
+        let input_y = input.axis_value("move_y").unwrap_or(0.0);
+        let jump_down = input.action_is_down("jump").unwrap_or(false);
+        for (player, steering_intent) in (&mut players, &mut steering_intents).join() {
+            let initiate_jump = jump_down && !player.pressing_jump;
+            player.pressing_jump = jump_down;
+            player.jump_grace_timer = if initiate_jump {
+                Some(0.)
+            } else if let Some(time_passed) = player.jump_grace_timer {
+                let time_passed = time_passed + time.delta_seconds();
+                if time_passed < config.jump_allowance {
+                    Some(time_passed)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+            steering_intent.walk = Direction1D::new(input_x);
+            steering_intent.climb = Direction1D::new(input_y);
+            steering_intent.jump = initiate_jump;
+            steering_intent.jump_direction = if player.jump_grace_timer.is_some() {
+                steering_intent.walk
+            } else {
+                Direction1D::Neutral
+            };
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct SteeringSystem;
+
+impl<'s> System<'s> for SteeringSystem {
+    type SystemData = (
+        ReadStorage<'s, SteeringIntent>,
         ReadStorage<'s, Transform>,
         WriteStorage<'s, Steering>,
-        Read<'s, InputHandler<StringBindings>>,
         Read<'s, TileMap>,
         Write<'s, History>,
         Read<'s, Time>,
@@ -46,26 +67,10 @@ impl<'s> System<'s> for PlayerSystem {
 
     fn run(
         &mut self,
-        (player_tags, transforms, mut steerings, input, tile_map, mut history, time): Self::SystemData,
+        (steering_intents, transforms, mut steerings, tile_map, mut history, time): Self::SystemData,
     ) {
-        let input_x = input.axis_value("move_x").unwrap_or(0.0);
-        let input_y = input.axis_value("move_y").unwrap_or(0.0);
-        let jump_down = input.action_is_down("jump").unwrap_or(false);
-        let initiate_jump = jump_down && !self.pressing_jump;
-        self.pressing_jump = jump_down;
-        self.jump_grace_timer = if initiate_jump {
-            Some(0.)
-        } else if let Some(time_passed) = self.jump_grace_timer {
-            let time_passed = time_passed + time.delta_seconds();
-            if time_passed < JUMP_ALLOWANCE {
-                Some(time_passed)
-            } else {
-                None
-            }
-        } else {
-            None
-        };
-        for (_, transform, steering) in (&player_tags, &transforms, &mut steerings).join() {
+        for (intent, transform, steering) in (&steering_intents, &transforms, &mut steerings).join()
+        {
             let old_pos = steering.pos.clone();
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             steering.pos = Pos::new(anchored_x.round() as i32, anchored_y.round() as i32);
@@ -82,37 +87,37 @@ impl<'s> System<'s> for PlayerSystem {
                 steering.destination = steering.pos;
             } else if (steering.is_grounded()
                 && !has_ground_beneath_feet
-                && aligned_with_grid(steering.destination.x as f32, anchored_x, input_x))
-                || (steering.is_climbing() && initiate_jump)
+                && aligned_with_grid(steering.destination.x as f32, anchored_x, intent.walk))
+                || (steering.is_climbing() && intent.jump)
             {
                 steering.mode = SteeringMode::Falling {
-                    x_movement: 0.,
+                    x_movement: Direction1D::Neutral,
                     starting_y_pos: transform.translation().y,
                     starting_time: time.absolute_time_seconds(),
                 };
             } else if steering.is_grounded()
-                && initiate_jump
+                && intent.jump
                 && !is_underneath_ceiling(steering, &tile_map)
             {
                 steering.mode = SteeringMode::Jumping {
-                    x_movement: input_x,
+                    x_movement: intent.walk,
                     starting_y_pos: transform.translation().y,
                     starting_time: time.absolute_time_seconds(),
                 };
-                steering.direction = (input_x, 0.);
+                steering.direction = Direction2D::from(intent.walk, Direction1D::Neutral);
             } else if steering.jump_has_peaked(time.absolute_time_seconds()) {
                 steering.mode = steering.mode.jump_to_fall();
             } else if steering.is_grounded()
-                && aligned_with_grid(steering.destination.x as f32, anchored_x, input_x)
-                && ((input_y > f32::EPSILON && can_climb_up(steering, &tile_map))
-                    || (input_y < -f32::EPSILON && can_climb_down(steering, &tile_map)))
+                && aligned_with_grid(steering.destination.x as f32, anchored_x, intent.walk)
+                && ((intent.climb.is_positive() && can_climb_up(steering, &tile_map))
+                    || (intent.climb.is_negative() && can_climb_down(steering, &tile_map)))
             {
                 steering.mode = SteeringMode::Climbing;
             } else if steering.is_climbing()
-                && aligned_with_grid(steering.destination.y as f32, anchored_y, input_y)
-                && ((input_x > f32::EPSILON
+                && aligned_with_grid(steering.destination.y as f32, anchored_y, intent.climb)
+                && ((intent.walk.is_positive()
                     && !is_against_wall_right(&steering, steering.pos.y as f32, &tile_map))
-                    || (input_x < -f32::EPSILON
+                    || (intent.walk.is_negative()
                         && !is_against_wall_left(&steering, steering.pos.y as f32, &tile_map)))
             {
                 steering.mode = SteeringMode::Grounded;
@@ -121,50 +126,55 @@ impl<'s> System<'s> for PlayerSystem {
             // This match will adjust the steering based on the current steering mode.
             match steering.mode {
                 SteeringMode::Grounded => {
-                    if input_x.abs() > f32::EPSILON {
-                        steering.direction = (input_x, 0.);
-                        let offset_from_discrete_pos = steering.destination.x as f32 - anchored_x;
-                        if offset_from_discrete_pos < f32::EPSILON && input_x > f32::EPSILON {
+                    if !intent.walk.is_neutral() {
+                        steering.direction = Direction2D::from(intent.walk, Direction1D::Neutral);
+                        let offset_from_destination = steering.destination.x as f32 - anchored_x;
+                        if offset_from_destination < f32::EPSILON && intent.walk.is_positive() {
                             if !is_against_wall_right(&steering, steering.pos.y as f32, &tile_map) {
                                 steering.destination.x = steering.pos.x + 1;
                             }
-                        } else if offset_from_discrete_pos > -f32::EPSILON && input_x < f32::EPSILON
+                        } else if offset_from_destination > -f32::EPSILON
+                            && intent.walk.is_negative()
                         {
                             if !is_against_wall_left(&steering, steering.pos.y as f32, &tile_map) {
                                 steering.destination.x = steering.pos.x - 1;
                             }
-                        } else if ((steering.destination.x - steering.pos.x) * input_x as i32)
-                            .is_negative()
+                        } else if !intent
+                            .walk
+                            .aligns_with((steering.destination.x - steering.pos.x) as f32)
                         {
+                            // TODO: Maybe remove, this doesn't seem to do anything.
                             // Player wants to go back where they came from.
                             steering.destination.x = steering.pos.x;
                         }
                     }
                 }
                 SteeringMode::Climbing => {
-                    if input_y.abs() > f32::EPSILON {
-                        steering.direction = (0., input_y);
+                    if !intent.climb.is_neutral() {
+                        steering.direction = Direction2D::from(Direction1D::Neutral, intent.climb);
                         let offset_from_discrete_pos = steering.destination.y as f32 - anchored_y;
                         if offset_from_discrete_pos < f32::EPSILON
-                            && input_y > f32::EPSILON
+                            && intent.climb.is_positive()
                             && can_climb_up(steering, &tile_map)
                         {
                             steering.destination.y = steering.pos.y + 1;
                         } else if offset_from_discrete_pos > -f32::EPSILON
-                            && input_y < -f32::EPSILON
+                            && intent.climb.is_negative()
                         {
                             if can_climb_down(steering, &tile_map) {
                                 steering.destination.y = steering.pos.y - 1;
                             } else if above_air(steering, &tile_map) {
                                 steering.mode = SteeringMode::Falling {
-                                    x_movement: 0.,
+                                    x_movement: Direction1D::Neutral,
                                     starting_y_pos: transform.translation().y,
                                     starting_time: time.absolute_time_seconds(),
                                 };
                             }
-                        } else if ((steering.destination.y - steering.pos.y) * input_y as i32)
-                            .is_negative()
+                        } else if !intent
+                            .climb
+                            .aligns_with((steering.destination.y - steering.pos.y) as f32)
                         {
+                            // TODO: Maybe remove, this doesn't seem to do anything.
                             // Player wants to go back where they came from.
                             steering.destination.y = steering.pos.y;
                         }
@@ -175,14 +185,14 @@ impl<'s> System<'s> for PlayerSystem {
                     starting_y_pos,
                     starting_time,
                 } => {
-                    if x_movement.abs() < f32::EPSILON {
+                    if x_movement.is_neutral() {
                         // No horizontal movement.
                         steering.destination.x = steering.pos.x;
-                    } else if x_movement > f32::EPSILON {
+                    } else if x_movement.is_positive() {
                         // Moving towards the right.
                         if is_against_wall_right(steering, anchored_y, &tile_map) {
                             steering.mode = SteeringMode::Falling {
-                                x_movement: 0.,
+                                x_movement: Direction1D::Neutral,
                                 starting_y_pos,
                                 starting_time,
                             };
@@ -197,7 +207,7 @@ impl<'s> System<'s> for PlayerSystem {
                         // Moving towards the left.
                         if is_against_wall_left(steering, anchored_y, &tile_map) {
                             steering.mode = SteeringMode::Falling {
-                                x_movement: 0.,
+                                x_movement: Direction1D::Neutral,
                                 starting_y_pos,
                                 starting_time,
                             };
@@ -215,18 +225,19 @@ impl<'s> System<'s> for PlayerSystem {
                     starting_y_pos,
                     starting_time,
                 } => {
-                    if self.jump_grace_timer.is_some() && input_x.abs() > f32::EPSILON {
+                    if !intent.jump_direction.is_neutral() {
                         steering.mode = SteeringMode::Jumping {
-                            x_movement: input_x,
+                            x_movement: intent.jump_direction,
                             starting_y_pos,
                             starting_time,
                         };
-                        steering.direction = (input_x, 0.);
+                        steering.direction =
+                            Direction2D::from(intent.jump_direction, Direction1D::Neutral);
                     }
-                    if x_movement.abs() < f32::EPSILON {
+                    if x_movement.is_neutral() {
                         // No horizontal movement.
                         steering.destination.x = steering.pos.x;
-                    } else if x_movement > f32::EPSILON {
+                    } else if x_movement.is_positive() {
                         // Moving towards the right.
                         if aligned_with_grid(steering.destination.x as f32, anchored_x, x_movement)
                             && !is_against_wall_right(steering, steering.pos.y as f32, &tile_map)
@@ -254,12 +265,12 @@ impl<'s> System<'s> for PlayerSystem {
 
 /// Returns true iff the player is aligned with the grid.
 /// This function can be used for both horizontal and vertical coordinates.
-fn aligned_with_grid(destination_pos: f32, actual_pos: f32, input: f32) -> bool {
+fn aligned_with_grid(destination_pos: f32, actual_pos: f32, input: Direction1D) -> bool {
     let offset = actual_pos - destination_pos;
     // Actual pos equal or greater than destination. Moving towards the positive.
-    (offset > -f32::EPSILON && input > f32::EPSILON)
+    (offset > -f32::EPSILON && input.is_positive())
         // Actual pos equal or smaller than destination. Moving towards the negative.
-        || (offset < f32::EPSILON && input < -f32::EPSILON)
+        || (offset < f32::EPSILON && input.is_negative())
         // Actual pos basically equal to the destination.
         || (offset.abs() < f32::EPSILON)
 }

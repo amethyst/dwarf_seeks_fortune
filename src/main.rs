@@ -40,16 +40,16 @@ fn main() -> amethyst::Result<()> {
     let assets_dir = app_root.join("assets/");
     let config_dir = assets_dir.join("config/");
     let display_config_path = config_dir.join("display.ron");
-    let debug_config_path = config_dir.join("debug_config.ron");
-    let editor_config_path = config_dir.join("editor_config.ron");
-    let bindings_config_path = config_dir.join("input_bindings.ron");
+    let bindings_config_path = config_dir.join("input.ron");
 
     let mut app_builder = Application::build(assets_dir, states::LoadingState::default())?;
 
-    let debug_config = DebugConfig::load(&debug_config_path)?;
-    let editor_config = EditorConfig::load(&editor_config_path)?;
+    let debug_config = DebugConfig::load(&config_dir.join("debug.ron"))?;
+    let editor_config = EditorConfig::load(&config_dir.join("editor.ron"))?;
+    let movement_config = MovementConfig::load(&config_dir.join("movement.ron"))?;
     app_builder.world.insert(debug_config);
     app_builder.world.insert(editor_config);
+    app_builder.world.insert(movement_config);
     let game_data = CustomGameDataBuilder::default()
         .with_base_bundle(
             &mut app_builder.world,
@@ -79,9 +79,14 @@ fn main() -> amethyst::Result<()> {
             &["input_system"],
         )
         .with_core(
+            systems::SteeringSystem::default().pausable(CurrentState::Running),
+            "steering_system",
+            &["player_system"],
+        )
+        .with_core(
             systems::MovementSystem.pausable(CurrentState::Running),
             "movement_system",
-            &["player_system"],
+            &["steering_system"],
         )
         .with_core(
             systems::VelocitySystem.pausable(CurrentState::Running),

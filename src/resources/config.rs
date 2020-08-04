@@ -61,3 +61,15 @@ impl DebugConfig {
         }
     }
 }
+
+#[derive(Debug, Deserialize, Serialize, Default)]
+#[serde(default)]
+#[serde(deny_unknown_fields)]
+pub struct MovementConfig {
+    /// The max speed of the player in meters per second.
+    pub player_speed: f32,
+    /// How many seconds can pass between starting your jump and starting to move sideways for it to
+    /// still register. If you start moving sideways later than that, it will not work and the
+    /// character will simply jump straight up into the air instead.
+    pub jump_allowance: f32,
+}

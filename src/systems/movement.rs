@@ -38,7 +38,7 @@ impl<'s> System<'s> for MovementSystem {
         ReadStorage<'s, Steering>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Velocity>,
-        Read<'s, DebugConfig>,
+        Read<'s, MovementConfig>,
         Read<'s, Time>,
     );
 
@@ -59,13 +59,8 @@ impl<'s> System<'s> for MovementSystem {
                     velocity.x = 0.0;
                     // If climbing:
                     let delta = desired_pos_y - transform.translation().y;
-                    let delta_signum = if delta.abs() < f32::EPSILON {
-                        0.0
-                    } else {
-                        delta.signum()
-                    };
-                    if (delta_signum * steering.direction.1).is_sign_positive() {
-                        velocity.y = delta_signum * config.player_speed;
+                    if steering.direction.y.aligns_with(delta) {
+                        velocity.y = steering.direction.y.signum() * config.player_speed;
                     } else {
                         velocity.y = 0.0;
                         transform.set_translation_y(centered_y);
@@ -98,14 +93,8 @@ impl<'s> System<'s> for MovementSystem {
             // Set x-velocity based on current and desired position.
             // If necessary, adjust x-position, snap to grid.
             let delta = desired_pos_x - transform.translation().x;
-            let delta_signum = if delta.abs() < f32::EPSILON {
-                0.0
-            } else {
-                delta.signum()
-            };
-            //TODO: rewrite
-            if (delta_signum * steering.direction.0).is_sign_positive() {
-                velocity.x = delta_signum * config.player_speed;
+            if steering.direction.x.aligns_with(delta) {
+                velocity.x = steering.direction.x.signum() * config.player_speed;
             } else {
                 velocity.x = 0.0;
                 transform.set_translation_x(centered_x);

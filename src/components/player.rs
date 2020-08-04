@@ -13,6 +13,19 @@ use serde::{Deserialize, Serialize};
 #[prefab(Component)]
 pub struct Player {
     pub equipped: Option<ToolType>,
+    /// Whether the jump key is currently down. Needed to figure out if the player wants to jump
+    /// this frame. (Jump is only executed if this value changes from false to true.)
+    pub pressing_jump: bool,
+    /// How many seconds have passed since the character started jumping?
+    ///
+    /// This value is usually None. When the character starts jumping, it is assigned Some(0.0).
+    /// The delta_seconds is added to this value every tick. Once it surpasses a threshold, it is
+    /// set back to None.
+    ///
+    /// As long as the grace timer hasn't run out yet, the player can give their jump horizontal
+    /// speed. This fixes the problem that if the player presses jump and move at the same time,
+    /// jump is sometimes registered before move and the character only jumps up, not sideways.
+    pub jump_grace_timer: Option<f32>,
 }
 
 /// The entity with this component is a tool equipped by the player.

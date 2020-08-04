@@ -1,3 +1,4 @@
+use crate::components::Direction1D::Neutral;
 use amethyst::{
     assets::PrefabData,
     core::{math::Vector2, transform::Transform},
@@ -6,6 +7,86 @@ use amethyst::{
     error::Error,
 };
 use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub struct Direction2D {
+    pub x: Direction1D,
+    pub y: Direction1D,
+}
+
+impl Direction2D {
+    pub fn new(signum_x: f32, signum_y: f32) -> Self {
+        Direction2D {
+            x: Direction1D::new(signum_x),
+            y: Direction1D::new(signum_y),
+        }
+    }
+    pub fn from(x: Direction1D, y: Direction1D) -> Self {
+        Direction2D { x, y }
+    }
+
+    pub fn is_opposite(&self, other: &Direction2D) -> bool {
+        self.x.is_opposite(&other.x) || self.y.is_opposite(&other.y)
+    }
+
+    pub fn is_neutral(&self) -> bool {
+        self.x == Direction1D::Neutral && self.y == Direction1D::Neutral
+    }
+}
+
+#[derive(Clone, Copy, Component, Debug, Deserialize, Serialize, PrefabData, PartialEq)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub enum Direction1D {
+    Negative,
+    Positive,
+    Neutral,
+}
+
+impl Direction1D {
+    pub fn new(signum: f32) -> Self {
+        if signum.abs() <= f32::EPSILON {
+            Direction1D::Neutral
+        } else if signum.is_sign_positive() {
+            Direction1D::Positive
+        } else {
+            Direction1D::Negative
+        }
+    }
+    pub fn is_opposite(&self, other: &Direction1D) -> bool {
+        (*self == Direction1D::Negative && *other == Direction1D::Positive)
+            || (*self == Direction1D::Positive && *other == Direction1D::Negative)
+    }
+    pub fn is_positive(&self) -> bool {
+        self == &Direction1D::Positive
+    }
+    pub fn is_negative(&self) -> bool {
+        self == &Direction1D::Negative
+    }
+    pub fn is_neutral(&self) -> bool {
+        self == &Direction1D::Neutral
+    }
+
+    pub fn aligns_with(&self, direction: f32) -> bool {
+        let other = Direction1D::new(direction);
+        self != &Direction1D::Neutral && self == &other
+    }
+    pub fn signum(&self) -> f32 {
+        match self {
+            Direction1D::Positive => 1.,
+            Direction1D::Negative => -1.,
+            Direction1D::Neutral => 0.,
+        }
+    }
+}
+
+impl Default for Direction1D {
+    fn default() -> Self {
+        Direction1D::Neutral
+    }
+}
 
 /// Velocity in meters per second.
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
@@ -60,9 +141,28 @@ pub struct Steering {
     /// Width and height of the entity.
     pub dimens: Pos,
     /// Direction the player is travelling along the x-axis and y-axis.
-    pub direction: (f32, f32),
+    pub direction: Direction2D,
     pub destination: Pos,
     pub mode: SteeringMode,
+}
+
+/// Specifies how the entity intents to move. For the player, this is mostly informed by the
+/// keyboard input. For enemies, this will be set by the AI. For all entities with Steering,
+/// the SteeringSystem then actually moves the entity based on this intent.
+#[derive(Clone, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+#[serde(deny_unknown_fields)]
+pub struct SteeringIntent {
+    /// The entity wishes to walk along the floor in this direction.
+    pub walk: Direction1D,
+    /// The entity wishes to climb on a ladder in this direction.
+    pub climb: Direction1D,
+    /// If true; the entity wishes to jump.
+    pub jump: bool,
+    /// The entity wishes to jump in this direction. This is separate from walk because it is
+    /// possible to specify a direction for a limited time after the jump has already started.
+    /// That feature exists solely for players, to make movement feel better.
+    pub jump_direction: Direction1D,
 }
 
 /// SteeringMode influences max speeds, ability to jump, ability to move, etc.
@@ -77,7 +177,7 @@ pub enum SteeringMode {
     Falling {
         /// The x-movement that the entity has while falling. This will remain constant.
         /// It is either a -1 (move to left) 0 (don't move along x-axis) or 1 (move right).
-        x_movement: f32,
+        x_movement: Direction1D,
         /// The y-coordinate that the entity had when it  first started falling.
         starting_y_pos: f32,
         /// A time in seconds since the start of the game. This is the time at which the entity
@@ -91,7 +191,7 @@ pub enum SteeringMode {
     Jumping {
         /// The x-movement that the entity has while jumping. This will remain constant.
         /// It is either a -1 (move to left) 0 (don't move along x-axis) or 1 (move right).
-        x_movement: f32,
+        x_movement: Direction1D,
         /// The y-coordinate that the entity had when it started the jump.
         starting_y_pos: f32,
         /// A time in seconds since the start of the game. This is the time at which the entity
@@ -155,7 +255,7 @@ impl Steering {
         Steering {
             pos,
             dimens,
-            direction: (0.0, 0.0),
+            direction: Direction2D::default(),
             destination: pos,
             mode: SteeringMode::Grounded,
         }

@@ -36,7 +36,7 @@ impl<'s> System<'s> for CursorSystem {
         for (cursor, transform) in (&mut cursors, &mut transforms).join() {
             let input_x = input.axis_value("move_x").unwrap_or(0.0);
             let input_y = input.axis_value("move_y").unwrap_or(0.0);
-            let new_direction = Direction::new(input_x, input_y);
+            let new_direction = Direction2D::new(input_x, input_y);
             if cursor.last_direction.is_neutral() && !new_direction.is_neutral() {
                 // Start movement now. Move once, then set cooldown to High.
                 editor_data.selector.end.x += input_x as i32;
