@@ -41,6 +41,7 @@ pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
 }
 
 pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
+    let mut win_condition = WinCondition::default();
     let display_debug_frames = world.read_resource::<DebugConfig>().display_debug_frames;
     let fallback_def = TileDefinition::fallback();
     let tile_defs = load_tile_definitions()?;
@@ -78,7 +79,8 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
                 }
             }
             Archetype::Key => {
-                builder.with(KeyTag).build();
+                win_condition.add_key(pos);
+                builder.with(Key::new(pos.clone())).build();
             }
             Archetype::Tool(tool_type) => {
                 if let Some(AssetType::Still(sprite, sprite_nr)) = tile_def.asset {
@@ -92,13 +94,57 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
                     );
                 }
             }
+            Archetype::Door => {
+                builder.with(ExitDoor).build();
+            }
             _ => {
                 builder.build();
             }
         };
     });
+    add_key_displays_to_door(world, &win_condition);
+    world.insert(win_condition);
     world.insert(TileMap::new(level, tile_defs));
     Ok(())
+}
+
+fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
+    let door_entity = world.exec(|(doors, entities): (ReadStorage<ExitDoor>, Entities)| {
+        (&doors, &entities)
+            .join()
+            .map(|(_, entity)| (entity))
+            .next()
+    });
+    if let Some((door_entity)) = door_entity {
+        win_condition
+            .keys
+            .iter()
+            .enumerate()
+            .for_each(|(index, key)| {
+                let mut transform = Transform::default();
+                let x_offset = (index % 4);
+                let y_offset = (index / 4);
+                transform.set_translation_x((-1. + x_offset as f32) * 64.);
+                transform.set_translation_y((1. + y_offset as f32) * 64.);
+                transform.set_scale(Vector3::new(0.5, 0.5, 1.0));
+                println!(
+                    "LOLlol: {:?} - {:?}, {:?}",
+                    index,
+                    transform.translation().x,
+                    transform.translation().y
+                );
+                let sprite = load_asset_from_world(&SpriteType::Blocks, 3, world);
+                world
+                    .create_entity()
+                    .with(Parent {
+                        entity: door_entity,
+                    })
+                    .with(transform)
+                    .with(sprite)
+                    .with(KeyDisplay::new(key.clone()))
+                    .build();
+            });
+    }
 }
 
 fn build_frames(player: Entity, world: &mut World, tile_def: &TileDefinition) {

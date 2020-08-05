@@ -129,32 +129,32 @@ impl<'s> System<'s> for UseToolSystem {
                 return;
             }
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
-            let targetted_blocks = match player.equipped {
+            let targeted_blocks = match player.equipped {
                 Some(ToolType::BreakBlocksHorizontally(depth)) => Some(tiles_to_side(2, steering)),
                 Some(ToolType::BreakBlocksBelow(depth)) => Some(tiles_below(2, steering)),
                 _ => None,
             };
-            if let Some(targetted_blocks) = targetted_blocks {
-                if targetted_blocks.iter().any(|pos| {
+            if let Some(targeted_blocks) = targeted_blocks {
+                if targeted_blocks.iter().any(|pos| {
                     tile_map
                         .get_tile(pos)
                         .map(|block| block.is_breakable())
                         .unwrap_or(false)
-                }) && targetted_blocks.iter().all(|pos| {
+                }) && targeted_blocks.iter().all(|pos| {
                     tile_map
                         .get_tile(pos)
                         .map(|block| block.is_breakable())
                         .unwrap_or(true)
                 }) {
                     player.equipped = None;
-                    targetted_blocks.iter().for_each(|pos| {
+                    targeted_blocks.iter().for_each(|pos| {
                         tile_map.remove_tile(pos);
                     });
                     for (_, entity) in (&equipped_tags, &entities).join() {
                         entities.delete(entity);
                     }
                     for (block, entity) in (&blocks, &entities).join() {
-                        if targetted_blocks.contains(&block.pos) {
+                        if targeted_blocks.contains(&block.pos) {
                             entities.delete(entity);
                         }
                     }

@@ -10,12 +10,16 @@ use amethyst::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
-pub struct KeyTag;
+pub struct Key {
+    pub pos: Pos,
+}
 
-impl Component for KeyTag {
-    type Storage = NullStorage<Self>;
+impl Key {
+    pub fn new(pos: Pos) -> Self {
+        Key { pos }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
@@ -42,3 +46,23 @@ impl Tool {
 pub struct Block {
     pub pos: Pos,
 }
+
+/// A miniature version of every key is found on the exit door.
+#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct KeyDisplay {
+    /// The position of the corresponding key in the world. NOT the actual position of this display.
+    /// The display is a miniature version of the key located somewhere on top of the door.
+    pub pos: Pos,
+}
+
+impl KeyDisplay {
+    pub fn new(pos: Pos) -> Self {
+        KeyDisplay { pos }
+    }
+}
+
+/// The exit door.
+#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct ExitDoor;

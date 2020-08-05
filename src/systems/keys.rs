@@ -25,12 +25,17 @@ impl<'s> System<'s> for WinSystem {
     type SystemData = (
         ReadStorage<'s, Player>,
         ReadStorage<'s, Steering>,
-        ReadStorage<'s, KeyTag>,
+        ReadStorage<'s, Key>,
+        ReadStorage<'s, KeyDisplay>,
         ReadStorage<'s, Transform>,
+        Write<'s, WinCondition>,
         Entities<'s>,
     );
 
-    fn run(&mut self, (player_tags, steerings, key_tags, transforms, entities): Self::SystemData) {
+    fn run(
+        &mut self,
+        (player_tags, steerings, keys, key_displays, transforms, mut win, entities): Self::SystemData,
+    ) {
         let player_collider = (&player_tags, &steerings, &transforms)
             .join()
             .map(|(_, steering, transform)| {
@@ -41,15 +46,25 @@ impl<'s> System<'s> for WinSystem {
             })
             .next();
         if let Some((pos, dimens)) = player_collider {
-            for (_, transform, entity) in (&key_tags, &transforms, &entities).join() {
-                let key_x = transform.translation().x;
-                let key_y = transform.translation().y;
-                if pos.x - dimens.x / 2. < key_x + KEY_WIDTH / 3.
-                    && pos.x + dimens.x / 2. > key_x - KEY_WIDTH / 3.
-                    && pos.y - dimens.y / 2. < key_y + KEY_WIDTH / 3.
-                    && pos.y + dimens.y / 2. > key_y - KEY_WIDTH / 3.
-                {
-                    entities.delete(entity);
+            let collected_key = (&keys, &transforms, &entities)
+                .join()
+                .filter(|(_, transform, _)| {
+                    let key_x = transform.translation().x;
+                    let key_y = transform.translation().y;
+                    pos.x - dimens.x / 2. < key_x + KEY_WIDTH / 3.
+                        && pos.x + dimens.x / 2. > key_x - KEY_WIDTH / 3.
+                        && pos.y - dimens.y / 2. < key_y + KEY_WIDTH / 3.
+                        && pos.y + dimens.y / 2. > key_y - KEY_WIDTH / 3.
+                })
+                .map(|(key, _, entity)| (key, entity))
+                .next();
+            if let Some((key, key_entity)) = collected_key {
+                win.set_key_collected(&key.pos);
+                entities.delete(key_entity);
+                for (key_display, display_entity) in (&key_displays, &entities).join() {
+                    if key_display.pos == key.pos {
+                        entities.delete(display_entity);
+                    }
                 }
             }
         }
