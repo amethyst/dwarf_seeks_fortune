@@ -86,7 +86,7 @@
                 collides_bottom: false,
             ),
             asset: Still(Tools, 0),
-            archetype: Tool(PickAxe),
+            archetype: Tool(BreakBlocksBelow(2)),
         ),
         "Hammer":(
             depth: FloatingBlocks,
@@ -99,7 +99,7 @@
                 collides_bottom: false,
             ),
             asset: Still(Tools, 2),
-            archetype: Tool(Hammer),
+            archetype: Tool(BreakBlocksHorizontally(2)),
         ),
         "Door":(
             depth: Blocks,

@@ -206,13 +206,23 @@ impl Default for Sturdiness {
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum ToolType {
-    PickAxe,
-    Hammer,
+    /// This tool will break the blocks that the player is facing, n layers deep.
+    /// The integer argument is how many layers of blocks will be broken.
+    ///
+    /// If the player is facing right and occupies blocks (0, 0) to (1, 1) inclusive, the blocks
+    /// that are targeted are: (2, 0) to (1 + depth, 1) inclusive.
+    BreakBlocksHorizontally(u8),
+    /// This tool will break the blocks below the player, in the direction the player is facing,
+    /// n layers deep. The integer argument is how many layers of blocks will be broken.
+    ///
+    /// If the player is facing right and occupies blocks (0, 0) to (1, 1) inclusive, the blocks
+    /// that are targeted are: (1, -1) to (2, -depth) inclusive.
+    BreakBlocksBelow(u8),
 }
 
 impl Default for ToolType {
     fn default() -> Self {
-        ToolType::PickAxe
+        ToolType::BreakBlocksHorizontally(0)
     }
 }
 

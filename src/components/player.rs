@@ -1,3 +1,4 @@
+use crate::components::Pos;
 use crate::levels::ToolType;
 use amethyst::{
     assets::PrefabData,

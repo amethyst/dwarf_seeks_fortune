@@ -69,6 +69,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
         if let Some(transform) = transform {
             builder = builder.with(transform);
         }
+        builder = builder.with(Block { pos: pos.clone() });
         match tile_def.archetype {
             Archetype::Player => {
                 let player = build_player(builder, pos, tile_def);

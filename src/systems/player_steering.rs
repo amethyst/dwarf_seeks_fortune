@@ -201,7 +201,7 @@ impl<'s> System<'s> for SteeringSystem {
                             anchored_x,
                             x_movement,
                         ) {
-                            steering.destination.x += 1;
+                            steering.destination.x = steering.pos.x + 1;
                         }
                     } else {
                         // Moving towards the left.
@@ -216,7 +216,7 @@ impl<'s> System<'s> for SteeringSystem {
                             anchored_x,
                             x_movement,
                         ) {
-                            steering.destination.x += -1;
+                            steering.destination.x = steering.pos.x - 1;
                         }
                     }
                 }
@@ -242,14 +242,14 @@ impl<'s> System<'s> for SteeringSystem {
                         if aligned_with_grid(steering.destination.x as f32, anchored_x, x_movement)
                             && !is_against_wall_right(steering, steering.pos.y as f32, &tile_map)
                         {
-                            steering.destination.x += 1;
+                            steering.destination.x = steering.pos.x + 1;
                         }
                     } else {
                         // Moving towards the left.
                         if aligned_with_grid(steering.destination.x as f32, anchored_x, x_movement)
                             && !is_against_wall_left(steering, steering.pos.y as f32, &tile_map)
                         {
-                            steering.destination.x += -1;
+                            steering.destination.x = steering.pos.x - 1;
                         }
                     }
                 }

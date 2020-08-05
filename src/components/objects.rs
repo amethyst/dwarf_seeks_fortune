@@ -1,3 +1,4 @@
+use crate::components::Pos;
 use crate::levels::ToolType;
 use crate::resources::{AssetType, SpriteType};
 use amethyst::{
@@ -33,4 +34,11 @@ impl Tool {
             sprite_nr,
         }
     }
+}
+
+/// All destructible entities must have this component, this is how we find and delete them.
+#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct Block {
+    pub pos: Pos,
 }

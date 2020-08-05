@@ -75,6 +75,7 @@ impl<'s> System<'s> for PickupSystem {
                     let render = load_asset_from_world(&sprite, sprite_nr, world);
                     world
                         .create_entity()
+                        .with(EquippedTag)
                         .with(Transform::default())
                         .with(Parent {
                             entity: player_entity,
@@ -96,6 +97,8 @@ impl<'s> System<'s> for UseToolSystem {
         ReadStorage<'s, Steering>,
         ReadStorage<'s, Tool>,
         ReadStorage<'s, Transform>,
+        ReadStorage<'s, EquippedTag>,
+        ReadStorage<'s, Block>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, LazyUpdate>,
         Write<'s, TileMap>,
@@ -104,29 +107,57 @@ impl<'s> System<'s> for UseToolSystem {
 
     fn run(
         &mut self,
-        (mut players, steerings, tools, transforms, input, lazy, mut tile_map, entities): Self::SystemData,
+        (
+            mut players,
+            steerings,
+            tools,
+            transforms,
+            equipped_tags,
+            blocks,
+            input,
+            lazy,
+            mut tile_map,
+            entities,
+        ): Self::SystemData,
     ) {
-        //TODO: Maybe use SteeringIntent?
         let wants_to_use_tool = input.action_is_down("jump").unwrap_or(false);
+        if !wants_to_use_tool {
+            return;
+        }
         for (player, steering, transform) in (&mut players, &steerings, &transforms).join() {
+            if !steering.is_grounded() {
+                return;
+            }
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
-            if wants_to_use_tool && steering.is_grounded() && player.equipped.is_some() {
-                let blocks = tiles_to_side(2, steering);
-                if blocks.iter().any(|pos| {
+            let targetted_blocks = match player.equipped {
+                Some(ToolType::BreakBlocksHorizontally(depth)) => Some(tiles_to_side(2, steering)),
+                Some(ToolType::BreakBlocksBelow(depth)) => Some(tiles_below(2, steering)),
+                _ => None,
+            };
+            if let Some(targetted_blocks) = targetted_blocks {
+                if targetted_blocks.iter().any(|pos| {
                     tile_map
                         .get_tile(pos)
                         .map(|block| block.is_breakable())
                         .unwrap_or(false)
-                }) && blocks.iter().all(|pos| {
+                }) && targetted_blocks.iter().all(|pos| {
                     tile_map
                         .get_tile(pos)
                         .map(|block| block.is_breakable())
                         .unwrap_or(true)
                 }) {
                     player.equipped = None;
-                    blocks.iter().for_each(|pos| {
+                    targetted_blocks.iter().for_each(|pos| {
                         tile_map.remove_tile(pos);
-                    })
+                    });
+                    for (_, entity) in (&equipped_tags, &entities).join() {
+                        entities.delete(entity);
+                    }
+                    for (block, entity) in (&blocks, &entities).join() {
+                        if targetted_blocks.contains(&block.pos) {
+                            entities.delete(entity);
+                        }
+                    }
                 }
             }
         }
@@ -134,15 +165,37 @@ impl<'s> System<'s> for UseToolSystem {
 }
 
 fn tiles_to_side(depth: u8, steering: &Steering) -> Vec<Pos> {
-    let x_offset = if steering.facing.x.is_positive() {
+    let facing_offset = if steering.facing.x.is_positive() {
         steering.dimens.x
     } else {
         -1
     };
-    (0..depth)
+    (0..(depth as i32))
         .flat_map(|x| {
-            (0..steering.dimens.y).map(move |y| (x as i32 * steering.facing.x.signum_i(), y))
+            (0..steering.dimens.y).map(move |y| (x, y)) //???
         })
-        .map(|(x, y)| Pos::new(steering.pos.x + x_offset + x, steering.pos.y + y))
+        .map(|(x_offset, y_offset)| {
+            Pos::new(
+                steering.pos.x + facing_offset + x_offset * steering.facing.x.signum_i(),
+                steering.pos.y + y_offset,
+            )
+        })
+        .collect()
+}
+
+fn tiles_below(depth: u8, steering: &Steering) -> Vec<Pos> {
+    let facing_offset = if steering.facing.x.is_positive() {
+        steering.dimens.x - 1
+    } else {
+        0
+    };
+    (0..steering.dimens.x)
+        .flat_map(|x| (0..(depth as i32)).map(move |y| (x, y)))
+        .map(|(x_offset, y_offset)| {
+            Pos::new(
+                steering.pos.x + facing_offset + x_offset * steering.facing.x.signum_i(),
+                steering.pos.y - 1 - y_offset,
+            )
+        })
         .collect()
 }
