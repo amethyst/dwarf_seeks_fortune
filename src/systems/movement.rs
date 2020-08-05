@@ -102,3 +102,41 @@ impl<'s> System<'s> for MovementSystem {
         }
     }
 }
+
+/// Implements wrapping behaviour for levels.
+///
+/// IE: if character falls out the bottom, they appear at top. If character goes off to the left,
+/// they wrap around to the right.
+pub struct LevelWrappingSystem;
+
+impl<'s> System<'s> for LevelWrappingSystem {
+    type SystemData = (
+        WriteStorage<'s, Steering>,
+        WriteStorage<'s, Transform>,
+        Read<'s, TileMap>,
+        Read<'s, Time>,
+    );
+
+    fn run(&mut self, (mut steerings, mut transforms, tile_map, time): Self::SystemData) {
+        for (transform, steering) in (&mut transforms, &mut steerings).join() {
+            let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
+            if anchored_y < tile_map.pos.y as f32 {
+                transform.set_translation_y(transform.translation().y + tile_map.dimens.y as f32);
+                match steering.mode {
+                    SteeringMode::Falling {
+                        x_movement,
+                        starting_y_pos,
+                        starting_time,
+                    } => {
+                        steering.mode = SteeringMode::Falling {
+                            x_movement,
+                            starting_y_pos: starting_y_pos + tile_map.dimens.y as f32,
+                            starting_time,
+                        }
+                    }
+                    _ => (),
+                };
+            }
+        }
+    }
+}

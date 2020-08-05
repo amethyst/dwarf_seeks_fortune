@@ -10,6 +10,9 @@ use std::collections::{BTreeMap, HashMap};
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct Level {
+    pub pos: Pos,
+    /// Width and height of the level. In this game, the world wraps at the borders.
+    pub dimens: Pos,
     /// Mapping of (x,y) position in the world to a TileDefinition key.
     /// These keys can be used to look up the corresponding TileDefinition.
     #[serde(serialize_with = "ordered_map")]

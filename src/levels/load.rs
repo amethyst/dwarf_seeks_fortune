@@ -46,6 +46,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     let fallback_def = TileDefinition::fallback();
     let tile_defs = load_tile_definitions()?;
     let level = Level::load(level_file)?;
+    add_background(world, &level.pos, &level.dimens);
     level.tiles.iter().for_each(|(pos, tile_def_key)| {
         let tile_def = tile_defs.get(tile_def_key);
         let still_asset = load_still_asset(tile_def, &world.read_resource::<Assets>());
@@ -108,6 +109,17 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     Ok(())
 }
 
+fn add_background(world: &mut World, pos: &Pos, dimens: &Pos) {
+    let transform = load_transform(
+        pos,
+        &DepthLayer::Background,
+        dimens,
+        &AssetType::Still(SpriteType::Selection, 1),
+    );
+    let asset = load_asset_from_world(&SpriteType::Selection, 1, world);
+    world.create_entity().with(transform).with(asset).build();
+}
+
 fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
     let door_entity = world.exec(|(doors, entities): (ReadStorage<ExitDoor>, Entities)| {
         (&doors, &entities)
@@ -126,17 +138,13 @@ fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
                 let y_offset = (index / 4);
                 transform.set_translation_x((-1. + x_offset as f32) * 64.);
                 transform.set_translation_y((1. + y_offset as f32) * 64.);
+                transform.set_translation_z(1.); //One higher than parent.
                 transform.set_scale(Vector3::new(0.5, 0.5, 1.0));
-                println!(
-                    "LOLlol: {:?} - {:?}, {:?}",
-                    index,
-                    transform.translation().x,
-                    transform.translation().y
-                );
                 let sprite = load_asset_from_world(&SpriteType::Blocks, 3, world);
                 world
                     .create_entity()
                     .with(Parent {
+                        //TODO:FIXME: don't make this a parent, leads to problems.
                         entity: door_entity,
                     })
                     .with(transform)

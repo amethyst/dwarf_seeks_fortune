@@ -130,6 +130,7 @@ fn main() -> amethyst::Result<()> {
         .with_core(systems::WinSystem, "win_system", &[])
         .with_core(systems::PickupSystem, "pickup_system", &[])
         .with_core(systems::UseToolSystem, "use_tool_system", &[])
+        .with_core(systems::LevelWrappingSystem, "level_wrapping_system", &[])
         .with_base_bundle(
             &mut app_builder.world,
             PrecompiledRenderBundle {

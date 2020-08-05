@@ -4,6 +4,8 @@ use std::collections::HashMap;
 
 #[derive(Debug, Default)]
 pub struct TileMap {
+    pub pos: Pos,
+    pub dimens: Pos,
     tiles: HashMap<Pos, Tile>,
     tile_defs: TileDefinitions,
 }
@@ -33,15 +35,20 @@ impl TileMap {
                     };
                     if let Some(replaced_value) = tiles.insert(Pos::new(pos.x + x, pos.y + y), tile) {
                         error!("Error! At pos ({:?},{:?}), there are multiple tiles! {:?} replaces {:?}",
-                                 x,
-                                 y,
-                                 (pos, key),
-                                 replaced_value);
+                               x,
+                               y,
+                               (pos, key),
+                               replaced_value);
                     }
                 }
             }
         });
-        TileMap { tiles, tile_defs }
+        TileMap {
+            pos: level.pos,
+            dimens: level.dimens,
+            tiles,
+            tile_defs,
+        }
     }
     pub fn get_tile(&self, pos: &Pos) -> Option<&TileDefinition> {
         self.tiles

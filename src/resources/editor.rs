@@ -13,6 +13,8 @@ use crate::resources::*;
 /// that this struct contains additional information that makes it easier to manipulate it.
 #[derive(Debug, Clone, Default)]
 pub struct LevelEdit {
+    pub pos: Pos,
+    pub dimens: Pos,
     pub tile_map: HashMap<Pos, TileEdit>,
 }
 
@@ -39,7 +41,11 @@ impl From<LevelEdit> for Level {
         item.tile_map.drain().for_each(|(key, val)| {
             map.insert(key, val.tile_def_key);
         });
-        Level { tiles: map }
+        Level {
+            pos: item.pos,
+            dimens: item.dimens,
+            tiles: map,
+        }
     }
 }
 
@@ -49,7 +55,11 @@ impl From<Level> for LevelEdit {
         item.tiles.drain().for_each(|(key, val)| {
             map.insert(key, TileEdit::new(val));
         });
-        LevelEdit { tile_map: map }
+        LevelEdit {
+            pos: item.pos,
+            dimens: item.dimens,
+            tile_map: map,
+        }
     }
 }
 
