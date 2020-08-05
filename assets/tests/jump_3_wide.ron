@@ -1,5 +1,5 @@
 (
-    tile_defs: {
+    tiles: {
         (
             x: 0,
             y: -2,

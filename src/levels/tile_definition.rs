@@ -1,7 +1,7 @@
 use crate::components::Pos;
 use crate::resources::{AssetType, SpriteType};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize, Serializer};
+use std::collections::{BTreeMap, HashMap};
 
 /// Describes a complete level.
 /// Contains a map of positions, mapped to tile definitions.
@@ -12,7 +12,19 @@ use std::collections::HashMap;
 pub struct Level {
     /// Mapping of (x,y) position in the world to a TileDefinition key.
     /// These keys can be used to look up the corresponding TileDefinition.
-    pub tile_defs: HashMap<Pos, String>,
+    #[serde(serialize_with = "ordered_map")]
+    pub tiles: HashMap<Pos, String>,
+}
+
+/// A function used by serde to serialise the tile map in a deterministic way.
+/// This will prevent the output being different each time the level is saved, which will
+/// prevent lots of unnecessarily large diffs in the git commits.
+fn ordered_map<S>(value: &HashMap<Pos, String>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let ordered: BTreeMap<_, _> = value.iter().collect();
+    ordered.serialize(serializer)
 }
 
 #[derive(Debug, Deserialize, Serialize)]

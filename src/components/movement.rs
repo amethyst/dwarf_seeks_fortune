@@ -114,7 +114,9 @@ impl Velocity {
 /// Used among other things for positioning tiles, which are always snapped to the grid.
 ///
 /// Not to be confused with Transform, which contains an entity's actual position.
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq, Hash)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Hash,
+)]
 #[serde(deny_unknown_fields)]
 pub struct Pos {
     // TODO: consider whether to replace Pos with with nalgebra's Point2?

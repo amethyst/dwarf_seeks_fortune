@@ -58,5 +58,5 @@ fn load_level_from_file(test: &MovementTest, world: &mut World) {
         .join("assets/")
         .join("tests/")
         .join(file_name);
-    load_level(&level_file, world);
+    load_level(&level_file, world).expect("Failed to load level!");
 }

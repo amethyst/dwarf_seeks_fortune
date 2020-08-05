@@ -131,8 +131,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         data: StateData<'_, CustomGameData<'_, '_>>,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
         data.data.update(&data.world, true);
-        let skip_straight_to_editor =
-            (&*data.world.read_resource::<DebugConfig>()).skip_straight_to_editor;
         match self.progress.complete() {
             Completion::Failed => {
                 error!("Failed loading assets");
@@ -143,11 +141,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
                 if let Some(entity) = self.load_ui {
                     let _ = data.world.delete_entity(entity);
                 }
-                if skip_straight_to_editor {
-                    Trans::Switch(Box::new(EditorState))
-                } else {
-                    Trans::Switch(Box::new(MainMenuState::new()))
-                }
+                Trans::Switch(Box::new(MainMenuState::new()))
             }
             Completion::Loading => Trans::None,
         }

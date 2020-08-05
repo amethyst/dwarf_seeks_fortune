@@ -39,14 +39,14 @@ impl From<LevelEdit> for Level {
         item.tile_map.drain().for_each(|(key, val)| {
             map.insert(key, val.tile_def_key);
         });
-        Level { tile_defs: map }
+        Level { tiles: map }
     }
 }
 
 impl From<Level> for LevelEdit {
     fn from(mut item: Level) -> Self {
         let mut map = HashMap::new();
-        item.tile_defs.drain().for_each(|(key, val)| {
+        item.tiles.drain().for_each(|(key, val)| {
             map.insert(key, TileEdit::new(val));
         });
         LevelEdit { tile_map: map }

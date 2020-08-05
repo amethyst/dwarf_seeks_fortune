@@ -45,7 +45,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     let fallback_def = TileDefinition::fallback();
     let tile_defs = load_tile_definitions()?;
     let level = Level::load(level_file)?;
-    level.tile_defs.iter().for_each(|(pos, tile_def_key)| {
+    level.tiles.iter().for_each(|(pos, tile_def_key)| {
         let tile_def = tile_defs.get(tile_def_key);
         let still_asset = load_still_asset(tile_def, &world.read_resource::<Assets>());
         let anim_asset = load_anim_asset(tile_def, &world.read_resource::<Assets>());

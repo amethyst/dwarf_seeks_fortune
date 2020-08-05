@@ -22,7 +22,7 @@ pub enum Tile {
 impl TileMap {
     pub fn new(level: Level, tile_defs: TileDefinitions) -> Self {
         let mut tiles = HashMap::new();
-        level.tile_defs.iter().for_each(|(pos, key)| {
+        level.tiles.iter().for_each(|(pos, key)| {
             let dimens = tile_defs.get(key).dimens;
             for x in 0..dimens.x {
                 for y in 0..dimens.y {

@@ -101,7 +101,15 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
         &mut self,
         data: StateData<'_, CustomGameData<'_, '_>>,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        data.data.update(&data.world, false);
-        Trans::None
+        let skip_straight_to_editor =
+            (&*data.world.read_resource::<DebugConfig>()).skip_straight_to_editor;
+        if skip_straight_to_editor {
+            info!("Bypassing main menu, skipping straight to editor.");
+            (&mut *data.world.write_resource::<DebugConfig>()).skip_straight_to_editor = false;
+            Trans::Push(Box::new(EditorState))
+        } else {
+            data.data.update(&data.world, false);
+            Trans::None
+        }
     }
 }
