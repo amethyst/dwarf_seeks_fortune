@@ -23,6 +23,7 @@ const TOOL_HEIGHT: f32 = 2.;
 pub struct PickupSystem;
 
 impl<'s> System<'s> for PickupSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Player>,
         ReadStorage<'s, Steering>,
@@ -53,15 +54,14 @@ impl<'s> System<'s> for PickupSystem {
             }
             let tool_opt = (&tools, &transforms, &entities)
                 .join()
-                .filter(|(_, transform, _)| {
+                .find(|(_, transform, _)| {
                     let key_x = transform.translation().x;
                     let key_y = transform.translation().y;
                     pos.x - dimens.x / 2. < key_x + TOOL_WIDTH / 3.
                         && pos.x + dimens.x / 2. > key_x - TOOL_WIDTH / 3.
                         && pos.y - dimens.y / 2. < key_y + TOOL_HEIGHT / 3.
                         && pos.y + dimens.y / 2. > key_y - TOOL_HEIGHT / 3.
-                })
-                .next();
+                });
             if let Some((tool, _, tool_entity)) = tool_opt {
                 player.equipped = Some(tool.tool_type);
                 let (sprite, sprite_nr) = (tool.sprite, tool.sprite_nr);
@@ -89,6 +89,7 @@ impl<'s> System<'s> for PickupSystem {
 pub struct UseToolSystem;
 
 impl<'s> System<'s> for UseToolSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Player>,
         ReadStorage<'s, Steering>,
@@ -127,17 +128,19 @@ impl<'s> System<'s> for UseToolSystem {
                 _ => None,
             };
             if let Some(targeted_blocks) = targeted_blocks {
-                if targeted_blocks.iter().any(|pos| {
+                let at_least_one_is_breakable = targeted_blocks.iter().any(|pos| {
                     tile_map
                         .get_tile(pos)
                         .map(|block| block.is_breakable())
                         .unwrap_or(false)
-                }) && targeted_blocks.iter().all(|pos| {
+                });
+                let none_are_unbreakable = targeted_blocks.iter().all(|pos| {
                     tile_map
                         .get_tile(pos)
                         .map(|block| block.is_breakable())
                         .unwrap_or(true)
-                }) {
+                });
+                if at_least_one_is_breakable && none_are_unbreakable {
                     player.equipped = None;
                     targeted_blocks.iter().for_each(|pos| {
                         tile_map.remove_tile(pos);

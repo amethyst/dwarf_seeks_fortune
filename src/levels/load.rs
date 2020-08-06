@@ -57,7 +57,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
         if let Some(transform) = transform {
             builder = builder.with(transform);
         }
-        builder = builder.with(Block { pos: pos.clone() });
+        builder = builder.with(Block { pos: *pos });
         match tile_def.archetype {
             Archetype::Player => {
                 let _ = build_player(builder, pos, tile_def);
@@ -67,7 +67,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
             }
             Archetype::Key => {
                 win_condition.add_key(pos);
-                builder.with(Key::new(pos.clone())).build();
+                builder.with(Key::new(*pos)).build();
             }
             Archetype::Tool(tool_type) => {
                 if let Some(AssetType::Still(sprite, sprite_nr)) = tile_def.asset {
@@ -136,7 +136,7 @@ fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
                     })
                     .with(transform)
                     .with(sprite)
-                    .with(KeyDisplay::new(key.clone()))
+                    .with(KeyDisplay::new(*key))
                     .build();
             });
     }
@@ -182,7 +182,7 @@ fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) ->
         .with(Transparent)
         .with(Velocity::default())
         .with(SteeringIntent::default())
-        .with(Steering::new(pos.clone(), tile_def.dimens.clone()))
+        .with(Steering::new(*pos, tile_def.dimens))
         .with(Player::default())
         .build()
 }

@@ -49,7 +49,7 @@ pub fn save(name: String, world: &mut World) -> Result<(), ConfigError> {
 
 fn write_level_file(level_file: PathBuf, world: &mut World) -> Result<(), ConfigError> {
     let data = world.write_resource::<EditorData>();
-    let level: Level = (&*data).level.clone().into();
+    let level: Level = (*data).level.clone().into();
     level.write(level_file)
 }
 

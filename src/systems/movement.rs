@@ -32,6 +32,7 @@ impl<'s> System<'s> for VelocitySystem {
 pub struct MovementSystem;
 
 impl<'s> System<'s> for MovementSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadStorage<'s, Steering>,
         WriteStorage<'s, Transform>,

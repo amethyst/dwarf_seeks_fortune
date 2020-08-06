@@ -10,6 +10,7 @@ use amethyst::{
 pub struct PlayerSystem;
 
 impl<'s> System<'s> for PlayerSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Player>,
         WriteStorage<'s, SteeringIntent>,
@@ -53,6 +54,7 @@ impl<'s> System<'s> for PlayerSystem {
 pub struct SteeringSystem;
 
 impl<'s> System<'s> for SteeringSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadStorage<'s, SteeringIntent>,
         ReadStorage<'s, Transform>,
@@ -68,7 +70,7 @@ impl<'s> System<'s> for SteeringSystem {
     ) {
         for (intent, transform, steering) in (&steering_intents, &transforms, &mut steerings).join()
         {
-            let old_pos = steering.pos.clone();
+            let old_pos = steering.pos;
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             steering.pos = Pos::new(anchored_x.round() as i32, anchored_y.round() as i32);
 
@@ -258,7 +260,7 @@ impl<'s> System<'s> for SteeringSystem {
 
             // Push frame on history if player position changed.
             if old_pos != steering.pos || history.force_key_frame {
-                history.push_frame(Frame::new(steering.pos.clone()));
+                history.push_frame(Frame::new(steering.pos));
             }
         }
     }

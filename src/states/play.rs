@@ -127,6 +127,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
         let StateData { world, .. } = data;
         // Execute a pass similar to a system
         world.exec(
+            #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
                 Entities,
                 ReadStorage<AnimationSet<AnimationId, SpriteRender>>,

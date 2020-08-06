@@ -151,6 +151,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         let StateData { world, .. } = data;
         // Execute a pass similar to a system
         world.exec(
+            #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
                 Entities,
                 ReadStorage<AnimationSet<AnimationId, SpriteRender>>,
@@ -185,7 +186,7 @@ fn init_cursor(world: &mut World) {
     world
         .create_entity()
         .with(SpriteRender {
-            sprite_sheet: sprite_handle.clone(),
+            sprite_sheet: sprite_handle,
             sprite_number: 1,
         })
         .with(Transparent)
@@ -205,40 +206,8 @@ fn init_cursor(world: &mut World) {
 fn add_cursor_preview_tag(world: &mut World, key: Option<String>) {
     let cursor = lookup_cursor_entity(world);
     delete_cursor_preview(world);
-    if key.is_none() {
-        let sprite_sheet = world
-            .read_resource::<Assets>()
-            .get_still(&SpriteType::Selection);
-        let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 2));
-        let mut transform = Transform::default();
-        transform.set_translation_xyz(0.5, 0.5, (&DepthLayer::UiElements).z());
-        transform.set_scale(Vector3::new(
-            1. / asset_dimensions.x as f32,
-            1. / asset_dimensions.y as f32,
-            1.0,
-        ));
-        let parent = world
-            .create_entity()
-            .with(CursorPreviewParentTag)
-            .with(Parent { entity: cursor })
-            .with(transform)
-            .build();
-        world
-            .create_entity()
-            .with(SpriteRender {
-                sprite_sheet,
-                sprite_number: 2,
-            })
-            .with(Transparent)
-            .with(Transform::default())
-            .with(CursorPreviewTag)
-            .with(Parent { entity: parent })
-            .build();
-    } else {
-        let tile_def = world
-            .read_resource::<TileDefinitions>()
-            .get(&key.unwrap())
-            .clone();
+    if let Some(key) = key {
+        let tile_def = world.read_resource::<TileDefinitions>().get(&key).clone();
         let still_asset = load_still_asset(&tile_def, &world.read_resource::<Assets>());
         let anim_asset = load_anim_asset(&tile_def, &world.read_resource::<Assets>());
         let transform = if let Some(asset) = &tile_def.asset {
@@ -268,6 +237,35 @@ fn add_cursor_preview_tag(world: &mut World, key: Option<String>) {
             .with(Transform::default())
             .with(Transparent)
             .with(Tint(Srgba::new(0.4, 0.4, 0.4, 0.8)))
+            .with(CursorPreviewTag)
+            .with(Parent { entity: parent })
+            .build();
+    } else {
+        let sprite_sheet = world
+            .read_resource::<Assets>()
+            .get_still(&SpriteType::Selection);
+        let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 2));
+        let mut transform = Transform::default();
+        transform.set_translation_xyz(0.5, 0.5, (&DepthLayer::UiElements).z());
+        transform.set_scale(Vector3::new(
+            1. / asset_dimensions.x as f32,
+            1. / asset_dimensions.y as f32,
+            1.0,
+        ));
+        let parent = world
+            .create_entity()
+            .with(CursorPreviewParentTag)
+            .with(Parent { entity: cursor })
+            .with(transform)
+            .build();
+        world
+            .create_entity()
+            .with(SpriteRender {
+                sprite_sheet,
+                sprite_number: 2,
+            })
+            .with(Transparent)
+            .with(Transform::default())
             .with(CursorPreviewTag)
             .with(Parent { entity: parent })
             .build();

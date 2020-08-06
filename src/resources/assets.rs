@@ -36,7 +36,7 @@ impl Assets {
                 error!("Spritesheet asset {:?} is missing!", asset_type);
                 self.stills.get(&SpriteType::NotFound)
             })
-            .expect(&format!("Fallback asset also missing.")))
+            .expect("Fallback asset also missing."))
         .clone()
     }
 
@@ -48,7 +48,7 @@ impl Assets {
                 error!("Animation asset {:?} is missing!", asset_type);
                 self.animated.get(&AnimType::NotFound)
             })
-            .expect(&format!("Fallback asset also missing!")))
+            .expect("Fallback asset also missing!"))
         .clone()
     }
 }

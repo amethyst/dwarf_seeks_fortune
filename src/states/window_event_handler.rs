@@ -43,6 +43,7 @@ fn toggle_fullscreen(world: &mut World) {
 /// Responds to window resize events. Recreates the camera with the new dimensions.
 fn resize_camera(world: &mut World) {
     world.exec(
+        #[allow(clippy::type_complexity)]
         |data: (
             Entities,
             WriteStorage<Camera>,

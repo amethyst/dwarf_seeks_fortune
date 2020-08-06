@@ -19,6 +19,7 @@ use std::cmp::min;
 pub struct CursorSystem;
 
 impl<'s> System<'s> for CursorSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Cursor>,
@@ -93,6 +94,7 @@ impl<'s> System<'s> for CursorPreviewSystem {
 pub struct SelectionSystem;
 
 impl<'s> System<'s> for SelectionSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Cursor>,
@@ -147,6 +149,7 @@ impl<'s> System<'s> for SelectionSystem {
 pub struct TilePaintSystem;
 
 impl<'s> System<'s> for TilePaintSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, SpriteRender>,
@@ -209,9 +212,7 @@ impl<'s> System<'s> for TilePaintSystem {
             if let Some(transform) = transform {
                 builder = builder.with(transform, &mut transforms);
             }
-            builder
-                .with(PaintedTile::new(pos.clone()), &mut tiles)
-                .build();
+            builder.with(PaintedTile::new(*pos), &mut tiles).build();
             tile_edit.dirty = false;
         }
     }

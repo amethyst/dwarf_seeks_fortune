@@ -16,7 +16,7 @@ pub struct WinCondition {
 impl WinCondition {
     /// Add a key. Only to be used when loading a level.
     pub fn add_key(&mut self, pos: &Pos) {
-        self.keys.insert(pos.clone());
+        self.keys.insert(*pos);
     }
     /// How many keys are left uncollected in the level.
     pub fn nr_keys_left(&self) -> usize {

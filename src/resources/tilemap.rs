@@ -31,7 +31,7 @@ impl TileMap {
                     let tile = if x == 0 && y == 0 {
                         Tile::Key(key.clone())
                     } else {
-                        Tile::Dummy(pos.clone())
+                        Tile::Dummy(*pos)
                     };
                     if let Some(replaced_value) = tiles.insert(Pos::new(pos.x + x, pos.y + y), tile) {
                         error!("Error! At pos ({:?},{:?}), there are multiple tiles! {:?} replaces {:?}",

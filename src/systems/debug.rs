@@ -7,6 +7,7 @@ use amethyst::{
 pub struct DebugSystem;
 
 impl<'s> System<'s> for DebugSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, Steering>,

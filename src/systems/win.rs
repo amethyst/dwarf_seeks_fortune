@@ -20,6 +20,7 @@ const DOOR_HEIGHT: f32 = 4.;
 pub struct KeyCollectionSystem;
 
 impl<'s> System<'s> for KeyCollectionSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadStorage<'s, Player>,
         ReadStorage<'s, Steering>,
@@ -76,6 +77,7 @@ impl<'s> System<'s> for KeyCollectionSystem {
 pub struct WinSystem;
 
 impl<'s> System<'s> for WinSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadStorage<'s, Player>,
         ReadStorage<'s, Steering>,

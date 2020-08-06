@@ -78,7 +78,7 @@ impl<'a, 'b> DataInit<CustomGameData<'a, 'b>> for CustomGameDataBuilder<'a, 'b> 
         let pool = (*world.read_resource::<ArcThreadPool>()).clone();
 
         let mut core_dispatcher = self.core.with_pool(pool.clone()).build();
-        let mut running_dispatcher = self.running.with_pool(pool.clone()).build();
+        let mut running_dispatcher = self.running.with_pool(pool).build();
         core_dispatcher.setup(world);
         running_dispatcher.setup(world);
 

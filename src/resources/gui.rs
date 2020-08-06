@@ -21,7 +21,7 @@ impl UiHandles {
     pub fn clone_handle(&self, key: &UiType) -> Handle<UiPrefab> {
         self.map
             .get(key)
-            .expect(&format!("Tried loading UI element {:?} but failed!", key))
+            .unwrap_or_else(|| panic!("Tried loading UI element {:?} but failed!", key))
             .clone()
     }
 
