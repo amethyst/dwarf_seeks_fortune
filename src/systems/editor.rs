@@ -1,17 +1,17 @@
 use amethyst::{
     assets::{Handle, Prefab},
-    core::math::{Point2, Vector3},
+    core::math::Vector3,
     core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
+    ecs::prelude::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage},
     input::{InputHandler, StringBindings},
     renderer::sprite::SpriteRender,
-    window::ScreenDimensions,
 };
 
 use crate::components::*;
 use crate::levels::*;
 use crate::resources::*;
+use amethyst::core::num::FloatConst;
 use precompile::MyPrefabData;
 use std::cmp::min;
 
@@ -79,12 +79,11 @@ impl<'s> System<'s> for CursorPreviewSystem {
         ReadStorage<'s, CursorPreviewTag>,
         WriteStorage<'s, Transform>,
         Read<'s, Time>,
-        Read<'s, EditorData>,
     );
 
-    fn run(&mut self, (tags, mut transforms, time, editor_data): Self::SystemData) {
+    fn run(&mut self, (tags, mut transforms, time): Self::SystemData) {
         for (_, transform) in (&tags, &mut transforms).join() {
-            let scale_factor = 1. - 0.1 * (time.absolute_time_seconds() * 3.14).sin().abs();
+            let scale_factor = 1. - 0.1 * (time.absolute_time_seconds() * f64::PI()).sin().abs();
             transform.set_scale(Vector3::new(scale_factor, scale_factor, 1.0));
         }
     }
@@ -99,13 +98,12 @@ impl<'s> System<'s> for SelectionSystem {
         WriteStorage<'s, Cursor>,
         WriteStorage<'s, SelectionTag>,
         Read<'s, InputHandler<StringBindings>>,
-        Read<'s, Time>,
         Write<'s, EditorData>,
     );
 
     fn run(
         &mut self,
-        (mut transforms, mut cursors, mut selection_tags, input, time, mut editor_data): Self::SystemData,
+        (mut transforms, mut cursors, mut selection_tags, input, mut editor_data): Self::SystemData,
     ) {
         let cursor_data = (&mut cursors)
             .join()
@@ -177,14 +175,16 @@ impl<'s> System<'s> for TilePaintSystem {
             .join()
             .filter(|(tile, _)| data.level.is_dirty(&tile.pos))
         {
-            entities.delete(entity);
+            entities
+                .delete(entity)
+                .expect("Failed to delete tile sprite.");
         }
 
         for (pos, tile_edit) in data
             .level
             .tile_map
             .iter_mut()
-            .filter(|(pos, tile_edit)| tile_edit.dirty)
+            .filter(|(_, tile_edit)| tile_edit.dirty)
         {
             let tile_def = tile_defs.get(&tile_edit.tile_def_key);
             let still_asset = load_still_asset(tile_def, &assets);

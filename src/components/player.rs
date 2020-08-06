@@ -1,8 +1,6 @@
-use crate::components::Pos;
 use crate::levels::ToolType;
 use amethyst::{
     assets::PrefabData,
-    core::math::Vector2,
     derive::PrefabData,
     ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, WriteStorage},
     error::Error,

@@ -1,15 +1,11 @@
 use amethyst::core::ecs::{Entities, LazyUpdate};
 use amethyst::{
     core::math::Vector2,
-    core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
-    input::{InputHandler, StringBindings},
-    window::ScreenDimensions,
+    ecs::prelude::{Join, Read, ReadStorage, System, Write},
 };
 
 use crate::components::*;
-use crate::levels::*;
 use crate::resources::*;
 
 /// Key width and height, hardcoded for now.
@@ -55,17 +51,19 @@ impl<'s> System<'s> for KeyCollectionSystem {
                     let key_y = transform.translation().y;
                     pos.x - dimens.x / 2. < key_x + KEY_WIDTH / 3.
                         && pos.x + dimens.x / 2. > key_x - KEY_WIDTH / 3.
-                        && pos.y - dimens.y / 2. < key_y + KEY_WIDTH / 3.
-                        && pos.y + dimens.y / 2. > key_y - KEY_WIDTH / 3.
+                        && pos.y - dimens.y / 2. < key_y + KEY_HEIGHT / 3.
+                        && pos.y + dimens.y / 2. > key_y - KEY_HEIGHT / 3.
                 })
                 .map(|(key, _, entity)| (key, entity))
                 .next();
             if let Some((key, key_entity)) = collected_key {
                 win.set_key_collected(&key.pos);
-                entities.delete(key_entity);
+                entities.delete(key_entity).expect("Failed to delete key.");
                 for (key_display, display_entity) in (&key_displays, &entities).join() {
                     if key_display.pos == key.pos {
-                        entities.delete(display_entity);
+                        entities
+                            .delete(display_entity)
+                            .expect("Failed to delete key display!");
                     }
                 }
             }
@@ -106,8 +104,8 @@ impl<'s> System<'s> for WinSystem {
                 let door_y = door_transform.translation().y;
                 if pos.x - dimens.x / 2. < door_x + DOOR_WIDTH / 3.
                     && pos.x + dimens.x / 2. > door_x - DOOR_WIDTH / 3.
-                    && pos.y - dimens.y / 2. < door_y + DOOR_WIDTH / 3.
-                    && pos.y + dimens.y / 2. > door_y - DOOR_WIDTH / 3.
+                    && pos.y - dimens.y / 2. < door_y + DOOR_HEIGHT / 3.
+                    && pos.y + dimens.y / 2. > door_y - DOOR_HEIGHT / 3.
                 {
                     win.reached_open_door = true;
                     lazy.exec_mut(move |world| {

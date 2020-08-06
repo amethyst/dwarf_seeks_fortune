@@ -1,7 +1,7 @@
 use crate::game_data::CustomGameData;
 use crate::resources::*;
 use crate::states::*;
-use amethyst::prelude::{Builder, World};
+
 use amethyst::{
     ecs::prelude::{Entity, WorldExt},
     input::{is_close_requested, is_key_down, VirtualKeyCode},

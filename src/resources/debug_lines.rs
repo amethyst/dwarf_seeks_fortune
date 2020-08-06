@@ -1,21 +1,6 @@
 use amethyst::{
-    core::{
-        transform::{Transform, TransformBundle},
-        Parent, Time,
-    },
-    derive::SystemDesc,
-    ecs::{prelude::*, Entity, Read, ReadExpect, System, SystemData, WorldExt, Write},
-    prelude::*,
-    renderer::{
-        camera::Camera,
-        debug_drawing::{DebugLines, DebugLinesComponent, DebugLinesParams},
-        palette::Srgba,
-        plugins::{RenderDebugLines, RenderToWindow},
-        types::DefaultBackend,
-        RenderingBundle,
-    },
-    utils::application_root_dir,
-    window::ScreenDimensions,
+    ecs::{prelude::*, WorldExt},
+    renderer::{debug_drawing::DebugLinesComponent, palette::Srgba},
 };
 
 /// Sets up a grid of grey debug lines, spaced 2 meters apart.

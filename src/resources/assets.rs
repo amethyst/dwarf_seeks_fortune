@@ -1,10 +1,7 @@
 use crate::components::Pos;
 use amethyst::{
-    assets::{Completion, Handle, Prefab, PrefabLoader, ProgressCounter, RonFormat},
-    ecs::prelude::Entity,
-    input::{is_close_requested, is_key_down, VirtualKeyCode},
-    renderer::{SpriteSheet, Texture},
-    StateData, Trans,
+    assets::{Handle, Prefab},
+    renderer::SpriteSheet,
 };
 use precompile::MyPrefabData;
 use serde::{Deserialize, Serialize};

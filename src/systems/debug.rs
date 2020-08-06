@@ -1,10 +1,7 @@
 use crate::components::*;
 use amethyst::{
-    core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, WriteStorage},
-    input::{InputHandler, StringBindings},
-    window::ScreenDimensions,
+    ecs::prelude::{Join, ReadStorage, System, WriteStorage},
 };
 
 pub struct DebugSystem;
@@ -12,7 +9,6 @@ pub struct DebugSystem;
 impl<'s> System<'s> for DebugSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
-        ReadStorage<'s, EditorRootTag>,
         ReadStorage<'s, Steering>,
         ReadStorage<'s, Player>,
         ReadStorage<'s, DebugPosGhostTag>,
@@ -23,7 +19,6 @@ impl<'s> System<'s> for DebugSystem {
         &mut self,
         (
             mut transforms,
-            root_tags,
             steerings,
             player_tags,
             pos_ghost_tags,

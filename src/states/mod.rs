@@ -12,4 +12,3 @@ pub use self::main_menu::*;
 pub use self::paused::*;
 pub use self::play::*;
 pub use self::test::*;
-pub use self::window_event_handler::*;

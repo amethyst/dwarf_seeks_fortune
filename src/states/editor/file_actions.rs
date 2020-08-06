@@ -5,12 +5,8 @@ use amethyst::{
     prelude::{Config, World, WorldExt},
     utils::application_root_dir,
 };
-use std::error::Error;
-use std::ffi::{OsStr, OsString};
-use std::fs::DirEntry;
-use std::io::ErrorKind;
+
 use std::path::PathBuf;
-use std::{fs, io};
 
 /// Returns a PathBuf to the file that is used to store auto saves.
 pub fn auto_save_file() -> PathBuf {
@@ -29,7 +25,7 @@ pub fn load_auto_save() -> Result<LevelEdit, ConfigError> {
 }
 
 /// Load and return the level with the given name.
-pub fn load(name: String, world: &mut World) -> Result<LevelEdit, ConfigError> {
+pub fn load(name: String) -> Result<LevelEdit, ConfigError> {
     let level_file = get_levels_dir().join(name + ".ron");
     read_level_file(level_file)
 }
@@ -52,7 +48,7 @@ pub fn save(name: String, world: &mut World) -> Result<(), ConfigError> {
 }
 
 fn write_level_file(level_file: PathBuf, world: &mut World) -> Result<(), ConfigError> {
-    let mut data = world.write_resource::<EditorData>();
+    let data = world.write_resource::<EditorData>();
     let level: Level = (&*data).level.clone().into();
     level.write(level_file)
 }

@@ -1,12 +1,10 @@
 use crate::components::*;
-use crate::levels::*;
+
 use crate::resources::*;
 use amethyst::{
     core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
-    input::{InputHandler, StringBindings},
-    window::ScreenDimensions,
+    ecs::prelude::{Join, Read, ReadStorage, System, WriteStorage},
 };
 
 /// For every entity with a velocity and a transform, updates the transform according to the
@@ -66,22 +64,14 @@ impl<'s> System<'s> for MovementSystem {
                         transform.set_translation_y(centered_y);
                     }
                 }
-                SteeringMode::Falling {
-                    x_movement,
-                    starting_y_pos,
-                    starting_time,
-                } => {
+                SteeringMode::Falling { starting_y_pos, .. } => {
                     // Set y-position directly, based on movement function. We don't use velocity for this.
                     velocity.y = 0.0;
                     transform.set_translation_y(
                         starting_y_pos + steering.mode.calc_delta_y(time.absolute_time_seconds()),
                     );
                 }
-                SteeringMode::Jumping {
-                    x_movement,
-                    starting_y_pos,
-                    starting_time,
-                } => {
+                SteeringMode::Jumping { starting_y_pos, .. } => {
                     // Set y-position directly, based on movement function. We don't use velocity for this.
                     velocity.y = 0.0;
                     transform.set_translation_y(
@@ -114,12 +104,12 @@ impl<'s> System<'s> for LevelWrappingSystem {
         WriteStorage<'s, Steering>,
         WriteStorage<'s, Transform>,
         Read<'s, TileMap>,
-        Read<'s, Time>,
     );
 
-    fn run(&mut self, (mut steerings, mut transforms, tile_map, time): Self::SystemData) {
+    fn run(&mut self, (mut steerings, mut transforms, tile_map): Self::SystemData) {
         for (transform, steering) in (&mut transforms, &mut steerings).join() {
-            let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
+            // TODO: also implement for left, right, top borders.
+            let (_anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             if anchored_y < tile_map.pos.y as f32 {
                 transform.set_translation_y(transform.translation().y + tile_map.dimens.y as f32);
                 match steering.mode {

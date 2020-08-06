@@ -1,37 +1,15 @@
-use std::path::{Path, PathBuf};
-
-use amethyst::core::math::Vector3;
-use amethyst::prelude::WorldExt;
-use amethyst::ui::UiPrefab;
-use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
-    animation::{
-        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
-    },
-    assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{timing::Time, transform::Transform, Parent},
-    ecs::{prelude::World, Entities, Entity, Join, ReadStorage, Write, WriteStorage},
-    input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
-    prelude::*,
-    renderer::{
-        formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
-        Camera, SpriteSheet, Texture,
-    },
-    utils::application_root_dir,
-    window::{MonitorIdent, ScreenDimensions, Window},
+    core::{transform::Transform, Parent},
+    ecs::{prelude::World, Entities, Join, ReadStorage, WriteStorage},
+    input::InputEvent,
+    renderer::Camera,
+    window::{ScreenDimensions, Window},
     winit::{Event, WindowEvent},
-    StateData, Trans,
 };
 
-use precompile::AnimationId;
-
 use crate::components::*;
-use crate::entities::*;
-use crate::game_data::CustomGameData;
-use crate::levels::*;
-use crate::resources::*;
-use crate::states::{EditorState, PausedState};
+
 use amethyst::core::ecs::ReadExpect;
 
 /// Handle some general behaviour related to the window that should be executed in any State.
@@ -65,7 +43,7 @@ fn toggle_fullscreen(world: &mut World) {
 /// Responds to window resize events. Recreates the camera with the new dimensions.
 fn resize_camera(world: &mut World) {
     world.exec(
-        |mut data: (
+        |data: (
             Entities,
             WriteStorage<Camera>,
             WriteStorage<Transform>,
@@ -85,7 +63,9 @@ fn resize_camera(world: &mut World) {
                 .next();
             if let Some(frame) = frame {
                 if let Some(cam) = cam {
-                    entities.delete(cam);
+                    entities
+                        .delete(cam)
+                        .expect("Trying to resize, but failed to delete camera.");
                 }
                 if screen_dimens.width() > f32::EPSILON && screen_dimens.height() > f32::EPSILON {
                     entities

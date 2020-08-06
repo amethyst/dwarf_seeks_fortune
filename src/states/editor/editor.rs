@@ -1,27 +1,16 @@
 use amethyst::prelude::WorldExt;
-use amethyst::ui::UiPrefab;
+
 use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
     animation::{
         get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
     },
-    assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{
-        math::{Point2, Vector3},
-        transform::Transform,
-        Parent,
-    },
+    core::{math::Vector3, transform::Transform, Parent},
     ecs::{prelude::World, Entities, Entity, Join, ReadStorage, WriteStorage},
-    input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
+    input::{is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
     prelude::*,
-    renderer::{
-        formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
-        Camera, SpriteSheet, Texture, Transparent,
-    },
-    utils::application_root_dir,
-    window::ScreenDimensions,
-    winit::{Event, WindowEvent},
+    renderer::{palette::Srgba, resources::Tint, sprite::SpriteRender, Transparent},
     StateData, Trans,
 };
 use precompile::AnimationId;
@@ -31,19 +20,18 @@ use crate::entities::*;
 use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
-use crate::states::editor::file_actions::{auto_save, auto_save_file, load_auto_save, save};
+use crate::states::editor::file_actions::{auto_save, auto_save_file, load_auto_save};
 use crate::states::editor::paint::erase_tiles;
 use crate::states::editor::paint::paint_tiles;
-use crate::states::{window_event_handler, PausedState, PlayState};
-use std::io::Read;
+use crate::states::{window_event_handler, PlayState};
 
 pub struct EditorState;
 
 impl<'a, 'b> EditorState {
     fn handle_action(
         &mut self,
-        action: &str,
-        world: &mut World,
+        _action: &str,
+        _world: &mut World,
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
         Trans::None
     }
@@ -97,7 +85,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
             // Events related to the window and inputs.
             StateEvent::Window(event) => {
                 if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
-                    auto_save(data.world);
+                    auto_save(data.world).expect("Failed to auto-save level!");
                     Trans::Pop
                 } else {
                     Trans::None
@@ -124,7 +112,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                     key_code: VirtualKeyCode::F1,
                     scancode: _,
                 } => {
-                    auto_save(data.world);
+                    auto_save(data.world).expect("Failed to auto-save level!");
                     Trans::Push(Box::new(PlayState::new(auto_save_file())))
                 }
                 InputEvent::KeyReleased {
@@ -192,7 +180,6 @@ fn init_cursor(world: &mut World) {
     let sprite_handle = world
         .read_resource::<Assets>()
         .get_still(&SpriteType::Selection);
-    let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 0));
     let mut selection_transform = Transform::default();
     selection_transform.set_translation_z((&DepthLayer::UiElements).z());
     world
@@ -205,9 +192,8 @@ fn init_cursor(world: &mut World) {
         .with(selection_transform)
         .with(SelectionTag)
         .build();
-    let mut transform = Transform::default();
-    // transform.set_translation_xyz(0.5, 0.5, 2.0);
-    let cursor = world
+    let transform = Transform::default();
+    let _ = world
         .create_entity()
         .with(transform)
         .with(Cursor::default())
@@ -289,7 +275,7 @@ fn add_cursor_preview_tag(world: &mut World, key: Option<String>) {
 }
 
 fn lookup_cursor_entity(world: &mut World) -> Entity {
-    world.exec(|mut data: (ReadStorage<Cursor>, Entities)| {
+    world.exec(|data: (ReadStorage<Cursor>, Entities)| {
         let (cursors, entities) = data;
         let (entity, _) = (&entities, &cursors)
             .join()
@@ -300,15 +286,15 @@ fn lookup_cursor_entity(world: &mut World) -> Entity {
 }
 
 fn delete_cursor_preview(world: &mut World) {
-    world.exec(
-        |mut data: (ReadStorage<CursorPreviewParentTag>, Entities)| {
-            let (previews, entities) = data;
-            (&entities, &previews)
-                .join()
-                .map(|(entity, _)| entity)
-                .for_each(|preview| {
-                    entities.delete(preview);
-                });
-        },
-    );
+    world.exec(|data: (ReadStorage<CursorPreviewParentTag>, Entities)| {
+        let (previews, entities) = data;
+        (&entities, &previews)
+            .join()
+            .map(|(entity, _)| entity)
+            .for_each(|preview| {
+                entities
+                    .delete(preview)
+                    .expect("Failed to delete CursorPreviewParentTag.");
+            });
+    });
 }

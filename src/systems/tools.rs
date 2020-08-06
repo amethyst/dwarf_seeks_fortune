@@ -1,11 +1,9 @@
 use amethyst::core::ecs::{Entities, LazyUpdate};
 use amethyst::{
-    core::math::{Vector2, Vector3},
-    core::timing::Time,
+    core::math::Vector2,
     core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorage},
     input::{InputHandler, StringBindings},
-    window::ScreenDimensions,
 };
 
 use crate::components::*;
@@ -13,7 +11,6 @@ use crate::levels::*;
 use crate::resources::*;
 use amethyst::core::Parent;
 use amethyst::prelude::{Builder, WorldExt};
-use amethyst::renderer::SpriteRender;
 
 /// Tool width and height, hardcoded for now.
 /// TODO: Don't hardcode.
@@ -39,7 +36,7 @@ impl<'s> System<'s> for PickupSystem {
         &mut self,
         (mut players, steerings, tools, transforms, lazy, entities): Self::SystemData,
     ) {
-        let mut player = (&mut players, &entities, &steerings, &transforms)
+        let player = (&mut players, &entities, &steerings, &transforms)
             .join()
             .map(|(player, entity, steering, transform)| {
                 (
@@ -61,8 +58,8 @@ impl<'s> System<'s> for PickupSystem {
                     let key_y = transform.translation().y;
                     pos.x - dimens.x / 2. < key_x + TOOL_WIDTH / 3.
                         && pos.x + dimens.x / 2. > key_x - TOOL_WIDTH / 3.
-                        && pos.y - dimens.y / 2. < key_y + TOOL_WIDTH / 3.
-                        && pos.y + dimens.y / 2. > key_y - TOOL_WIDTH / 3.
+                        && pos.y - dimens.y / 2. < key_y + TOOL_HEIGHT / 3.
+                        && pos.y + dimens.y / 2. > key_y - TOOL_HEIGHT / 3.
                 })
                 .next();
             if let Some((tool, _, tool_entity)) = tool_opt {
@@ -95,12 +92,9 @@ impl<'s> System<'s> for UseToolSystem {
     type SystemData = (
         WriteStorage<'s, Player>,
         ReadStorage<'s, Steering>,
-        ReadStorage<'s, Tool>,
-        ReadStorage<'s, Transform>,
         ReadStorage<'s, EquippedTag>,
         ReadStorage<'s, Block>,
         Read<'s, InputHandler<StringBindings>>,
-        Read<'s, LazyUpdate>,
         Write<'s, TileMap>,
         Entities<'s>,
     );
@@ -110,12 +104,9 @@ impl<'s> System<'s> for UseToolSystem {
         (
             mut players,
             steerings,
-            tools,
-            transforms,
             equipped_tags,
             blocks,
             input,
-            lazy,
             mut tile_map,
             entities,
         ): Self::SystemData,
@@ -124,14 +115,15 @@ impl<'s> System<'s> for UseToolSystem {
         if !wants_to_use_tool {
             return;
         }
-        for (player, steering, transform) in (&mut players, &steerings, &transforms).join() {
+        for (player, steering) in (&mut players, &steerings).join() {
             if !steering.is_grounded() {
                 return;
             }
-            let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             let targeted_blocks = match player.equipped {
-                Some(ToolType::BreakBlocksHorizontally(depth)) => Some(tiles_to_side(2, steering)),
-                Some(ToolType::BreakBlocksBelow(depth)) => Some(tiles_below(2, steering)),
+                Some(ToolType::BreakBlocksHorizontally(depth)) => {
+                    Some(tiles_to_side(depth, steering))
+                }
+                Some(ToolType::BreakBlocksBelow(depth)) => Some(tiles_below(depth, steering)),
                 _ => None,
             };
             if let Some(targeted_blocks) = targeted_blocks {
@@ -151,11 +143,13 @@ impl<'s> System<'s> for UseToolSystem {
                         tile_map.remove_tile(pos);
                     });
                     for (_, entity) in (&equipped_tags, &entities).join() {
-                        entities.delete(entity);
+                        entities
+                            .delete(entity)
+                            .expect("Failed to delete equipped tool sprite.");
                     }
                     for (block, entity) in (&blocks, &entities).join() {
                         if targeted_blocks.contains(&block.pos) {
-                            entities.delete(entity);
+                            entities.delete(entity).expect("Failed to delete block!");
                         }
                     }
                 }

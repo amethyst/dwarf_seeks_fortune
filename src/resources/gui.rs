@@ -1,22 +1,10 @@
 use std::collections::HashMap;
 
-use amethyst::audio::output::init_output;
 use amethyst::prelude::WorldExt;
-use amethyst::ui::UiCreator;
-use amethyst::ui::UiLoader;
+
 use amethyst::ui::UiPrefab;
-use amethyst::State;
-use amethyst::StateEvent;
-use amethyst::{
-    assets::{
-        AssetStorage, Completion, Handle, Loader, Prefab, PrefabLoader, ProgressCounter, RonFormat,
-    },
-    ecs::prelude::Entity,
-    input::{is_close_requested, is_key_down, VirtualKeyCode},
-    prelude::*,
-    renderer::{formats::texture::ImageFormat, SpriteSheet, SpriteSheetFormat, Texture},
-    StateData, Trans,
-};
+
+use amethyst::{assets::Handle, ecs::prelude::Entity, prelude::*};
 
 #[derive(Default, Debug)]
 pub struct UiHandles {

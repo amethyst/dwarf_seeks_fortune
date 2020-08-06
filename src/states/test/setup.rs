@@ -1,37 +1,11 @@
-use std::path::{Path, PathBuf};
-
-use amethyst::core::math::Vector3;
-use amethyst::prelude::WorldExt;
-use amethyst::ui::UiPrefab;
-use amethyst::State;
-use amethyst::StateEvent;
 use amethyst::{
-    animation::{
-        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
-    },
-    assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{timing::Time, transform::Transform, Parent},
-    ecs::{prelude::World, Entities, Entity, Join, ReadStorage, WriteStorage},
-    input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
-    prelude::*,
-    renderer::{
-        formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
-        Camera, SpriteSheet, Texture,
-    },
+    ecs::{prelude::World, Entities, Join, ReadStorage},
     utils::application_root_dir,
-    window::{MonitorIdent, ScreenDimensions, Window},
-    winit::{Event, WindowEvent},
-    StateData, Trans,
 };
 
-use precompile::AnimationId;
-
 use crate::components::*;
-use crate::entities::*;
-use crate::game_data::CustomGameData;
+
 use crate::levels::*;
-use crate::resources::*;
-use crate::states::{window_event_handler, EditorState, PausedState};
 
 pub fn setup_test(test: MovementTest, world: &mut World) {
     clear_previous_test(world);
@@ -42,7 +16,9 @@ fn clear_previous_test(world: &mut World) {
     world.exec(
         |(entities, tags): (Entities, ReadStorage<MovementTestScopeTag>)| {
             for (entity, _) in (&entities, &tags).join() {
-                entities.delete(entity);
+                entities
+                    .delete(entity)
+                    .expect("Failed to clear entities belonging to the previous test.");
             }
         },
     );

@@ -4,10 +4,7 @@ use amethyst::{
     core::{math::Vector3, transform::Transform, Parent},
     ecs::Entity,
     prelude::{Builder, World, WorldExt},
-    renderer::{
-        formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
-        Camera, SpriteSheet, Texture,
-    },
+    renderer::Camera,
     window::ScreenDimensions,
 };
 

@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::components::*;
 use crate::levels::*;
-use crate::resources::*;
 
 /// The level editor uses this to store data related to the level it is editing.
 /// An instance of LevelEdit can be transformed into a Level.

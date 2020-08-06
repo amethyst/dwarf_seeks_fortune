@@ -1,11 +1,10 @@
 use crate::components::Pos;
 use crate::levels::ToolType;
-use crate::resources::{AssetType, SpriteType};
+use crate::resources::SpriteType;
 use amethyst::{
     assets::PrefabData,
-    core::math::Vector2,
     derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, WriteStorage},
+    ecs::{prelude::Entity, Component, DenseVecStorage, WriteStorage},
     error::Error,
 };
 use serde::{Deserialize, Serialize};

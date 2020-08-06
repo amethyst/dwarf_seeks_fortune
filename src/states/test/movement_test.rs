@@ -1,26 +1,14 @@
-use std::path::{Path, PathBuf};
-
-use amethyst::core::math::Vector3;
 use amethyst::prelude::WorldExt;
-use amethyst::ui::UiPrefab;
+
 use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
     animation::{
         get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
     },
-    assets::{AssetStorage, Handle, Loader, Prefab},
-    core::{timing::Time, transform::Transform, Parent},
-    ecs::{prelude::World, Entities, Entity, Join, ReadStorage, WriteStorage},
-    input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
-    prelude::*,
-    renderer::{
-        formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
-        Camera, SpriteSheet, Texture,
-    },
-    utils::application_root_dir,
-    window::{MonitorIdent, ScreenDimensions, Window},
-    winit::{Event, WindowEvent},
+    ecs::{Entities, Join, ReadStorage, WriteStorage},
+    input::{is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
+    renderer::sprite::SpriteRender,
     StateData, Trans,
 };
 
@@ -29,9 +17,9 @@ use precompile::AnimationId;
 use crate::components::*;
 use crate::entities::*;
 use crate::game_data::CustomGameData;
-use crate::levels::*;
+
 use crate::resources::*;
-use crate::states::{setup_test, window_event_handler, EditorState, PausedState};
+use crate::states::{setup_test, window_event_handler};
 
 pub struct MovementTestState;
 

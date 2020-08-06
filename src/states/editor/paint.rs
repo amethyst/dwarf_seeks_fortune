@@ -1,14 +1,8 @@
 use crate::components::*;
 use crate::levels::*;
-use crate::resources::{Assets, EditorData, SpriteType, TileEdit};
-use amethyst::prelude::Builder;
-use amethyst::{
-    core::math::Vector3,
-    core::transform::Transform,
-    prelude::{World, WorldExt},
-    renderer::sprite::SpriteRender,
-};
-use std::cmp::min;
+use crate::resources::{EditorData, TileEdit};
+
+use amethyst::prelude::{World, WorldExt};
 
 pub fn paint_tiles(world: &mut World) {
     let (key, tile_def) = get_brush(world);

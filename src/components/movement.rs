@@ -1,9 +1,8 @@
-use crate::components::Direction1D::Neutral;
 use amethyst::{
     assets::PrefabData,
-    core::{math::Vector2, transform::Transform},
+    core::transform::Transform,
     derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, NullStorage, WriteStorage},
+    ecs::{prelude::Entity, Component, DenseVecStorage, WriteStorage},
     error::Error,
 };
 use serde::{Deserialize, Serialize};
@@ -102,12 +101,6 @@ impl Default for Direction1D {
 pub struct Velocity {
     pub x: f32,
     pub y: f32,
-}
-
-impl Velocity {
-    pub fn new(x: f32, y: f32) -> Velocity {
-        Velocity { x, y }
-    }
 }
 
 /// A discrete position in the world, with x and y being integral numbers.
@@ -228,19 +221,11 @@ impl SteeringMode {
     /// return 0. otherwise.
     pub fn calc_delta_y(&self, time: f64) -> f32 {
         match self {
-            SteeringMode::Jumping {
-                starting_y_pos,
-                starting_time,
-                ..
-            } => {
+            SteeringMode::Jumping { starting_time, .. } => {
                 let t = time - starting_time;
                 (-50. * (t - 0.209).powf(2.) + 2.2) as f32
             }
-            SteeringMode::Falling {
-                starting_y_pos,
-                starting_time,
-                ..
-            } => {
+            SteeringMode::Falling { starting_time, .. } => {
                 let t = time - starting_time;
                 (t * -15.) as f32
             }

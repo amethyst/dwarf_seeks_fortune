@@ -8,7 +8,6 @@ use amethyst::{
     ui::{UiEvent, UiFinder, UiText},
     utils::fps_counter::FpsCounter,
 };
-use log::info;
 
 #[derive(Default)]
 pub struct FpsCounterUiSystem {

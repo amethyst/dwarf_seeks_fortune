@@ -1,34 +1,21 @@
 use amethyst::prelude::WorldExt;
-use amethyst::ui::UiPrefab;
-use amethyst::State;
-use amethyst::StateEvent;
+
 use amethyst::{
-    animation::{
-        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
-    },
-    assets::{AssetStorage, Handle, Loader, Prefab},
+    assets::{Handle, Prefab},
     config::ConfigError,
     core::{math::Vector3, transform::Transform, Parent},
-    ecs::{prelude::World, Entities, Entity, EntityBuilder, Join, ReadStorage, WriteStorage},
-    input::{get_key, is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
+    ecs::{prelude::World, Entities, Entity, EntityBuilder, Join, ReadStorage},
     prelude::*,
-    renderer::{
-        formats::texture::ImageFormat, palette::Srgba, resources::Tint, sprite::SpriteRender,
-        Camera, SpriteSheet, Texture, Transparent,
-    },
+    renderer::{sprite::SpriteRender, Transparent},
     utils::application_root_dir,
-    window::ScreenDimensions,
-    winit::{Event, WindowEvent},
-    StateData, Trans,
 };
-use precompile::{AnimationId, MyPrefabData};
+use precompile::MyPrefabData;
 
 use crate::components::*;
-use crate::game_data::CustomGameData;
+
 use crate::levels::{Archetype, DepthLayer, Level, TileDefinition, TileDefinitions};
 use crate::resources::*;
-use crate::states::PausedState;
-use std::error::Error;
+
 use std::path::PathBuf;
 
 pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
@@ -43,7 +30,6 @@ pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
 pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
     let mut win_condition = WinCondition::default();
     let display_debug_frames = world.read_resource::<DebugConfig>().display_debug_frames;
-    let fallback_def = TileDefinition::fallback();
     let tile_defs = load_tile_definitions()?;
     let level = Level::load(level_file)?;
     add_background(world, &level.pos, &level.dimens);
@@ -74,9 +60,9 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
         builder = builder.with(Block { pos: pos.clone() });
         match tile_def.archetype {
             Archetype::Player => {
-                let player = build_player(builder, pos, tile_def);
+                let _ = build_player(builder, pos, tile_def);
                 if display_debug_frames {
-                    build_frames(player, world, tile_def);
+                    build_frames(world, tile_def);
                 }
             }
             Archetype::Key => {
@@ -128,15 +114,15 @@ fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
             .map(|(_, entity)| (entity))
             .next()
     });
-    if let Some((door_entity)) = door_entity {
+    if let Some(door_entity) = door_entity {
         win_condition
             .keys
             .iter()
             .enumerate()
             .for_each(|(index, key)| {
                 let mut transform = Transform::default();
-                let x_offset = (index % 4);
-                let y_offset = (index / 4);
+                let x_offset = index % 4;
+                let y_offset = index / 4;
                 transform.set_translation_x((-1. + x_offset as f32) * 64.);
                 transform.set_translation_y((1. + y_offset as f32) * 64.);
                 transform.set_translation_z(1.); //One higher than parent.
@@ -156,7 +142,7 @@ fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
     }
 }
 
-fn build_frames(player: Entity, world: &mut World, tile_def: &TileDefinition) {
+fn build_frames(world: &mut World, tile_def: &TileDefinition) {
     let frame = world
         .read_resource::<Assets>()
         .get_still(&SpriteType::Frame);
@@ -219,7 +205,7 @@ pub fn load_transform(pos: &Pos, depth: &DepthLayer, dimens: &Pos, asset: &Asset
 
 pub fn load_still_asset(tile: &TileDefinition, assets: &Assets) -> Option<SpriteRender> {
     match &tile.asset? {
-        AssetType::Animated(anim) => None,
+        AssetType::Animated(..) => None,
         AssetType::Still(spritesheet, sprite_nr) => {
             let handle = assets.get_still(&spritesheet);
             Some(SpriteRender {
@@ -251,6 +237,6 @@ pub fn load_anim_asset(
             let handle = assets.get_animated(&anim);
             Some(handle)
         }
-        AssetType::Still(spritesheet, sprite_nr) => None,
+        AssetType::Still(..) => None,
     }
 }

@@ -1,12 +1,9 @@
 use crate::components::*;
-use crate::levels::*;
 use crate::resources::*;
+use amethyst::core::{Time, Transform};
 use amethyst::{
-    core::timing::Time,
-    core::transform::Transform,
-    ecs::prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorage},
     input::{InputHandler, StringBindings},
-    window::ScreenDimensions,
 };
 
 #[derive(Default)]

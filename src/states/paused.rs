@@ -1,4 +1,3 @@
-use amethyst::prelude::Builder;
 use amethyst::{
     ecs::prelude::{Entity, WorldExt},
     input::{is_key_down, VirtualKeyCode},
@@ -9,14 +8,9 @@ use crate::game_data::CustomGameData;
 use crate::resources::*;
 use crate::states::window_event_handler;
 
+#[derive(Default)]
 pub struct PausedState {
     ui: Option<Entity>,
-}
-
-impl PausedState {
-    pub fn new() -> PausedState {
-        PausedState { ui: None }
-    }
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PausedState {

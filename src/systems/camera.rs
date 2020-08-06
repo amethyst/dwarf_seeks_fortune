@@ -1,19 +1,13 @@
 use crate::components::*;
-use crate::resources::*;
+
 use amethyst::{
     core::transform::Transform,
     core::{
-        math::{partial_clamp, partial_min, Vector2, Vector3},
+        math::{partial_clamp, Vector2},
         timing::Time,
-        Parent,
     },
-    ecs::{
-        prelude::{Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage},
-        Entities,
-    },
+    ecs::prelude::{Join, Read, ReadStorage, System, WriteStorage},
     input::{InputHandler, StringBindings},
-    renderer::{sprite::SpriteRender, Camera},
-    window::ScreenDimensions,
 };
 
 /// This system handles player input to control certain aspects of the camera.
@@ -22,14 +16,13 @@ pub struct CameraControlSystem;
 
 impl<'s> System<'s> for CameraControlSystem {
     type SystemData = (
-        ReadStorage<'s, Player>,
         WriteStorage<'s, CameraFrame>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
     );
 
-    fn run(&mut self, (players, mut camera_frames, input, time): Self::SystemData) {
-        let zoom = input.axis_value("zoom").unwrap_or(0.0);
+    fn run(&mut self, (mut camera_frames, input, time): Self::SystemData) {
+        let _zoom = input.axis_value("zoom").unwrap_or(0.0);
         let pan_x = input.axis_value("pan_x").unwrap_or(0.0);
         let pan_y = input.axis_value("pan_y").unwrap_or(0.0);
         for frame in (&mut camera_frames).join() {

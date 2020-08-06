@@ -1,7 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use crate::components::*;
-use crate::levels::*;
 
 /// Maintains some information related to winning the level.
 /// In any given level, the player must collect all keys. Once all keys are collected, the exit door

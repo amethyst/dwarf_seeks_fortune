@@ -1,10 +1,7 @@
 #![allow(
     dead_code,
-    unused_must_use,
     unused_imports,
     unused_variables,
-    unused_parens,
-    unused_mut
 )]
 #![forbid(unsafe_code)]
 
@@ -29,7 +26,6 @@ use amethyst::{
     Application, LoggerConfig,
 };
 use game_data::CustomGameDataBuilder;
-use log::LevelFilter;
 use precompile::MyPrefabData;
 use precompile::PrecompiledDefaultsBundle;
 use precompile::PrecompiledRenderBundle;

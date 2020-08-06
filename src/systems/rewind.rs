@@ -5,7 +5,6 @@ use amethyst::{
     core::transform::Transform,
     ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorage},
     input::{InputHandler, StringBindings},
-    renderer::{palette::Srgba, resources::Tint},
 };
 
 pub struct RewindControlSystem;
@@ -18,12 +17,11 @@ impl<'s> System<'s> for RewindControlSystem {
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
         Read<'s, DebugConfig>,
-        WriteStorage<'s, Tint>,
     );
 
     fn run(
         &mut self,
-        (mut current_state, mut rewind, mut history, input, time, config, mut tints): Self::SystemData,
+        (mut current_state, mut rewind, mut history, input, time, config): Self::SystemData,
     ) {
         history.force_key_frame = false;
         if input.action_is_down("shift").unwrap_or(false) {
@@ -44,14 +42,6 @@ impl<'s> System<'s> for RewindControlSystem {
             }
             *current_state = CurrentState::Running;
         }
-
-        // for tint in (&mut tints).join() {
-        //     tint.0 = if *current_state == CurrentState::Running {
-        //         Srgba::new(1.0, 1.0, 1.0, 1.0)
-        //     } else {
-        //         Srgba::new(0.1, 0.1, 0.1, 1.0)
-        //     };
-        // }
     }
 }
 

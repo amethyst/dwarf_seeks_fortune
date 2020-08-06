@@ -2,7 +2,7 @@ use amethyst::audio::output::init_output;
 use amethyst::prelude::WorldExt;
 use amethyst::ui::UiCreator;
 use amethyst::ui::UiLoader;
-use amethyst::ui::UiPrefab;
+
 use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
@@ -19,7 +19,7 @@ use precompile::MyPrefabData;
 
 use crate::game_data::CustomGameData;
 use crate::resources::*;
-use crate::states::{window_event_handler, EditorState, MainMenuState};
+use crate::states::{window_event_handler, MainMenuState};
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -42,7 +42,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
             (UiType::MainMenu, "ui/main_menu.ron"),
         ]
         .drain(..)
-        .fold(UiHandles::default(), |mut handles, (ui_type, path)| {
+        .fold(UiHandles::default(), |handles, (ui_type, path)| {
             handles.put_handle(
                 ui_type,
                 data.world
@@ -51,7 +51,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         });
         data.world.insert(ui_handles);
 
-        let mut assets = vec![
+        let assets = vec![
             (
                 SpriteType::NotFound,
                 "textures/not_found.png",
@@ -91,7 +91,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         .drain(..)
         .fold(
             Assets::default(),
-            |mut assets, (sprite_type, texture_path, ron_path)| {
+            |assets, (sprite_type, texture_path, ron_path)| {
                 assets.put_still(
                     sprite_type,
                     load_spritesheet(texture_path, ron_path, data.world, &mut self.progress),
@@ -104,7 +104,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
             (AnimType::Miner, "prefab/anim_miner.ron"),
         ]
         .drain(..)
-        .fold(assets, |mut assets, (anim_type, prefab_path)| {
+        .fold(assets, |assets, (anim_type, prefab_path)| {
             assets.put_animated(
                 anim_type,
                 load_animation(prefab_path, data.world, &mut self.progress),
