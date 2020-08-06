@@ -35,8 +35,6 @@ use crate::states::{window_event_handler, EditorState, PausedState};
 
 pub struct PlayState {
     level_file: PathBuf,
-    // TODO: get rid of editor_mode, just push/pop instead.
-    editor_mode: bool,
 }
 
 impl<'a, 'b> PlayState {
@@ -47,18 +45,12 @@ impl<'a, 'b> PlayState {
             .join("assets/")
             .join("levels/")
             .join("demo_level.ron");
-        PlayState {
-            level_file,
-            editor_mode: false,
-        }
+        PlayState { level_file }
     }
 
     /// Creates a new PlayState that will load the given level.
-    pub fn new(level_file: PathBuf, editor_mode: bool) -> Self {
-        PlayState {
-            level_file,
-            editor_mode,
-        }
+    pub fn new(level_file: PathBuf) -> Self {
+        PlayState { level_file }
     }
 
     fn handle_action(
@@ -120,11 +112,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
                 if is_close_requested(&event) {
                     Trans::Quit
                 } else if is_key_down(&event, VirtualKeyCode::Escape) {
-                    if self.editor_mode {
-                        Trans::Switch(Box::new(EditorState))
-                    } else {
-                        Trans::Pop
-                    }
+                    Trans::Pop
                 } else {
                     Trans::None
                 }

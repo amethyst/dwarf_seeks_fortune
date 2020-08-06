@@ -47,12 +47,8 @@ impl<'a, 'b> EditorState {
     ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
         Trans::None
     }
-}
 
-impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
-    fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-        info!("EditorState on_start");
-        let StateData { world, .. } = data;
+    fn setup(&self, world: &mut World) {
         UiHandles::add_ui(&UiType::Fps, world);
         UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
@@ -66,6 +62,24 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         editor_data.brush.set_palette(&tile_defs);
         world.insert(editor_data);
         world.insert(tile_defs);
+    }
+}
+
+impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
+    fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        info!("EditorState on_start");
+        let StateData { world, .. } = data;
+        self.setup(world);
+    }
+
+    fn on_pause(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        info!("EditorState on_pause");
+        data.world.delete_all();
+    }
+
+    fn on_resume(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        info!("EditorState on_resume");
+        self.setup(data.world);
     }
 
     fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
@@ -111,7 +125,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                     scancode: _,
                 } => {
                     auto_save(data.world);
-                    Trans::Switch(Box::new(PlayState::new(auto_save_file(), true)))
+                    Trans::Push(Box::new(PlayState::new(auto_save_file())))
                 }
                 InputEvent::KeyReleased {
                     key_code: VirtualKeyCode::LBracket,
