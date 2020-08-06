@@ -1,4 +1,4 @@
-use amethyst::core::ecs::Entities;
+use amethyst::core::ecs::{Entities, LazyUpdate};
 use amethyst::{
     core::math::Vector2,
     core::timing::Time,
@@ -15,13 +15,15 @@ use crate::resources::*;
 /// Key width and height, hardcoded for now.
 const KEY_WIDTH: f32 = 2.;
 const KEY_HEIGHT: f32 = 2.;
+const DOOR_WIDTH: f32 = 4.;
+const DOOR_HEIGHT: f32 = 4.;
 
 /// Checks if the player intersects any keys.
 /// If so, the key will collected by the player and will be removed from the game.
 #[derive(Default)]
-pub struct WinSystem;
+pub struct KeyCollectionSystem;
 
-impl<'s> System<'s> for WinSystem {
+impl<'s> System<'s> for KeyCollectionSystem {
     type SystemData = (
         ReadStorage<'s, Player>,
         ReadStorage<'s, Steering>,
@@ -65,6 +67,52 @@ impl<'s> System<'s> for WinSystem {
                     if key_display.pos == key.pos {
                         entities.delete(display_entity);
                     }
+                }
+            }
+        }
+    }
+}
+
+/// Checks if the player has won the game.
+#[derive(Default)]
+pub struct WinSystem;
+
+impl<'s> System<'s> for WinSystem {
+    type SystemData = (
+        ReadStorage<'s, Player>,
+        ReadStorage<'s, Steering>,
+        ReadStorage<'s, ExitDoor>,
+        ReadStorage<'s, Transform>,
+        Write<'s, WinCondition>,
+        Read<'s, LazyUpdate>,
+    );
+
+    fn run(&mut self, (players, steerings, doors, transforms, mut win, lazy): Self::SystemData) {
+        if win.reached_open_door || !win.all_keys_collected() {
+            return;
+        }
+        let player_collider = (&players, &steerings, &transforms)
+            .join()
+            .map(|(_, steering, transform)| {
+                (
+                    Vector2::new(transform.translation().x, transform.translation().y),
+                    Vector2::new(steering.dimens.x as f32, steering.dimens.y as f32),
+                )
+            })
+            .next();
+        if let Some((pos, dimens)) = player_collider {
+            for (_, door_transform) in (&doors, &transforms).join() {
+                let door_x = door_transform.translation().x;
+                let door_y = door_transform.translation().y;
+                if pos.x - dimens.x / 2. < door_x + DOOR_WIDTH / 3.
+                    && pos.x + dimens.x / 2. > door_x - DOOR_WIDTH / 3.
+                    && pos.y - dimens.y / 2. < door_y + DOOR_WIDTH / 3.
+                    && pos.y + dimens.y / 2. > door_y - DOOR_WIDTH / 3.
+                {
+                    win.reached_open_door = true;
+                    lazy.exec_mut(move |world| {
+                        UiHandles::add_ui(&UiType::WinMessage, world);
+                    });
                 }
             }
         }

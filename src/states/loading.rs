@@ -35,6 +35,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         }));
         let ui_handles = vec![
             (UiType::Fps, "ui/fps.ron"),
+            (UiType::WinMessage, "ui/win_message.ron"),
             (UiType::Save, "ui/save.ron"),
             (UiType::Editor, "ui/editor.ron"),
             (UiType::Paused, "ui/paused.ron"),

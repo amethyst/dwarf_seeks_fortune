@@ -48,6 +48,8 @@ impl UiHandles {
 pub enum UiType {
     /// Small debug FPS meter.
     Fps,
+    /// A message in the center of the screen that tells you that you completed the level.
+    WinMessage,
     /// Dialog that pops up when you want to save a level in the editor.
     Save,
     /// Ui for the level editor.

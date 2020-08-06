@@ -34,8 +34,8 @@ impl<'s> System<'s> for CursorSystem {
         (mut transforms, mut cursors, input, time, config, mut editor_data): Self::SystemData,
     ) {
         for (cursor, transform) in (&mut cursors, &mut transforms).join() {
-            let input_x = input.axis_value("move_x").unwrap_or(0.0);
-            let input_y = input.axis_value("move_y").unwrap_or(0.0);
+            let input_x = input.axis_value("pan_x").unwrap_or(0.0);
+            let input_y = input.axis_value("pan_y").unwrap_or(0.0);
             let new_direction = Direction2D::new(input_x, input_y);
             if cursor.last_direction.is_neutral() && !new_direction.is_neutral() {
                 // Start movement now. Move once, then set cooldown to High.

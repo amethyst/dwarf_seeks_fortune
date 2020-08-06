@@ -127,10 +127,11 @@ fn main() -> amethyst::Result<()> {
             "test_setup_system",
             &["input_system"],
         )
-        .with_core(systems::WinSystem, "win_system", &[])
+        .with_core(systems::KeyCollectionSystem, "key_collection_system", &[])
         .with_core(systems::PickupSystem, "pickup_system", &[])
         .with_core(systems::UseToolSystem, "use_tool_system", &[])
         .with_core(systems::LevelWrappingSystem, "level_wrapping_system", &[])
+        .with_core(systems::WinSystem, "win_system", &[])
         .with_base_bundle(
             &mut app_builder.world,
             PrecompiledRenderBundle {

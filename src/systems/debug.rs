@@ -11,7 +11,6 @@ pub struct DebugSystem;
 
 impl<'s> System<'s> for DebugSystem {
     type SystemData = (
-        ReadStorage<'s, ExitDoor>, //Temporarily added here so it inserts the storage into the world.
         WriteStorage<'s, Transform>,
         ReadStorage<'s, EditorRootTag>,
         ReadStorage<'s, Steering>,
@@ -23,7 +22,6 @@ impl<'s> System<'s> for DebugSystem {
     fn run(
         &mut self,
         (
-            _,
             mut transforms,
             root_tags,
             steerings,
