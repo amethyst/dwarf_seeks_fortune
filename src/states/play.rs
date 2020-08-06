@@ -35,6 +35,7 @@ use crate::states::{window_event_handler, EditorState, PausedState};
 
 pub struct PlayState {
     level_file: PathBuf,
+    // TODO: get rid of editor_mode, just push/pop instead.
     editor_mode: bool,
 }
 
@@ -75,6 +76,9 @@ impl<'a, 'b> PlayState {
             info!("Slowing down time, from x{:?} to x{:?}. This feature exists for debugging purposes only.", old_scale, new_scale);
             self.update_time_scale(world, new_scale);
             Trans::None
+        } else if action == "restart" {
+            self.reset_level(world);
+            Trans::None
         } else {
             Trans::None
         }
@@ -83,16 +87,20 @@ impl<'a, 'b> PlayState {
     fn update_time_scale(&self, world: &mut World, time_scale: f32) {
         world.write_resource::<Time>().set_time_scale(time_scale);
     }
+
+    fn reset_level(&self, world: &mut World) {
+        world.delete_all();
+        UiHandles::add_ui(&UiType::Fps, world);
+        create_camera(world);
+        load_level(&self.level_file, world).expect("Failed to load level!");
+    }
 }
 
 impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
     fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         info!("PlayState on_start");
         let StateData { world, .. } = data;
-        UiHandles::add_ui(&UiType::Fps, world);
-        create_camera(world);
-        world.insert(History::default());
-        load_level(&self.level_file, world).expect("Failed to load level!");
+        self.reset_level(world);
     }
 
     fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {

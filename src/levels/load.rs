@@ -106,6 +106,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     add_key_displays_to_door(world, &win_condition);
     world.insert(win_condition);
     world.insert(TileMap::new(level, tile_defs));
+    world.insert(History::default());
     Ok(())
 }
 
