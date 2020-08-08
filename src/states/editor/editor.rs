@@ -38,7 +38,7 @@ impl<'a, 'b> EditorState {
 
     fn setup(&self, world: &mut World) {
         UiHandles::add_ui(&UiType::Fps, world);
-        UiHandles::add_ui(&UiType::Editor, world);
+        // UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
         init_cursor(world);
         create_camera(world);

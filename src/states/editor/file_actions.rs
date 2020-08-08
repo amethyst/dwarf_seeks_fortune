@@ -42,6 +42,9 @@ pub fn auto_save(world: &mut World) -> Result<(), ConfigError> {
 }
 
 /// Store the current state of the LevelEdit to file. The given name will be used as a filename.
+/// TODO: check if name is reserved (ie: auto_save)
+/// TODO: check if level already exists, if so maybe ask to overwrite?
+///     (or keep track of which one we loaded, so we know whether it's safe to overwrite)
 pub fn save(name: String, world: &mut World) -> Result<(), ConfigError> {
     let level_file = get_levels_dir().join(name + ".ron");
     write_level_file(level_file, world)

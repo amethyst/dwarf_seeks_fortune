@@ -110,7 +110,7 @@ impl<'s> System<'s> for LevelWrappingSystem {
     fn run(&mut self, (mut steerings, mut transforms, tile_map): Self::SystemData) {
         for (transform, steering) in (&mut transforms, &mut steerings).join() {
             // TODO: also implement for left, right, top borders.
-            let (_anchored_x, anchored_y) = steering.to_anchor_coords(transform);
+            let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             if anchored_y < tile_map.pos.y as f32 {
                 transform.set_translation_y(transform.translation().y + tile_map.dimens.y as f32);
                 match steering.mode {
@@ -127,6 +127,11 @@ impl<'s> System<'s> for LevelWrappingSystem {
                     }
                     _ => (),
                 };
+            }
+            if anchored_x < tile_map.pos.x as f32 {
+                transform.set_translation_x(transform.translation().x + tile_map.dimens.x as f32);
+            } else if anchored_x > (tile_map.pos.x + tile_map.dimens.x) as f32 {
+                transform.set_translation_x(transform.translation().x - tile_map.dimens.x as f32);
             }
         }
     }

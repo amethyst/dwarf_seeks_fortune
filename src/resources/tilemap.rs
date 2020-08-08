@@ -10,17 +10,6 @@ pub struct TileMap {
     tile_defs: TileDefinitions,
 }
 
-#[derive(Debug)]
-pub enum Tile {
-    /// A dummy tile, points towards its anchor point, where the real tile is stored.
-    /// Dummy tiles are used when a tile is bigger than 1 by 1. The bottom-left position within the
-    /// tile will be set as the tile itself. All other positions will contain a dummy that points
-    /// towards that bottom-left position.
-    Dummy(Pos),
-    /// A tile. Contains a tile definition key.
-    Key(String),
-}
-
 impl TileMap {
     pub fn new(level: Level, tile_defs: TileDefinitions) -> Self {
         let mut tiles = HashMap::new();
@@ -29,7 +18,7 @@ impl TileMap {
             for x in 0..dimens.x {
                 for y in 0..dimens.y {
                     let tile = if x == 0 && y == 0 {
-                        Tile::Key(key.clone())
+                        Tile::TileDefKey(key.clone())
                     } else {
                         Tile::Dummy(*pos)
                     };
@@ -55,13 +44,13 @@ impl TileMap {
             .get(pos)
             .map(|tile| match tile {
                 Tile::Dummy(pos) => match self.tiles.get(pos) {
-                    Some(Tile::Key(key)) => Some(key),
+                    Some(Tile::TileDefKey(key)) => Some(key),
                     _ => {
                         error!("Error! Dummy position lookup failed for tile {:?}", tile);
                         None
                     }
                 },
-                Tile::Key(key) => Some(key),
+                Tile::TileDefKey(key) => Some(key),
             })
             .flatten()
             .map(|tile_def_key| self.tile_defs.get(tile_def_key))
@@ -69,4 +58,15 @@ impl TileMap {
     pub fn remove_tile(&mut self, pos: &Pos) {
         self.tiles.remove(pos);
     }
+}
+
+#[derive(Debug)]
+pub enum Tile {
+    /// A dummy tile, points towards its anchor point, where the real tile is stored.
+    /// Dummy tiles are used when a tile is bigger than 1 by 1. The bottom-left position within the
+    /// tile will be set as the tile itself. All other positions will contain a dummy that points
+    /// towards that bottom-left position.
+    Dummy(Pos),
+    /// A tile. Contains a tile definition key.
+    TileDefKey(String),
 }
