@@ -96,7 +96,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     Ok(())
 }
 
-fn add_background(world: &mut World, pos: &Pos, dimens: &Pos) {
+pub fn add_background(world: &mut World, pos: &Pos, dimens: &Pos) {
     let transform = load_transform(
         pos,
         &DepthLayer::Background,
@@ -104,7 +104,12 @@ fn add_background(world: &mut World, pos: &Pos, dimens: &Pos) {
         &AssetType::Still(SpriteType::Selection, 1),
     );
     let asset = load_asset_from_world(&SpriteType::Selection, 1, world);
-    world.create_entity().with(transform).with(asset).build();
+    world
+        .create_entity()
+        .with(Background)
+        .with(transform)
+        .with(asset)
+        .build();
 }
 
 fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {

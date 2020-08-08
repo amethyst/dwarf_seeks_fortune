@@ -151,6 +151,7 @@ pub struct TilePaintSystem;
 impl<'s> System<'s> for TilePaintSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        ReadStorage<'s, Background>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Handle<Prefab<MyPrefabData>>>,
@@ -164,6 +165,7 @@ impl<'s> System<'s> for TilePaintSystem {
     fn run(
         &mut self,
         (
+            _backgrounds,
             mut transforms,
             mut sprite_renders,
             mut anims,

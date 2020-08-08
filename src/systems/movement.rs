@@ -1,6 +1,7 @@
 use crate::components::*;
 
 use crate::resources::*;
+use amethyst::core::num::FloatConst;
 use amethyst::{
     core::timing::Time,
     core::transform::Transform,
@@ -109,10 +110,25 @@ impl<'s> System<'s> for LevelWrappingSystem {
 
     fn run(&mut self, (mut steerings, mut transforms, tile_map): Self::SystemData) {
         for (transform, steering) in (&mut transforms, &mut steerings).join() {
-            // TODO: also implement for left, right, top borders.
-            let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
-            if anchored_y < tile_map.pos.y as f32 {
+            transform.set_rotation_y_axis(if steering.facing.x == Direction1D::Negative {
+                f32::PI()
+            } else {
+                0.
+            });
+            if transform.translation().x < tile_map.pos.x as f32 {
+                transform.set_translation_x(transform.translation().x + tile_map.dimens.x as f32);
+                steering.pos.x += tile_map.dimens.x;
+                steering.destination.x += tile_map.dimens.x;
+            } else if transform.translation().x > (tile_map.pos.x + tile_map.dimens.x) as f32 {
+                transform.set_translation_x(transform.translation().x - tile_map.dimens.x as f32);
+                steering.pos.x -= tile_map.dimens.x;
+                steering.destination.x -= tile_map.dimens.x;
+            }
+
+            if transform.translation().y < tile_map.pos.y as f32 {
                 transform.set_translation_y(transform.translation().y + tile_map.dimens.y as f32);
+                steering.pos.y += tile_map.dimens.y;
+                steering.destination.y += tile_map.dimens.y;
                 match steering.mode {
                     SteeringMode::Falling {
                         x_movement,
@@ -127,11 +143,9 @@ impl<'s> System<'s> for LevelWrappingSystem {
                     }
                     _ => (),
                 };
-            }
-            if anchored_x < tile_map.pos.x as f32 {
-                transform.set_translation_x(transform.translation().x + tile_map.dimens.x as f32);
-            } else if anchored_x > (tile_map.pos.x + tile_map.dimens.x) as f32 {
-                transform.set_translation_x(transform.translation().x - tile_map.dimens.x as f32);
+            } else if transform.translation().y > (tile_map.pos.y + tile_map.dimens.y) as f32 {
+                steering.pos.y -= tile_map.dimens.y;
+                steering.destination.y -= tile_map.dimens.y;
             }
         }
     }

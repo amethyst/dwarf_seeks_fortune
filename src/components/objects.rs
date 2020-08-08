@@ -1,6 +1,7 @@
 use crate::components::Pos;
 use crate::levels::ToolType;
 use crate::resources::SpriteType;
+use amethyst::core::ecs::NullStorage;
 use amethyst::{
     assets::PrefabData,
     derive::PrefabData,
@@ -62,6 +63,19 @@ impl KeyDisplay {
 }
 
 /// The exit door.
-#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct ExitDoor;
+
+impl Component for ExitDoor {
+    type Storage = NullStorage<Self>;
+}
+
+/// The blue background sprite.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[prefab(Component)]
+pub struct Background;
+
+impl Component for Background {
+    type Storage = NullStorage<Self>;
+}

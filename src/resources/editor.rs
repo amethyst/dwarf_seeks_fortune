@@ -10,11 +10,21 @@ use crate::levels::*;
 /// An instance of LevelEdit can be transformed into a Level.
 /// The main difference between this struct and the Level struct used by the game is
 /// that this struct contains additional information that makes it easier to manipulate it.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct LevelEdit {
     pub pos: Pos,
     pub dimens: Pos,
     pub tile_map: HashMap<Pos, TileEdit>,
+}
+
+impl Default for LevelEdit {
+    fn default() -> Self {
+        LevelEdit {
+            pos: Pos::new(-20, -10),
+            dimens: Pos::new(40, 20),
+            tile_map: HashMap::default(),
+        }
+    }
 }
 
 impl LevelEdit {

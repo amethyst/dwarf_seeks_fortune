@@ -24,6 +24,7 @@ use crate::states::editor::file_actions::{auto_save, auto_save_file, load_auto_s
 use crate::states::editor::paint::erase_tiles;
 use crate::states::editor::paint::paint_tiles;
 use crate::states::{window_event_handler, PlayState};
+use amethyst::core::ecs::Read;
 
 pub struct EditorState;
 
@@ -44,6 +45,7 @@ impl<'a, 'b> EditorState {
         create_camera(world);
         let mut editor_data = EditorData::default();
         if let Ok(level_edit) = load_auto_save() {
+            add_background(world, &level_edit.pos, &level_edit.dimens);
             editor_data.level = level_edit;
         }
         let tile_defs = load_tile_definitions().expect("Tile definitions failed to load!");
@@ -60,6 +62,11 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         self.setup(world);
     }
 
+    fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+        info!("EditorState on_stop");
+        data.world.delete_all();
+    }
+
     fn on_pause(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         info!("EditorState on_pause");
         data.world.delete_all();
@@ -68,11 +75,6 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
     fn on_resume(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
         info!("EditorState on_resume");
         self.setup(data.world);
-    }
-
-    fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
-        info!("EditorState on_stop");
-        data.world.delete_all();
     }
 
     fn handle_event(
@@ -94,6 +96,13 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
             // Ui event. Button presses, mouse hover, etc...
             StateEvent::Ui(_) => Trans::None,
             StateEvent::Input(input_event) => match input_event {
+                InputEvent::KeyReleased {
+                    key_code: VirtualKeyCode::F8,
+                    scancode: _,
+                } => {
+                    redo_background(data.world);
+                    Trans::None
+                }
                 InputEvent::KeyReleased {
                     key_code: VirtualKeyCode::Return,
                     scancode: _,
@@ -175,6 +184,19 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         data.data.update(&world, true);
         Trans::None
     }
+}
+
+fn redo_background(world: &mut World) {
+    world.exec(
+        |(level, backgrounds, entities): (Read<LevelEdit>, ReadStorage<Background>, Entities)| {
+            for (_, entity) in (&backgrounds, &entities).join() {
+                entities
+                    .delete(entity)
+                    .expect("Failed to delete background.");
+            }
+        },
+    );
+    // add_background(world, level.);
 }
 
 fn init_cursor(world: &mut World) {
