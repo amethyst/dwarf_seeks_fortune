@@ -1,19 +1,14 @@
-[package]
-name = "dwarf_seeks_fortune"
-version = "0.1.0"
-authors = ["Jazarro <nospam.git@boschman.io>"]
-edition = "2018"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-rand = "0.7.0"
-log = { version = "0.4.6", features = ["serde"] }
-serde = { version = "1.0", features = ["derive"] }
-derive-new = "0.5"
-specs-derive = "0.4"
-precompile = { path = "precompile" }
-# Windows / Linux users, use the following line:
-amethyst = {version = "0.15.0", features = ["vulkan"]}
-# Mac users, use the following line:
-#amethyst = {version = "0.15.0", features = ["metal"]}
+members = [
+    # Prepares some bundles. The main reason this is split off is to improve compilation times.
+    "dsf_precompile",
+    # Contains all the core game code.
+    "dsf_core",
+    # Contains all code partaining to the level editor.
+    "dsf_editor",
+    # Contains all code partaining to the automated checks.
+    "dsf_checks",
+    # The main binary, contains the starting point of the application.
+    "dwarf_seeks_fortune",
+]
