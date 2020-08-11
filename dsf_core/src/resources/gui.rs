@@ -17,12 +17,12 @@ impl UiHandles {
         self
     }
 
-    /// TODO: Get rid of expect call.
     pub fn clone_handle(&self, key: &UiType) -> Handle<UiPrefab> {
-        self.map
+        (*self
+            .map
             .get(key)
-            .unwrap_or_else(|| panic!("Tried loading UI element {:?} but failed!", key))
-            .clone()
+            .unwrap_or_else(|| panic!("Tried loading UI element {:?} but failed!", key)))
+        .clone()
     }
 
     /// Convenience method that grabs the correct UiHandle and usues it to create an entity.
