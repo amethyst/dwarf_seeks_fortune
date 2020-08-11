@@ -20,24 +20,41 @@ use crate::resources::*;
 use crate::states::file_actions::{auto_save, auto_save_file, load_auto_save};
 use crate::states::paint::erase_tiles;
 use crate::states::paint::paint_tiles;
-use amethyst::core::ecs::Read;
+use crate::systems;
+use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read};
 use dsf_core::components::{Background, Pos};
 use dsf_core::entities::*;
-use dsf_core::game_data::CustomGameData;
 use dsf_core::levels::*;
 use dsf_core::resources::{
     get_asset_dimensions, setup_debug_lines, AssetType, Assets, SpriteType, UiHandles, UiType,
 };
 use dsf_core::states::{window_event_handler, PlayState};
 
-pub struct EditorState;
+pub struct EditorState {
+    dispatcher: Dispatcher<'static, 'static>,
+}
 
 impl<'a, 'b> EditorState {
-    fn handle_action(
-        &mut self,
-        _action: &str,
-        _world: &mut World,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+    pub fn new() -> Self {
+        EditorState {
+            dispatcher: DispatcherBuilder::new()
+                .with(systems::CursorPreviewSystem, "cursor_preview_system", &[])
+                .with(systems::CursorSystem, "cursor_system", &[])
+                .with(
+                    systems::SelectionSystem,
+                    "selection_system",
+                    &["cursor_system"],
+                )
+                .with(
+                    systems::TilePaintSystem,
+                    "tile_paint_system",
+                    &["selection_system"],
+                )
+                .build(),
+        }
+    }
+
+    fn handle_action(&mut self, _action: &str, _world: &mut World) -> SimpleTrans {
         Trans::None
     }
 
@@ -59,33 +76,29 @@ impl<'a, 'b> EditorState {
     }
 }
 
-impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
-    fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+impl SimpleState for EditorState {
+    fn on_start(&mut self, data: StateData<GameData>) {
         info!("EditorState on_start");
-        let StateData { world, .. } = data;
-        self.setup(world);
+        self.dispatcher.setup(data.world);
+        self.setup(data.world);
     }
 
-    fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+    fn on_stop(&mut self, data: StateData<GameData>) {
         info!("EditorState on_stop");
         data.world.delete_all();
     }
 
-    fn on_pause(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+    fn on_pause(&mut self, data: StateData<GameData>) {
         info!("EditorState on_pause");
         data.world.delete_all();
     }
 
-    fn on_resume(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+    fn on_resume(&mut self, data: StateData<GameData>) {
         info!("EditorState on_resume");
         self.setup(data.world);
     }
 
-    fn handle_event(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-        event: StateEvent,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         match event {
             // Events related to the window and inputs.
@@ -157,13 +170,10 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
         }
     }
 
-    fn update(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        let StateData { world, .. } = data;
+    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+        self.dispatcher.dispatch(&data.world);
         // Execute a pass similar to a system
-        world.exec(
+        data.world.exec(
             #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
                 Entities,
@@ -185,7 +195,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for EditorState {
                 }
             },
         );
-        data.data.update(&world, true);
+        data.data.update(&data.world);
         Trans::None
     }
 }

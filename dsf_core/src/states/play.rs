@@ -2,7 +2,6 @@ use std::path::PathBuf;
 
 use amethyst::prelude::WorldExt;
 
-use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
     animation::{
@@ -15,16 +14,20 @@ use amethyst::{
     utils::application_root_dir,
     StateData, Trans,
 };
+use amethyst::{GameData, SimpleState, SimpleTrans, State};
 
 use dsf_precompile::AnimationId;
 
 use crate::entities::*;
-use crate::game_data::CustomGameData;
 use crate::levels::*;
 use crate::resources::*;
 use crate::states::window_event_handler;
+use crate::systems;
+use amethyst::core::ecs::{Dispatcher, DispatcherBuilder};
+use amethyst::core::SystemExt;
 
 pub struct PlayState {
+    dispatcher: Dispatcher<'static, 'static>,
     level_file: PathBuf,
 }
 
@@ -36,19 +39,55 @@ impl<'a, 'b> PlayState {
             .join("../assets/")
             .join("levels/")
             .join("demo_level.ron");
-        PlayState { level_file }
+        PlayState::new(level_file)
     }
 
     /// Creates a new PlayState that will load the given level.
     pub fn new(level_file: PathBuf) -> Self {
-        PlayState { level_file }
+        PlayState {
+            level_file,
+            dispatcher: DispatcherBuilder::new()
+                .with(
+                    systems::PlayerSystem::default().pausable(CurrentState::Running),
+                    "player_system",
+                    &[],
+                )
+                .with(
+                    systems::SteeringSystem::default().pausable(CurrentState::Running),
+                    "steering_system",
+                    &["player_system"],
+                )
+                .with(
+                    systems::MovementSystem.pausable(CurrentState::Running),
+                    "movement_system",
+                    &["steering_system"],
+                )
+                .with(
+                    systems::VelocitySystem.pausable(CurrentState::Running),
+                    "velocity_system",
+                    &["movement_system"],
+                )
+                .with(
+                    systems::RewindControlSystem,
+                    "rewind_control_system",
+                    &["player_system"],
+                )
+                .with(
+                    systems::RewindSystem.pausable(CurrentState::Rewinding),
+                    "rewind_system",
+                    &["rewind_control_system"],
+                )
+                .with(systems::DebugSystem, "debug_system", &[])
+                .with(systems::KeyCollectionSystem, "key_collection_system", &[])
+                .with(systems::PickupSystem, "pickup_system", &[])
+                .with(systems::UseToolSystem, "use_tool_system", &[])
+                .with(systems::LevelWrappingSystem, "level_wrapping_system", &[])
+                .with(systems::WinSystem, "win_system", &[])
+                .build(),
+        }
     }
 
-    fn handle_action(
-        &mut self,
-        action: &str,
-        world: &mut World,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+    fn handle_action(&mut self, action: &str, world: &mut World) -> SimpleTrans {
         if action == "speedUp" {
             let (old_scale, new_scale) = (*world.fetch_mut::<DebugConfig>()).increase_speed();
             info!("Speeding up time, from x{:?} to x{:?}. This feature exists for debugging purposes only.", old_scale, new_scale);
@@ -79,23 +118,19 @@ impl<'a, 'b> PlayState {
     }
 }
 
-impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
-    fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+impl SimpleState for PlayState {
+    fn on_start(&mut self, data: StateData<GameData>) {
         info!("PlayState on_start");
-        let StateData { world, .. } = data;
-        self.reset_level(world);
+        self.dispatcher.setup(data.world);
+        self.reset_level(data.world);
     }
 
-    fn on_stop(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+    fn on_stop(&mut self, data: StateData<GameData>) {
         info!("PlayState on_stop");
         data.world.delete_all();
     }
 
-    fn handle_event(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-        event: StateEvent,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         match event {
             // Events related to the window and inputs.
@@ -120,13 +155,10 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
         }
     }
 
-    fn update(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        let StateData { world, .. } = data;
+    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+        self.dispatcher.dispatch(&data.world);
         // Execute a pass similar to a system
-        world.exec(
+        data.world.exec(
             #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
                 Entities,
@@ -148,7 +180,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for PlayState {
                 }
             },
         );
-        data.data.update(&world, true);
+        data.data.update(&data.world);
         Trans::None
     }
 }

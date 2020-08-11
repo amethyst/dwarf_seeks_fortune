@@ -18,11 +18,11 @@ use amethyst::{
     utils::fps_counter::FpsCounterBundle,
 };
 
-pub struct PrecompiledRenderBundle<'a> {
-    pub display_config_path: &'a PathBuf,
+pub struct PrecompiledRenderBundle {
+    pub display_config_path: PathBuf,
 }
 
-impl<'a, 'b> SystemBundle<'a, 'b> for PrecompiledRenderBundle<'_> {
+impl<'a, 'b> SystemBundle<'a, 'b> for PrecompiledRenderBundle {
     fn build(
         self,
         world: &mut World,
@@ -46,11 +46,11 @@ impl<'a, 'b> SystemBundle<'a, 'b> for PrecompiledRenderBundle<'_> {
     }
 }
 
-pub struct PrecompiledDefaultsBundle<'a> {
-    pub bindings_config_path: &'a PathBuf,
+pub struct PrecompiledDefaultsBundle {
+    pub bindings_config_path: PathBuf,
 }
 
-impl<'a, 'b, 'c> SystemBundle<'a, 'b> for PrecompiledDefaultsBundle<'c> {
+impl<'a, 'b> SystemBundle<'a, 'b> for PrecompiledDefaultsBundle {
     fn build(
         self,
         world: &mut World,

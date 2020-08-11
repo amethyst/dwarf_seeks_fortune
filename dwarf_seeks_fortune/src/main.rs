@@ -12,10 +12,10 @@ use amethyst::{
     audio::Source,
     core::SystemDesc,
     utils::application_root_dir,
-    Application, LoggerConfig,
+    Application, GameDataBuilder, LoggerConfig,
 };
 use dsf_checks::systems as checks_systems;
-use dsf_core::game_data::CustomGameDataBuilder;
+
 use dsf_core::resources::{CurrentState, DebugConfig, MovementConfig};
 use dsf_core::systems;
 use dsf_editor::resources::EditorConfig;
@@ -40,98 +40,30 @@ fn main() -> amethyst::Result<()> {
     app_builder.world.insert(debug_config);
     app_builder.world.insert(editor_config);
     app_builder.world.insert(movement_config);
-    let game_data = CustomGameDataBuilder::default()
-        .with_base_bundle(
-            &mut app_builder.world,
-            PrecompiledDefaultsBundle {
-                bindings_config_path: &bindings_config_path,
-            },
-        )?
-        .with_core(
+    let game_data = GameDataBuilder::default()
+        .with_bundle(PrecompiledDefaultsBundle {
+            bindings_config_path,
+        })?
+        .with(
             PrefabLoaderSystemDesc::<MyPrefabData>::default().build(&mut app_builder.world),
             "scene_loader",
             &[],
         )
-        .with_core(Processor::<Source>::new(), "source_processor", &[])
-        .with_core(
-            systems::UiEventHandlerSystem::new(),
-            "ui_event_handler",
-            &[],
-        )
-        .with_core(
+        .with(Processor::<Source>::new(), "source_processor", &[])
+        .with(
             systems::FpsCounterUiSystem::default(),
             "fps_counter_ui_system",
             &[],
         )
-        .with_core(
-            systems::PlayerSystem::default().pausable(CurrentState::Running),
-            "player_system",
-            &["input_system"],
-        )
-        .with_core(
-            systems::SteeringSystem::default().pausable(CurrentState::Running),
-            "steering_system",
-            &["player_system"],
-        )
-        .with_core(
-            systems::MovementSystem.pausable(CurrentState::Running),
-            "movement_system",
-            &["steering_system"],
-        )
-        .with_core(
-            systems::VelocitySystem.pausable(CurrentState::Running),
-            "velocity_system",
-            &["movement_system"],
-        )
-        .with_core(systems::DebugSystem, "debug_system", &["input_system"])
-        .with_core(systems::CameraSystem, "camera_system", &[])
-        .with_core(
+        .with(systems::CameraSystem, "camera_system", &[])
+        .with(
             systems::CameraControlSystem,
             "camera_control_system",
             &["camera_system"],
         )
-        .with_core(
-            systems::RewindControlSystem,
-            "rewind_control_system",
-            &["player_system"],
-        )
-        .with_core(
-            systems::RewindSystem.pausable(CurrentState::Rewinding),
-            "rewind_system",
-            &["rewind_control_system", "input_system"],
-        )
-        .with_core(
-            editor_systems::CursorPreviewSystem,
-            "cursor_preview_system",
-            &[],
-        )
-        .with_core(editor_systems::CursorSystem, "cursor_system", &[])
-        .with_core(
-            editor_systems::SelectionSystem,
-            "selection_system",
-            &["cursor_system"],
-        )
-        .with_core(
-            editor_systems::TilePaintSystem,
-            "tile_paint_system",
-            &["selection_system"],
-        )
-        .with_core(
-            checks_systems::TestSetupSystem::default(),
-            "test_setup_system",
-            &["input_system"],
-        )
-        .with_core(systems::KeyCollectionSystem, "key_collection_system", &[])
-        .with_core(systems::PickupSystem, "pickup_system", &[])
-        .with_core(systems::UseToolSystem, "use_tool_system", &[])
-        .with_core(systems::LevelWrappingSystem, "level_wrapping_system", &[])
-        .with_core(systems::WinSystem, "win_system", &[])
-        .with_base_bundle(
-            &mut app_builder.world,
-            PrecompiledRenderBundle {
-                display_config_path: &display_config_path,
-            },
-        )?;
+        .with_bundle(PrecompiledRenderBundle {
+            display_config_path,
+        })?;
     let mut game = app_builder.build(game_data)?;
     game.run();
     Ok(())

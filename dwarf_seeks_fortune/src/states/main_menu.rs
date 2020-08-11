@@ -2,10 +2,10 @@ use amethyst::{
     ecs::prelude::{Entity, WorldExt},
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     ui::{UiEvent, UiEventType, UiFinder},
-    State, StateData, StateEvent, Trans,
+    GameData, SimpleState, SimpleTrans, State, StateData, StateEvent, Trans,
 };
 use dsf_checks::states::MovementTestState;
-use dsf_core::game_data::CustomGameData;
+
 use dsf_core::resources::{DebugConfig, UiHandles, UiType};
 use dsf_core::states::{window_event_handler, PlayState};
 use dsf_editor::states::EditorState;
@@ -29,11 +29,11 @@ impl MainMenuState {
         MainMenuState::default()
     }
 
-    fn init_ui(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+    fn init_ui(&mut self, data: StateData<GameData>) {
         UiHandles::add_ui(&UiType::Fps, data.world);
         self.ui = UiHandles::add_ui(&UiType::MainMenu, data.world);
         // invoke a world update to finish creating our ui entities
-        data.data.update(&data.world, false);
+        data.data.update(&data.world);
         // look up our buttons
         data.world.exec(|ui_finder: UiFinder<'_>| {
             self.play_button = ui_finder.find(PLAY_BUTTON_ID);
@@ -44,13 +44,13 @@ impl MainMenuState {
     }
 }
 
-impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
-    fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+impl SimpleState for MainMenuState {
+    fn on_start(&mut self, data: StateData<GameData>) {
         info!("MainMenuState on_start");
         self.init_ui(data);
     }
 
-    fn on_pause(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+    fn on_pause(&mut self, data: StateData<GameData>) {
         info!("MainMenuState on_pause");
         data.world.delete_all();
         self.play_button = None;
@@ -59,16 +59,12 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
         self.exit_button = None;
     }
 
-    fn on_resume(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+    fn on_resume(&mut self, data: StateData<GameData>) {
         info!("MainMenuState on_resume");
         self.init_ui(data);
     }
 
-    fn handle_event(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-        event: StateEvent,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         match event {
             StateEvent::Window(event) => {
@@ -85,9 +81,9 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
                 if Some(target) == self.play_button {
                     Trans::Push(Box::new(PlayState::demo()))
                 } else if Some(target) == self.editor_button {
-                    Trans::Push(Box::new(EditorState))
+                    Trans::Push(Box::new(EditorState::new()))
                 } else if Some(target) == self.movement_test_button {
-                    Trans::Push(Box::new(MovementTestState))
+                    Trans::Push(Box::new(MovementTestState::new()))
                 } else if Some(target) == self.exit_button {
                     Trans::Quit
                 } else {
@@ -98,18 +94,15 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for MainMenuState {
         }
     }
 
-    fn update(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
         let skip_straight_to_editor =
             (*data.world.read_resource::<DebugConfig>()).skip_straight_to_editor;
         if skip_straight_to_editor {
             info!("Bypassing main menu, skipping straight to editor.");
             (*data.world.write_resource::<DebugConfig>()).skip_straight_to_editor = false;
-            Trans::Push(Box::new(EditorState))
+            Trans::Push(Box::new(EditorState::new()))
         } else {
-            data.data.update(&data.world, false);
+            data.data.update(&data.world);
             Trans::None
         }
     }

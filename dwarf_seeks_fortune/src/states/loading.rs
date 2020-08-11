@@ -20,7 +20,6 @@ use amethyst::{
 use dsf_precompile::MyPrefabData;
 
 use crate::states::MainMenuState;
-use dsf_core::game_data::CustomGameData;
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -28,8 +27,8 @@ pub struct LoadingState {
     load_ui: Option<Entity>,
 }
 
-impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
-    fn on_start(&mut self, data: StateData<'_, CustomGameData<'_, '_>>) {
+impl SimpleState for LoadingState {
+    fn on_start(&mut self, data: StateData<GameData>) {
         init_output(data.world);
         self.load_ui = Some(data.world.exec(|mut creator: UiCreator<'_>| {
             creator.create("ui/loading.ron", &mut self.progress)
@@ -114,11 +113,7 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         data.world.insert(assets);
     }
 
-    fn handle_event(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-        event: StateEvent,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
+    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         if let StateEvent::Window(event) = event {
             if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
@@ -128,11 +123,8 @@ impl<'a, 'b> State<CustomGameData<'a, 'b>, StateEvent> for LoadingState {
         Trans::None
     }
 
-    fn update(
-        &mut self,
-        data: StateData<'_, CustomGameData<'_, '_>>,
-    ) -> Trans<CustomGameData<'a, 'b>, StateEvent> {
-        data.data.update(&data.world, true);
+    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+        data.data.update(&data.world);
         match self.progress.complete() {
             Completion::Failed => {
                 error!("Failed loading assets");

@@ -6,7 +6,6 @@ extern crate log;
 
 pub mod components;
 pub mod entities;
-pub mod game_data;
 pub mod levels;
 pub mod resources;
 pub mod states;
