@@ -49,30 +49,3 @@ impl<'a> System<'a> for FpsCounterUiSystem {
         }
     }
 }
-
-/// This shows how to handle UI events.
-#[derive(Default)]
-pub struct UiEventHandlerSystem {
-    reader_id: Option<ReaderId<UiEvent>>,
-}
-
-impl UiEventHandlerSystem {
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
-impl<'a> System<'a> for UiEventHandlerSystem {
-    type SystemData = Write<'a, EventChannel<UiEvent>>;
-
-    fn run(&mut self, mut events: Self::SystemData) {
-        let reader_id = self
-            .reader_id
-            .get_or_insert_with(|| events.register_reader());
-
-        // Reader id was just initialized above if empty
-        for ev in events.read(reader_id) {
-            debug!("[SYSTEM] You just interacted with a ui element: {:?}", ev);
-        }
-    }
-}

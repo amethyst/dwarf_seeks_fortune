@@ -2,7 +2,9 @@ use amethyst::audio::output::init_output;
 use amethyst::prelude::WorldExt;
 use amethyst::ui::UiCreator;
 use amethyst::ui::UiLoader;
-use dsf_core::resources::{AnimType, Assets, SpriteType, UiHandles, UiType};
+use dsf_core::resources::{
+    AnimType, Assets, DebugConfig, MovementConfig, SpriteType, UiHandles, UiType,
+};
 use dsf_core::states::window_event_handler;
 
 use amethyst::State;
@@ -20,6 +22,8 @@ use amethyst::{
 use dsf_precompile::MyPrefabData;
 
 use crate::states::MainMenuState;
+use amethyst::utils::application_root_dir;
+use dsf_editor::resources::EditorConfig;
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -29,6 +33,7 @@ pub struct LoadingState {
 
 impl SimpleState for LoadingState {
     fn on_start(&mut self, data: StateData<GameData>) {
+        load_configs(data.world);
         init_output(data.world);
         self.load_ui = Some(data.world.exec(|mut creator: UiCreator<'_>| {
             creator.create("ui/loading.ron", &mut self.progress)
@@ -142,7 +147,7 @@ impl SimpleState for LoadingState {
     }
 }
 
-pub fn load_texture<N>(name: N, world: &World, progress: &mut ProgressCounter) -> Handle<Texture>
+fn load_texture<N>(name: N, world: &World, progress: &mut ProgressCounter) -> Handle<Texture>
 where
     N: Into<String>,
 {
@@ -155,7 +160,7 @@ where
     )
 }
 
-pub fn load_spritesheet<N>(
+fn load_spritesheet<N>(
     texture_name: N,
     spritesheet_name: N,
     world: &World,
@@ -174,7 +179,7 @@ where
     )
 }
 
-pub fn load_animation<N>(
+fn load_animation<N>(
     prefab_name: N,
     world: &mut World,
     progress: &mut ProgressCounter,
@@ -185,4 +190,38 @@ where
     world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
         loader.load(prefab_name, RonFormat, progress)
     })
+}
+
+fn load_configs(world: &mut World) {
+    let config_dir = application_root_dir()
+        .expect("Failed to get application root directory!")
+        .join("../assets/")
+        .join("config/");
+    world.insert(
+        DebugConfig::load(&config_dir.join("debug.ron")).unwrap_or_else(|error| {
+            error!(
+                "Failed to load debug config! Falling back to default. Error: {:?}",
+                error
+            );
+            DebugConfig::default()
+        }),
+    );
+    world.insert(
+        MovementConfig::load(&config_dir.join("movement.ron")).unwrap_or_else(|error| {
+            error!(
+                "Failed to load movement config! Falling back to default. Error: {:?}",
+                error
+            );
+            MovementConfig::default()
+        }),
+    );
+    world.insert(
+        EditorConfig::load(&config_dir.join("editor.ron")).unwrap_or_else(|error| {
+            error!(
+                "Failed to load editor config! Falling back to default. Error: {:?}",
+                error
+            );
+            EditorConfig::default()
+        }),
+    );
 }

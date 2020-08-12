@@ -11,4 +11,5 @@ mod startup;
 mod structs;
 
 pub use self::bundles::{PrecompiledDefaultsBundle, PrecompiledRenderBundle};
+pub use self::startup::*;
 pub use self::structs::{AnimationId, MyPrefabData};

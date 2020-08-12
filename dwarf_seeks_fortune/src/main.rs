@@ -11,6 +11,7 @@ use amethyst::{
     assets::{PrefabLoaderSystemDesc, Processor},
     audio::Source,
     core::SystemDesc,
+    prelude::*,
     utils::application_root_dir,
     Application, GameDataBuilder, LoggerConfig,
 };
@@ -20,9 +21,9 @@ use dsf_core::resources::{CurrentState, DebugConfig, MovementConfig};
 use dsf_core::systems;
 use dsf_editor::resources::EditorConfig;
 use dsf_editor::systems as editor_systems;
-use dsf_precompile::MyPrefabData;
 use dsf_precompile::PrecompiledDefaultsBundle;
 use dsf_precompile::PrecompiledRenderBundle;
+use dsf_precompile::{start_game, MyPrefabData};
 
 fn main() -> amethyst::Result<()> {
     amethyst::Logger::from_config(LoggerConfig::default()).start();
@@ -32,21 +33,13 @@ fn main() -> amethyst::Result<()> {
     let display_config_path = config_dir.join("display.ron");
     let bindings_config_path = config_dir.join("input.ron");
 
-    let mut app_builder = Application::build(assets_dir, states::LoadingState::default())?;
-
-    let debug_config = DebugConfig::load(&config_dir.join("debug.ron"))?;
-    let editor_config = EditorConfig::load(&config_dir.join("editor.ron"))?;
-    let movement_config = MovementConfig::load(&config_dir.join("movement.ron"))?;
-    app_builder.world.insert(debug_config);
-    app_builder.world.insert(editor_config);
-    app_builder.world.insert(movement_config);
     let game_data = GameDataBuilder::default()
         .with_bundle(PrecompiledDefaultsBundle {
             bindings_config_path,
         })?
-        .with(
-            PrefabLoaderSystemDesc::<MyPrefabData>::default().build(&mut app_builder.world),
-            "scene_loader",
+        .with_system_desc(
+            PrefabLoaderSystemDesc::<MyPrefabData>::default(),
+            "prefab_loader",
             &[],
         )
         .with(Processor::<Source>::new(), "source_processor", &[])
@@ -64,7 +57,11 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(PrecompiledRenderBundle {
             display_config_path,
         })?;
-    let mut game = app_builder.build(game_data)?;
-    game.run();
+
+    start_game(
+        assets_dir,
+        game_data,
+        Some(Box::new(states::LoadingState::default())),
+    );
     Ok(())
 }
