@@ -1,6 +1,5 @@
 use amethyst::prelude::WorldExt;
 
-use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
     animation::{

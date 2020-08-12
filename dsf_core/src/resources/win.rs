@@ -7,6 +7,8 @@ use crate::components::*;
 /// opens. When the player then reaches the door, they complete the level.
 #[derive(Debug, Default)]
 pub struct WinCondition {
+    /// The set of positions of keys that are left in the level. If this collection is empty, then
+    /// the player has collected all keys and is free to finish the level by reaching the exit door.
     pub keys: HashSet<Pos>,
     /// This is set to true when the player has collected all keys and then subsequently reached
     /// the exit door. If this is true, the player has completed the level.

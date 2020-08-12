@@ -7,7 +7,6 @@ use dsf_core::resources::{
 };
 use dsf_core::states::window_event_handler;
 
-use amethyst::State;
 use amethyst::StateEvent;
 use amethyst::{
     assets::{

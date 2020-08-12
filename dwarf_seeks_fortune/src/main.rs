@@ -1,4 +1,3 @@
-#![allow(dead_code, unused_imports, unused_variables)]
 #![forbid(unsafe_code)]
 
 #[macro_use]
@@ -6,22 +5,15 @@ extern crate log;
 
 mod states;
 
-use amethyst::prelude::{Config, SystemExt};
 use amethyst::{
     assets::{PrefabLoaderSystemDesc, Processor},
     audio::Source,
-    core::SystemDesc,
-    prelude::*,
     utils::application_root_dir,
-    Application, GameDataBuilder, LoggerConfig,
+    GameDataBuilder, LoggerConfig,
 };
-use dsf_checks::systems as checks_systems;
 
-use dsf_core::resources::Tile::Dummy;
-use dsf_core::resources::{CurrentState, DebugConfig, MovementConfig};
 use dsf_core::systems;
-use dsf_editor::resources::EditorConfig;
-use dsf_editor::systems as editor_systems;
+
 use dsf_precompile::PrecompiledDefaultsBundle;
 use dsf_precompile::PrecompiledRenderBundle;
 use dsf_precompile::{start_game, MyPrefabData};

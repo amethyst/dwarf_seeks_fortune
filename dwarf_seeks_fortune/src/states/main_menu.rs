@@ -2,7 +2,7 @@ use amethyst::{
     ecs::prelude::{Entity, WorldExt},
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     ui::{UiEvent, UiEventType, UiFinder},
-    GameData, SimpleState, SimpleTrans, State, StateData, StateEvent, Trans,
+    GameData, SimpleState, SimpleTrans, StateData, StateEvent, Trans,
 };
 use dsf_checks::states::MovementTestState;
 
