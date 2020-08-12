@@ -4,6 +4,21 @@ use amethyst::{
     ecs::prelude::{Join, ReadStorage, System, WriteStorage},
 };
 
+/// Sometimes you just added a new component, but haven't added it to a system yet.
+/// This will result in annoying runtime errors.
+/// This system exists to solve this problem!
+/// Add the component to this system temporarily, and the game will stop crashing.
+pub struct DummySystem;
+
+impl<'s> System<'s> for DummySystem {
+    #[allow(clippy::type_complexity)]
+    type SystemData = (ReadStorage<'s, Background>,);
+
+    fn run(&mut self, (_,): Self::SystemData) {
+        // Do nothing.
+    }
+}
+
 pub struct DebugSystem;
 
 impl<'s> System<'s> for DebugSystem {

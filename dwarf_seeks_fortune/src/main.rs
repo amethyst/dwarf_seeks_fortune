@@ -17,6 +17,7 @@ use amethyst::{
 };
 use dsf_checks::systems as checks_systems;
 
+use dsf_core::resources::Tile::Dummy;
 use dsf_core::resources::{CurrentState, DebugConfig, MovementConfig};
 use dsf_core::systems;
 use dsf_editor::resources::EditorConfig;
@@ -54,6 +55,7 @@ fn main() -> amethyst::Result<()> {
             "camera_control_system",
             &["camera_system"],
         )
+        .with(systems::DummySystem, "dummy_system", &[])
         .with_bundle(PrecompiledRenderBundle {
             display_config_path,
         })?;
