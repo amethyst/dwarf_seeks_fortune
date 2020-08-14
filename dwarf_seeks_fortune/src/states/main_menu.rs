@@ -102,7 +102,6 @@ impl SimpleState for MainMenuState {
             (*data.world.write_resource::<DebugConfig>()).skip_straight_to_editor = false;
             Trans::Push(Box::new(EditorState::new()))
         } else {
-            data.data.update(&data.world);
             Trans::None
         }
     }

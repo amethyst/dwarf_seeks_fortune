@@ -118,7 +118,6 @@ impl SimpleState for MovementTestState {
                 }
             },
         );
-        data.data.update(&data.world);
         Trans::None
     }
 }

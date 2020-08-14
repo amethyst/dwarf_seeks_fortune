@@ -180,7 +180,6 @@ impl SimpleState for PlayState {
                 }
             },
         );
-        data.data.update(&data.world);
         Trans::None
     }
 }

@@ -194,7 +194,6 @@ impl SimpleState for EditorState {
                 }
             },
         );
-        data.data.update(&data.world);
         Trans::None
     }
 }

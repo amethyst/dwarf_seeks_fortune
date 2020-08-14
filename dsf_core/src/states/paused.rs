@@ -34,7 +34,6 @@ impl SimpleState for PausedState {
     }
 
     fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
-        data.data.update(&data.world);
         Trans::None
     }
 }
