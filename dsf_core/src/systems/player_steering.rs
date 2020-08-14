@@ -38,7 +38,11 @@ impl<'s> System<'s> for PlayerSystem {
             } else {
                 None
             };
+            let old_walk = steering_intent.walk;
             steering_intent.walk = Direction1D::new(input_x);
+            if steering_intent.walk_invalidated && old_walk != steering_intent.walk {
+                steering_intent.walk_invalidated = false;
+            }
             steering_intent.climb = Direction1D::new(input_y);
             steering_intent.jump = player.equipped.is_none() && initiate_jump;
             steering_intent.jump_direction = if player.jump_grace_timer.is_some() {
@@ -56,7 +60,7 @@ pub struct SteeringSystem;
 impl<'s> System<'s> for SteeringSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-        ReadStorage<'s, SteeringIntent>,
+        WriteStorage<'s, SteeringIntent>,
         ReadStorage<'s, Transform>,
         WriteStorage<'s, Steering>,
         Read<'s, TileMap>,
@@ -66,9 +70,10 @@ impl<'s> System<'s> for SteeringSystem {
 
     fn run(
         &mut self,
-        (steering_intents, transforms, mut steerings, tile_map, mut history, time): Self::SystemData,
+        (mut steering_intents, transforms, mut steerings, tile_map, mut history, time): Self::SystemData,
     ) {
-        for (intent, transform, steering) in (&steering_intents, &transforms, &mut steerings).join()
+        for (intent, transform, steering) in
+            (&mut steering_intents, &transforms, &mut steerings).join()
         {
             let old_pos = steering.pos;
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
@@ -112,8 +117,12 @@ impl<'s> System<'s> for SteeringSystem {
                     || (intent.climb.is_negative() && can_climb_down(steering, &tile_map)))
             {
                 steering.mode = SteeringMode::Climbing;
+                if !intent.walk.is_neutral() {
+                    intent.walk_invalidated = true;
+                }
             } else if steering.is_climbing()
                 && aligned_with_grid(steering.destination.y as f32, anchored_y, intent.climb)
+                && !intent.walk_invalidated
                 && ((intent.walk.is_positive()
                     && !is_against_wall_right(&steering, steering.pos.y as f32, &tile_map))
                     || (intent.walk.is_negative()
@@ -152,11 +161,12 @@ impl<'s> System<'s> for SteeringSystem {
                     if !intent.climb.is_neutral() {
                         steering.direction = Direction2D::from(Direction1D::Neutral, intent.climb);
                         let offset_from_discrete_pos = steering.destination.y as f32 - anchored_y;
-                        if offset_from_discrete_pos < f32::EPSILON
-                            && intent.climb.is_positive()
-                            && can_climb_up(steering, &tile_map)
-                        {
-                            steering.destination.y = steering.pos.y + 1;
+                        if offset_from_discrete_pos < f32::EPSILON && intent.climb.is_positive() {
+                            if can_climb_up(steering, &tile_map) {
+                                steering.destination.y = steering.pos.y + 1;
+                            } else {
+                                steering.mode = SteeringMode::Grounded;
+                            }
                         } else if offset_from_discrete_pos > -f32::EPSILON
                             && intent.climb.is_negative()
                         {
@@ -168,6 +178,8 @@ impl<'s> System<'s> for SteeringSystem {
                                     starting_y_pos: transform.translation().y,
                                     starting_time: time.absolute_time_seconds(),
                                 };
+                            } else {
+                                steering.mode = SteeringMode::Grounded;
                             }
                         } else if !intent
                             .climb
@@ -363,7 +375,7 @@ fn is_against_wall(
 }
 
 fn can_climb_up(steering: &Steering, tile_map: &TileMap) -> bool {
-    can_climb(steering, tile_map, (0, 1))
+    can_climb(steering, tile_map, (0, 1)) && !is_underneath_ceiling(steering, &tile_map)
 }
 
 fn can_climb_down(steering: &Steering, tile_map: &TileMap) -> bool {

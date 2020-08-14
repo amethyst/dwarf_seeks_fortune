@@ -162,6 +162,17 @@ pub struct Steering {
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
 pub struct SteeringIntent {
+    /// If a player is still holding a horizontal movement key (for instance; RIGHT) when they
+    /// start climbing, they might move off the ladder after climbing 1 tile. To fix this,
+    /// this flag will be set to true when the player starts climbing. To start moving horizontally
+    /// at this point, they must let go of the movement key and press RIGHT or LEFT again.
+    ///
+    /// If they reach the end of the ladder and can climb no further, if they're still holding down
+    /// the (invalidated) RIGHT or LEFT button they will start moving horizontally regardless of
+    /// this flag.
+    ///
+    /// This feature exists solely for players, to make movement feel better.
+    pub walk_invalidated: bool,
     /// The entity wishes to walk along the floor in this direction.
     pub walk: Direction1D,
     /// The entity wishes to climb on a ladder in this direction.
