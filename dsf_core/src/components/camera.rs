@@ -1,3 +1,4 @@
+use amethyst::core::ecs::HashMapStorage;
 use amethyst::{
     assets::PrefabData,
     core::math::Vector2,
@@ -14,7 +15,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// The camera itself will maintain an offset position. Usually this will be at the origin
 /// (no offset). If there is camera shake, that will be done through this offset.
-#[derive(Clone, Copy, Debug, Component, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct CameraFrame {
     /// Player will be able to pan the camera around to a limited degree.
@@ -28,6 +29,10 @@ pub struct CameraFrame {
     /// of the panning controls. This will be faster than the speed at which the player can pan the
     /// camera around, resulting in a sort of rubber banding effect.
     pub panning_recovery_speed: f32,
+}
+
+impl Component for CameraFrame {
+    type Storage = HashMapStorage<Self>;
 }
 
 impl Default for CameraFrame {

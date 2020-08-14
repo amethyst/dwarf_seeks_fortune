@@ -1,4 +1,3 @@
-use crate::levels::ToolType;
 use amethyst::{
     assets::PrefabData,
     derive::PrefabData,
@@ -7,10 +6,14 @@ use amethyst::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::levels::ToolType;
+use amethyst::core::ecs::HashMapStorage;
+
 /// The entity with this component is the player.
-#[derive(Clone, Copy, Debug, Component, Default, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct Player {
+    /// The tool currently equipped by the player.
     pub equipped: Option<ToolType>,
     /// Whether the jump key is currently down. Needed to figure out if the player wants to jump
     /// this frame. (Jump is only executed if this value changes from false to true.)
@@ -25,6 +28,10 @@ pub struct Player {
     /// speed. This fixes the problem that if the player presses jump and move at the same time,
     /// jump is sometimes registered before move and the character only jumps up, not sideways.
     pub jump_grace_timer: Option<f32>,
+}
+
+impl Component for Player {
+    type Storage = HashMapStorage<Self>;
 }
 
 /// The entity with this component is a tool equipped by the player.

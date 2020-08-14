@@ -1,7 +1,7 @@
 use crate::components::Pos;
 use crate::levels::ToolType;
 use crate::resources::SpriteType;
-use amethyst::core::ecs::NullStorage;
+use amethyst::core::ecs::{HashMapStorage, NullStorage, VecStorage};
 use amethyst::{
     assets::PrefabData,
     derive::PrefabData,
@@ -10,10 +10,14 @@ use amethyst::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct Key {
     pub pos: Pos,
+}
+
+impl Component for Key {
+    type Storage = HashMapStorage<Self>;
 }
 
 impl Key {
@@ -22,12 +26,16 @@ impl Key {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct Tool {
     pub tool_type: ToolType,
     pub sprite: SpriteType,
     pub sprite_nr: usize,
+}
+
+impl Component for Tool {
+    type Storage = HashMapStorage<Self>;
 }
 
 impl Tool {
@@ -41,19 +49,27 @@ impl Tool {
 }
 
 /// All destructible entities must have this component, this is how we find and delete them.
-#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct Block {
     pub pos: Pos,
 }
 
+impl Component for Block {
+    type Storage = VecStorage<Self>;
+}
+
 /// A miniature version of every key is found on the exit door.
-#[derive(Clone, Copy, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 pub struct KeyDisplay {
     /// The position of the corresponding key in the world. NOT the actual position of this display.
     /// The display is a miniature version of the key located somewhere on top of the door.
     pub pos: Pos,
+}
+
+impl Component for KeyDisplay {
+    type Storage = HashMapStorage<Self>;
 }
 
 impl KeyDisplay {

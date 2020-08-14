@@ -1,3 +1,4 @@
+use amethyst::core::ecs::HashMapStorage;
 use amethyst::{
     assets::PrefabData,
     core::transform::Transform,
@@ -95,12 +96,15 @@ impl Default for Direction1D {
 }
 
 /// Velocity in meters per second.
-#[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
-#[prefab(Component)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Velocity {
     pub x: f32,
     pub y: f32,
+}
+
+impl Component for Velocity {
+    type Storage = HashMapStorage<Self>;
 }
 
 /// A discrete position in the world, with x and y being integral numbers.
@@ -128,7 +132,7 @@ impl Pos {
 ///
 /// Any non-particle entity that has movement should have steering.
 /// Examples of entities with steering include the Player, enemies and projectiles.
-#[derive(Clone, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
 pub struct Steering {
@@ -155,10 +159,14 @@ pub struct Steering {
     pub mode: SteeringMode,
 }
 
+impl Component for Steering {
+    type Storage = HashMapStorage<Self>;
+}
+
 /// Specifies how the entity intents to move. For the player, this is mostly informed by the
 /// keyboard input. For enemies, this will be set by the AI. For all entities with Steering,
 /// the SteeringSystem then actually moves the entity based on this intent.
-#[derive(Clone, Debug, Default, Component, Deserialize, Serialize, PrefabData)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
 pub struct SteeringIntent {
@@ -183,6 +191,10 @@ pub struct SteeringIntent {
     /// possible to specify a direction for a limited time after the jump has already started.
     /// That feature exists solely for players, to make movement feel better.
     pub jump_direction: Direction1D,
+}
+
+impl Component for SteeringIntent {
+    type Storage = HashMapStorage<Self>;
 }
 
 /// SteeringMode influences max speeds, ability to jump, ability to move, etc.
