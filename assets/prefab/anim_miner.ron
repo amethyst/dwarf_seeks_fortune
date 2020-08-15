@@ -32,6 +32,7 @@ Prefab(
                                     normalized: true,
                                     anisotropic: Off,
                                 ),
+                                premultiply_alpha: true,
                             ),
                         )),
                         sprites: [
