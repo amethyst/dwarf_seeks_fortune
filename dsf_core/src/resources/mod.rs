@@ -3,6 +3,7 @@ mod config;
 mod debug_lines;
 mod gui;
 mod history;
+mod music;
 mod tilemap;
 mod win;
 
@@ -11,5 +12,6 @@ pub use self::config::*;
 pub use self::debug_lines::*;
 pub use self::gui::*;
 pub use self::history::*;
+pub use self::music::*;
 pub use self::tilemap::*;
 pub use self::win::*;

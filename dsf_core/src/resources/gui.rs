@@ -42,7 +42,7 @@ pub enum UiType {
     Save,
     /// Ui for the level editor.
     Editor,
-    /// The paused menu.
+    /// The paused menu. Not currently in use, but will be implemented in the future.
     Paused,
     /// The main menu.
     MainMenu,

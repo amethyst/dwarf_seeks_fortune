@@ -13,3 +13,4 @@ amethyst = { version = "0.15.0", features = [] }
 
 log = { version = "0.4.6", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
+rand = "0.7"

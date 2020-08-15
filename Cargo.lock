@@ -1018,6 +1018,7 @@ dependencies = [
  "amethyst",
  "dsf_precompile",
  "log",
+ "rand 0.7.3",
  "serde",
 ]
 

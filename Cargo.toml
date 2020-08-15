@@ -9,6 +9,8 @@ members = [
     "dsf_editor",
     # Contains all code partaining to the automated checks.
     "dsf_checks",
-    # The main binary, contains the starting point of the application.
+    # The main binary, contains the starting point of the application. Glues everything together.
+    # If you're looking to change vulkan to metal, go to this crate's Cargo.toml. This is the only place where that
+    # feature is specified.
     "dwarf_seeks_fortune",
 ]
