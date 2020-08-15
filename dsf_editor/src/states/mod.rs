@@ -1,5 +1,4 @@
-mod editor;
+mod editor_state;
 mod file_actions;
-mod paint;
 
-pub use self::editor::EditorState;
+pub use self::editor_state::EditorState;

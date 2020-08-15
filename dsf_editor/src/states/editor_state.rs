@@ -17,25 +17,30 @@ use dsf_precompile::AnimationId;
 use crate::components::*;
 use crate::resources::*;
 use crate::states::file_actions::{auto_save, auto_save_file, load_auto_save};
-use crate::states::paint::erase_tiles;
-use crate::states::paint::paint_tiles;
 use crate::systems;
-use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read};
+use crate::systems::PlaceTilesSystem;
+use amethyst::core::ecs::shrev::EventChannel;
+use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, ReaderId, Write};
+use amethyst::input::StringBindings;
 use dsf_core::components::{Background, Pos};
 use dsf_core::entities::*;
 use dsf_core::levels::*;
 use dsf_core::resources::{
-    get_asset_dimensions, setup_debug_lines, AssetType, Assets, SpriteType, UiHandles, UiType,
+    get_asset_dimensions, setup_debug_lines, AssetType, Assets, EventReaders, SpriteType,
+    UiHandles, UiType,
 };
 use dsf_core::states::{window_event_handler, PlayState};
 
 pub struct EditorState {
+    /// Whether this state is currently on top of the stack.
+    is_active: bool,
     dispatcher: Dispatcher<'static, 'static>,
 }
 
 impl<'a, 'b> EditorState {
-    pub fn new() -> Self {
+    pub fn new(world: &mut World) -> Self {
         EditorState {
+            is_active: false,
             dispatcher: DispatcherBuilder::new()
                 .with(systems::CursorPreviewSystem, "cursor_preview_system", &[])
                 .with(systems::CursorSystem, "cursor_system", &[])
@@ -49,12 +54,9 @@ impl<'a, 'b> EditorState {
                     "tile_paint_system",
                     &["selection_system"],
                 )
+                .with(systems::PlaceTilesSystem, "place_tile_system", &[])
                 .build(),
         }
-    }
-
-    fn handle_action(&mut self, _action: &str, _world: &mut World) -> SimpleTrans {
-        Trans::None
     }
 
     fn setup(&self, world: &mut World) {
@@ -78,22 +80,30 @@ impl<'a, 'b> EditorState {
 impl SimpleState for EditorState {
     fn on_start(&mut self, data: StateData<GameData>) {
         info!("EditorState on_start");
+        self.is_active = true;
+        let readers =
+            EventReaders::default().add_reader("place_tiles_system".to_string(), data.world);
+        data.world.insert(readers);
         self.dispatcher.setup(data.world);
         self.setup(data.world);
     }
 
     fn on_stop(&mut self, data: StateData<GameData>) {
         info!("EditorState on_stop");
+        data.world.insert(EventReaders::default());
+        self.is_active = false;
         data.world.delete_all();
     }
 
     fn on_pause(&mut self, data: StateData<GameData>) {
         info!("EditorState on_pause");
+        self.is_active = false;
         data.world.delete_all();
     }
 
     fn on_resume(&mut self, data: StateData<GameData>) {
         info!("EditorState on_resume");
+        self.is_active = true;
         self.setup(data.world);
     }
 
@@ -117,20 +127,6 @@ impl SimpleState for EditorState {
                     scancode: _,
                 } => {
                     redo_background(data.world);
-                    Trans::None
-                }
-                InputEvent::KeyReleased {
-                    key_code: VirtualKeyCode::Return,
-                    scancode: _,
-                } => {
-                    paint_tiles(data.world);
-                    Trans::None
-                }
-                InputEvent::KeyReleased {
-                    key_code: VirtualKeyCode::Delete,
-                    scancode: _,
-                } => {
-                    erase_tiles(data.world);
                     Trans::None
                 }
                 InputEvent::KeyReleased {
@@ -158,10 +154,6 @@ impl SimpleState for EditorState {
                         .brush
                         .select_next();
                     add_cursor_preview_tag(data.world, new_key);
-                    Trans::None
-                }
-                InputEvent::ActionPressed(action) => {
-                    self.handle_action(&action, data.world);
                     Trans::None
                 }
                 _ => Trans::None,
@@ -195,6 +187,24 @@ impl SimpleState for EditorState {
             },
         );
         Trans::None
+    }
+
+    /// If this State is not active, then the systems associated with its dispatcher will not be
+    /// able to drain the event channels that they are registered to. This is a problem,
+    /// because events will start bunching up.
+    ///
+    /// To solve this, we drain the event channel in the shadow update.
+    fn shadow_update(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        if !self.is_active {
+            data.world.exec(
+                |(mut readers, channel): (
+                    Write<EventReaders>,
+                    Read<EventChannel<InputEvent<StringBindings>>>,
+                )| {
+                    readers.drain_event_channel(channel);
+                },
+            );
+        }
     }
 }
 

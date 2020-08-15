@@ -18,6 +18,11 @@ use amethyst::audio::{AudioSink, Mp3Format};
 use amethyst::utils::application_root_dir;
 use dsf_editor::resources::EditorConfig;
 
+/// This state is briefly active when the game is first started up. It loads all assets used in the
+/// entire game and then switches to the main menu state.
+///
+/// If you want to add a new asset that should be loaded, please go to LoadingConfig and add it
+/// there.
 #[derive(Default)]
 pub struct LoadingState {
     progress: ProgressCounter,

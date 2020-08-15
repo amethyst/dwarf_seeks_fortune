@@ -81,7 +81,7 @@ impl SimpleState for MainMenuState {
                 if Some(target) == self.play_button {
                     Trans::Push(Box::new(PlayState::demo()))
                 } else if Some(target) == self.editor_button {
-                    Trans::Push(Box::new(EditorState::new()))
+                    Trans::Push(Box::new(EditorState::new(data.world)))
                 } else if Some(target) == self.movement_test_button {
                     Trans::Push(Box::new(MovementTestState::new()))
                 } else if Some(target) == self.exit_button {
@@ -100,7 +100,7 @@ impl SimpleState for MainMenuState {
         if skip_straight_to_editor {
             info!("Bypassing main menu, skipping straight to editor.");
             (*data.world.write_resource::<DebugConfig>()).skip_straight_to_editor = false;
-            Trans::Push(Box::new(EditorState::new()))
+            Trans::Push(Box::new(EditorState::new(data.world)))
         } else {
             Trans::None
         }
