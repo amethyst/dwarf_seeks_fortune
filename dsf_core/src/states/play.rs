@@ -14,7 +14,7 @@ use amethyst::{
     utils::application_root_dir,
     StateData, Trans,
 };
-use amethyst::{GameData, SimpleState, SimpleTrans, State};
+use amethyst::{GameData, SimpleState, SimpleTrans};
 
 use dsf_precompile::AnimationId;
 

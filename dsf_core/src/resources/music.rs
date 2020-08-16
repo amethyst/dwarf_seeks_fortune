@@ -1,5 +1,3 @@
-use amethyst::audio::output::init_output;
-use amethyst::audio::Mp3Format;
 use amethyst::{
     assets::Loader,
     audio::{AudioSink, OggFormat, SourceHandle},
@@ -7,7 +5,7 @@ use amethyst::{
 };
 use rand::prelude::SliceRandom;
 use rand::thread_rng;
-use std::ffi::OsStr;
+
 use std::iter::Cycle;
 use std::vec::IntoIter;
 

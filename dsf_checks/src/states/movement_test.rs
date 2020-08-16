@@ -27,8 +27,8 @@ pub struct MovementTestState {
     dispatcher: Dispatcher<'static, 'static>,
 }
 
-impl MovementTestState {
-    pub fn new() -> Self {
+impl Default for MovementTestState {
+    fn default() -> Self {
         MovementTestState {
             dispatcher: DispatcherBuilder::new()
                 .with(

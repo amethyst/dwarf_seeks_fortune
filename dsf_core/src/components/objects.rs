@@ -5,7 +5,7 @@ use amethyst::core::ecs::{HashMapStorage, NullStorage, VecStorage};
 use amethyst::{
     assets::PrefabData,
     derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, WriteStorage},
+    ecs::{prelude::Entity, Component, WriteStorage},
     error::Error,
 };
 use serde::{Deserialize, Serialize};

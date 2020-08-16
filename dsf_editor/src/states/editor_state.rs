@@ -18,9 +18,9 @@ use crate::components::*;
 use crate::resources::*;
 use crate::states::file_actions::{auto_save, auto_save_file, load_auto_save};
 use crate::systems;
-use crate::systems::PlaceTilesSystem;
+
 use amethyst::core::ecs::shrev::EventChannel;
-use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, ReaderId, Write};
+use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::input::StringBindings;
 use dsf_core::components::{Background, Pos};
 use dsf_core::entities::*;
@@ -38,7 +38,7 @@ pub struct EditorState {
 }
 
 impl<'a, 'b> EditorState {
-    pub fn new(world: &mut World) -> Self {
+    pub fn new(_world: &mut World) -> Self {
         EditorState {
             is_active: false,
             dispatcher: DispatcherBuilder::new()

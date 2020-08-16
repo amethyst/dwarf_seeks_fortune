@@ -24,7 +24,7 @@ impl EventReaders {
         let reader_id = world
             .fetch_mut::<EventChannel<InputEvent<StringBindings>>>()
             .register_reader();
-        (&mut self).reader_ids.insert(system_name, reader_id);
+        self.reader_ids.insert(system_name, reader_id);
         self
     }
 

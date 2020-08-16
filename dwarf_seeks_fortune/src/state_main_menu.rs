@@ -83,7 +83,7 @@ impl SimpleState for MainMenuState {
                 } else if Some(target) == self.editor_button {
                     Trans::Push(Box::new(EditorState::new(data.world)))
                 } else if Some(target) == self.movement_test_button {
-                    Trans::Push(Box::new(MovementTestState::new()))
+                    Trans::Push(Box::new(MovementTestState::default()))
                 } else if Some(target) == self.exit_button {
                     Trans::Quit
                 } else {

@@ -3,7 +3,7 @@ use amethyst::{
     assets::PrefabData,
     core::math::Vector2,
     derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, WriteStorage},
+    ecs::{prelude::Entity, Component, WriteStorage},
     error::Error,
 };
 use serde::{Deserialize, Serialize};

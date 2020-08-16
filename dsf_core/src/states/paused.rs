@@ -1,7 +1,7 @@
 use amethyst::{
     ecs::prelude::{Entity, WorldExt},
     input::{is_key_down, VirtualKeyCode},
-    GameData, SimpleState, SimpleTrans, State, StateData, StateEvent, Trans,
+    GameData, SimpleState, SimpleTrans, StateData, StateEvent, Trans,
 };
 
 use crate::resources::*;
@@ -33,7 +33,7 @@ impl SimpleState for PausedState {
         Trans::None
     }
 
-    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+    fn update(&mut self, _data: &mut StateData<GameData>) -> SimpleTrans {
         Trans::None
     }
 }

@@ -1,14 +1,13 @@
 use amethyst::core::ecs::shrev::EventChannel;
-use amethyst::core::ecs::{LazyUpdate, ReaderId, World};
+
 use amethyst::input::{InputEvent, StringBindings, VirtualKeyCode};
 use amethyst::prelude::WorldExt;
-use amethyst::ui::UiEvent;
+
 use amethyst::{
     assets::{Handle, Prefab},
     core::transform::Transform,
     ecs::prelude::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage},
     renderer::sprite::SpriteRender,
-    Trans,
 };
 
 use dsf_core::components::{Background, Pos};
