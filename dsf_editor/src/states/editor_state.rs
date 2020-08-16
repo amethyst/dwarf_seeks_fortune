@@ -42,6 +42,8 @@ impl<'a, 'b> EditorState {
         EditorState {
             is_active: false,
             dispatcher: DispatcherBuilder::new()
+                .with(systems::PlaceTilesSystem, "place_tile_system", &[])
+                .with_barrier()
                 .with(systems::CursorPreviewSystem, "cursor_preview_system", &[])
                 .with(systems::CursorSystem, "cursor_system", &[])
                 .with(
@@ -54,7 +56,6 @@ impl<'a, 'b> EditorState {
                     "tile_paint_system",
                     &["selection_system"],
                 )
-                .with(systems::PlaceTilesSystem, "place_tile_system", &[])
                 .build(),
         }
     }

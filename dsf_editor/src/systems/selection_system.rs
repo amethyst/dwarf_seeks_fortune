@@ -43,7 +43,8 @@ impl<'s> System<'s> for SelectionSystem {
                     editor_data.selection.start = editor_data.selection.end;
                 }
                 let width = (editor_data.selection.start.x - editor_data.selection.end.x).abs() + 1;
-                let height = (editor_data.selection.start.y - editor_data.selection.end.y).abs() + 1;
+                let height =
+                    (editor_data.selection.start.y - editor_data.selection.end.y).abs() + 1;
                 // TODO: set scale requires knowledge about dimensions of sprite.
                 // Maybe solve with child entity.
                 // Or accept hardcoded nature, because sprite unlikely to change?
