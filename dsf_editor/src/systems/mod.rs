@@ -1,9 +1,13 @@
-mod cursor_preview_system;
-mod cursor_system;
-mod selection_system;
-mod tile_paint_system;
+mod choose_brush;
+mod cursor;
+mod cursor_preview;
+mod place_tiles;
+mod selection;
+mod tile_paint;
 
-pub use self::cursor_preview_system::*;
-pub use self::cursor_system::*;
-pub use self::selection_system::*;
-pub use self::tile_paint_system::*;
+pub use self::choose_brush::*;
+pub use self::cursor::*;
+pub use self::cursor_preview::*;
+pub use self::place_tiles::*;
+pub use self::selection::*;
+pub use self::tile_paint::*;

@@ -44,6 +44,7 @@ impl<'a, 'b> EditorState {
             dispatcher: DispatcherBuilder::new()
                 .with(systems::PlaceTilesSystem, "place_tile_system", &[])
                 .with_barrier()
+                .with(systems::ChooseBrushSystem, "choose_brush_system", &[])
                 .with(systems::CursorPreviewSystem, "cursor_preview_system", &[])
                 .with(systems::CursorSystem, "cursor_system", &[])
                 .with(
@@ -60,11 +61,11 @@ impl<'a, 'b> EditorState {
         }
     }
 
+    /// Perform setup that should be executed both upon starting and upon resuming the State.
     fn setup(&self, world: &mut World) {
         UiHandles::add_ui(&UiType::Fps, world);
         // UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
-        init_cursor(world);
         create_camera(world);
         let mut editor_data = EditorData::default();
         if let Ok(level_edit) = load_auto_save() {
@@ -82,8 +83,9 @@ impl SimpleState for EditorState {
     fn on_start(&mut self, data: StateData<GameData>) {
         info!("EditorState on_start");
         self.is_active = true;
-        let readers =
-            EventReaders::default().add_reader("place_tiles_system".to_string(), data.world);
+        let readers = EventReaders::default()
+            .add_reader("place_tiles_system".to_string(), data.world)
+            .add_reader("choose_brush_system".to_string(), data.world);
         data.world.insert(readers);
         self.dispatcher.setup(data.world);
         self.setup(data.world);
@@ -124,38 +126,11 @@ impl SimpleState for EditorState {
             StateEvent::Ui(_) => Trans::None,
             StateEvent::Input(input_event) => match input_event {
                 InputEvent::KeyReleased {
-                    key_code: VirtualKeyCode::F8,
-                    scancode: _,
-                } => {
-                    redo_background(data.world);
-                    Trans::None
-                }
-                InputEvent::KeyReleased {
                     key_code: VirtualKeyCode::F1,
                     scancode: _,
                 } => {
                     auto_save(data.world).expect("Failed to auto-save level!");
                     Trans::Push(Box::new(PlayState::new(auto_save_file())))
-                }
-                InputEvent::KeyReleased {
-                    key_code: VirtualKeyCode::LBracket,
-                    scancode: _,
-                } => {
-                    let new_key = (*data.world.write_resource::<EditorData>())
-                        .brush
-                        .select_previous();
-                    add_cursor_preview_tag(data.world, new_key);
-                    Trans::None
-                }
-                InputEvent::KeyReleased {
-                    key_code: VirtualKeyCode::RBracket,
-                    scancode: _,
-                } => {
-                    let new_key = (*data.world.write_resource::<EditorData>())
-                        .brush
-                        .select_next();
-                    add_cursor_preview_tag(data.world, new_key);
-                    Trans::None
                 }
                 _ => Trans::None,
             },
@@ -207,137 +182,4 @@ impl SimpleState for EditorState {
             );
         }
     }
-}
-
-fn redo_background(world: &mut World) {
-    world.exec(
-        |(_level, backgrounds, entities): (Read<LevelEdit>, ReadStorage<Background>, Entities)| {
-            for (_, entity) in (&backgrounds, &entities).join() {
-                entities
-                    .delete(entity)
-                    .expect("Failed to delete background.");
-            }
-        },
-    );
-    // add_background(world, level.);
-}
-
-fn init_cursor(world: &mut World) {
-    let sprite_handle = world
-        .read_resource::<Assets>()
-        .get_still(&SpriteType::Selection);
-    let mut selection_transform = Transform::default();
-    selection_transform.set_translation_z((&DepthLayer::UiElements).z());
-    world
-        .create_entity()
-        .with(SpriteRender {
-            sprite_sheet: sprite_handle,
-            sprite_number: 1,
-        })
-        .with(Transparent)
-        .with(selection_transform)
-        .with(SelectionTag)
-        .build();
-    let transform = Transform::default();
-    let _ = world
-        .create_entity()
-        .with(transform)
-        .with(Cursor::default())
-        .build();
-    add_cursor_preview_tag(world, None);
-}
-
-//TODO: Very crappy code.
-fn add_cursor_preview_tag(world: &mut World, key: Option<String>) {
-    let cursor = lookup_cursor_entity(world);
-    delete_cursor_preview(world);
-    if let Some(key) = key {
-        let tile_def = world.read_resource::<TileDefinitions>().get(&key).clone();
-        let still_asset = load_still_asset(&tile_def, &world.read_resource::<Assets>());
-        let anim_asset = load_anim_asset(&tile_def, &world.read_resource::<Assets>());
-        let transform = if let Some(asset) = &tile_def.asset {
-            Some(load_transform(
-                &Pos::default(),
-                &DepthLayer::UiElements,
-                &tile_def.dimens,
-                asset,
-            ))
-        } else {
-            panic!("Not implemented yet! Tiles with no graphics asset."); //TODO;...
-        };
-        let parent = world
-            .create_entity()
-            .with(CursorPreviewParentTag)
-            .with(transform.unwrap())
-            .with(Parent { entity: cursor })
-            .build();
-        let mut builder = world.create_entity();
-        if let Some(still_asset) = still_asset {
-            builder = builder.with(still_asset);
-        }
-        if let Some(anim_asset) = anim_asset {
-            builder = builder.with(anim_asset);
-        }
-        builder
-            .with(Transform::default())
-            .with(Transparent)
-            .with(Tint(Srgba::new(0.4, 0.4, 0.4, 0.8)))
-            .with(CursorPreviewTag)
-            .with(Parent { entity: parent })
-            .build();
-    } else {
-        let sprite_sheet = world
-            .read_resource::<Assets>()
-            .get_still(&SpriteType::Selection);
-        let asset_dimensions = get_asset_dimensions(&AssetType::Still(SpriteType::Selection, 2));
-        let mut transform = Transform::default();
-        transform.set_translation_xyz(0.5, 0.5, (&DepthLayer::UiElements).z());
-        transform.set_scale(Vector3::new(
-            1. / asset_dimensions.x as f32,
-            1. / asset_dimensions.y as f32,
-            1.0,
-        ));
-        let parent = world
-            .create_entity()
-            .with(CursorPreviewParentTag)
-            .with(Parent { entity: cursor })
-            .with(transform)
-            .build();
-        world
-            .create_entity()
-            .with(SpriteRender {
-                sprite_sheet,
-                sprite_number: 2,
-            })
-            .with(Transparent)
-            .with(Transform::default())
-            .with(CursorPreviewTag)
-            .with(Parent { entity: parent })
-            .build();
-    }
-}
-
-fn lookup_cursor_entity(world: &mut World) -> Entity {
-    world.exec(|data: (ReadStorage<Cursor>, Entities)| {
-        let (cursors, entities) = data;
-        let (entity, _) = (&entities, &cursors)
-            .join()
-            .next()
-            .expect("Help! Cursor entity does not exist!");
-        entity
-    })
-}
-
-fn delete_cursor_preview(world: &mut World) {
-    world.exec(|data: (ReadStorage<CursorPreviewParentTag>, Entities)| {
-        let (previews, entities) = data;
-        (&entities, &previews)
-            .join()
-            .map(|(entity, _)| entity)
-            .for_each(|preview| {
-                entities
-                    .delete(preview)
-                    .expect("Failed to delete CursorPreviewParentTag.");
-            });
-    });
 }
