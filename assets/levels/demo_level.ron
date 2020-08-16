@@ -863,7 +863,7 @@
         (
             x: -18,
             y: 6,
-        ): "Hammer",
+        ): "ToolHammer",
         (
             x: -18,
             y: 10,
@@ -1319,7 +1319,7 @@
         (
             x: -8,
             y: -4,
-        ): "Pickaxe",
+        ): "ToolPickaxe",
         (
             x: -8,
             y: -2,
@@ -2375,7 +2375,7 @@
         (
             x: 16,
             y: 6,
-        ): "Hammer",
+        ): "ToolHammer",
         (
             x: 16,
             y: 10,

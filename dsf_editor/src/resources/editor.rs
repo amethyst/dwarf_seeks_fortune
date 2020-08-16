@@ -115,6 +115,7 @@ impl Brush {
         defs.map.keys().for_each(|key| {
             self.palette.push(Some(key.clone()));
         });
+        self.palette.sort();
     }
     pub fn select_previous(&mut self) -> Option<String> {
         self.select(-1)

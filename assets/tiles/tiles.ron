@@ -35,19 +35,6 @@
             asset: Still(Blocks, 1),
             archetype: Block(Breakable),
         ),
-        "BigBlock":(
-            depth: Blocks,
-            dimens: ( x:2, y:2, ),
-            unique: false,
-            mandatory: false,
-            collision: (
-                collides_top: true,
-                collides_side: true,
-                collides_bottom: true,
-            ),
-            asset: Still(Blocks, 1),
-            archetype: Block(Invulnerable),
-        ),
         "Ladder":(
             depth: Blocks,
             dimens: ( x:2, y:1, ),
@@ -75,7 +62,7 @@
             asset: Still(Blocks, 3),
             archetype: Key,
         ),
-        "Pickaxe":(
+        "ToolPickaxe":(
             depth: FloatingBlocks,
             dimens: ( x:2, y:2, ),
             unique: false,
@@ -88,7 +75,7 @@
             asset: Still(Tools, 0),
             archetype: Tool(BreakBlocksBelow(2)),
         ),
-        "Hammer":(
+        "ToolHammer":(
             depth: FloatingBlocks,
             dimens: ( x:2, y:2, ),
             unique: false,
