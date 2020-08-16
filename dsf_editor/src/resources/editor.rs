@@ -99,7 +99,7 @@ pub struct EditorConfig {
 pub struct EditorData {
     pub level: LevelEdit,
     pub brush: Brush,
-    pub selector: Selector,
+    pub selection: Selection,
 }
 
 #[derive(Debug, Default)]
@@ -138,16 +138,15 @@ impl Brush {
     }
 }
 
-/// TODO: Rename to Selection?
 #[derive(Debug, Default)]
-pub struct Selector {
+pub struct Selection {
     /// Inclusive bound.
     pub start: Pos,
     /// Inclusive bound. The end point of the selection is always set to the current location of the cursor.
     pub end: Pos,
 }
 
-impl Selector {
+impl Selection {
     pub fn lower_bounds(&self) -> Pos {
         Pos::new(min(self.start.x, self.end.x), min(self.start.y, self.end.y))
     }

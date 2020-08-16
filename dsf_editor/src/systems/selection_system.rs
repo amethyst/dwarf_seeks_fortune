@@ -40,10 +40,10 @@ impl<'s> System<'s> for SelectionSystem {
             let shift = input.action_is_down("shift").unwrap_or(false);
             for (_, transform) in (&mut selection_tags, &mut transforms).join() {
                 if !shift && !direction.is_neutral() {
-                    editor_data.selector.start = editor_data.selector.end;
+                    editor_data.selection.start = editor_data.selection.end;
                 }
-                let width = (editor_data.selector.start.x - editor_data.selector.end.x).abs() + 1;
-                let height = (editor_data.selector.start.y - editor_data.selector.end.y).abs() + 1;
+                let width = (editor_data.selection.start.x - editor_data.selection.end.x).abs() + 1;
+                let height = (editor_data.selection.start.y - editor_data.selection.end.y).abs() + 1;
                 // TODO: set scale requires knowledge about dimensions of sprite.
                 // Maybe solve with child entity.
                 // Or accept hardcoded nature, because sprite unlikely to change?
@@ -59,9 +59,9 @@ impl<'s> System<'s> for SelectionSystem {
 
                 transform.set_translation_xyz(
                     (width as f32 * 0.5)
-                        + min(editor_data.selector.start.x, editor_data.selector.end.x) as f32,
+                        + min(editor_data.selection.start.x, editor_data.selection.end.x) as f32,
                     (height as f32 * 0.5)
-                        + min(editor_data.selector.start.y, editor_data.selector.end.y) as f32,
+                        + min(editor_data.selection.start.y, editor_data.selection.end.y) as f32,
                     (&DepthLayer::UiElements).z(),
                 );
             }

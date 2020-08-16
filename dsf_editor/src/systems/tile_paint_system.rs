@@ -74,8 +74,8 @@ fn set_tiles(world: &mut World, key: Option<String>, tile_def: Option<TileDefini
         .map(|def| def.dimens)
         .unwrap_or_else(|| Pos::new(1, 1));
     let mut editor_data = world.write_resource::<EditorData>();
-    let lower_bounds = (*editor_data).selector.lower_bounds();
-    let selection_dimens = (*editor_data).selector.dimens();
+    let lower_bounds = (*editor_data).selection.lower_bounds();
+    let selection_dimens = (*editor_data).selection.dimens();
     for x in
         (lower_bounds.x..(lower_bounds.x + selection_dimens.x)).step_by(brush_dimens.x as usize)
     {

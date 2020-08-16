@@ -38,11 +38,11 @@ impl<'s> System<'s> for CursorSystem {
             let new_direction = Direction2D::new(input_x, input_y);
             if cursor.last_direction.is_neutral() && !new_direction.is_neutral() {
                 // Start movement now. Move once, then set cooldown to High.
-                editor_data.selector.end.x += input_x as i32;
-                editor_data.selector.end.y += input_y as i32;
+                editor_data.selection.end.x += input_x as i32;
+                editor_data.selection.end.y += input_y as i32;
                 transform.set_translation_xyz(
-                    editor_data.selector.end.x as f32,
-                    editor_data.selector.end.y as f32,
+                    editor_data.selection.end.x as f32,
+                    editor_data.selection.end.y as f32,
                     0.0,
                 );
                 cursor.cooldown = config.cursor_move_high_cooldown;
@@ -55,11 +55,11 @@ impl<'s> System<'s> for CursorSystem {
                 cursor.cooldown -= time.delta_seconds();
                 if cursor.cooldown.is_sign_negative() {
                     cursor.cooldown = config.cursor_move_low_cooldown;
-                    editor_data.selector.end.x += input_x as i32;
-                    editor_data.selector.end.y += input_y as i32;
+                    editor_data.selection.end.x += input_x as i32;
+                    editor_data.selection.end.y += input_y as i32;
                     transform.set_translation_xyz(
-                        editor_data.selector.end.x as f32,
-                        editor_data.selector.end.y as f32,
+                        editor_data.selection.end.x as f32,
+                        editor_data.selection.end.y as f32,
                         0.0,
                     );
                 }
