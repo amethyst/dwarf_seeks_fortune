@@ -72,9 +72,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst"
-version = "0.15.0"
+version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5230db65cad09ef3a9b6cd92609a864d287eeb5de442fa275f61892e86085d7"
+checksum = "4abbd3b9de3f0bc26b71e0f3e12727196f375afe9758e150cad40f1b2f123697"
 dependencies = [
  "amethyst_animation",
  "amethyst_assets",
@@ -92,7 +92,7 @@ dependencies = [
  "amethyst_utils",
  "amethyst_window",
  "crossbeam-channel 0.4.3",
- "derivative",
+ "derivative 2.1.1",
  "dirs",
  "failure",
  "fern",
@@ -109,9 +109,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst_animation"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51a566efeec4a2bcebf5d765c61ca48e63300ab023ef9d8cd854c4d84fc4e452"
+checksum = "b0d76f9e5c3b5e3d658c5f5c5ea05d34a10ebb59966ad8ea29d001b26a2a9500"
 dependencies = [
  "amethyst_assets",
  "amethyst_core",
@@ -119,7 +119,7 @@ dependencies = [
  "amethyst_error",
  "amethyst_rendy",
  "amethyst_ui",
- "derivative",
+ "derivative 2.1.1",
  "fnv",
  "itertools",
  "log",
@@ -129,15 +129,15 @@ dependencies = [
 
 [[package]]
 name = "amethyst_assets"
-version = "0.11.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adec5aa374c11f4363b5053731894773ce7ae662b1e2016be8e3f45e50f4f027"
+checksum = "7ed000436fdbbf05d94677c28e0b77bd53bb580e2c234db3a2921a6fe5d311d8"
 dependencies = [
  "amethyst_core",
  "amethyst_derive",
  "amethyst_error",
  "crossbeam-queue 0.1.2",
- "derivative",
+ "derivative 2.1.1",
  "derive-new",
  "erased-serde",
  "err-derive",
@@ -154,9 +154,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst_audio"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89bda4c6ca0adadf8993b5ddede89f0f6d002be76b7ab6b93a2e20d928a2a3ac"
+checksum = "151655c815565ef75f716bbca8d97d0ba7cbf3e52bb639b574e0e4490a985b09"
 dependencies = [
  "amethyst_assets",
  "amethyst_core",
@@ -166,14 +166,14 @@ dependencies = [
  "log",
  "rodio",
  "serde",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
 ]
 
 [[package]]
 name = "amethyst_config"
-version = "0.14.0"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d93c5c157a43db0130972c420ef1071a59b77cd52a46c344f066aa9ad191e585"
+checksum = "3e371aee028dbf9d0b7852103fcd9ce9ec545fd8579ed3fc66cc0a66e80e7573"
 dependencies = [
  "log",
  "ron",
@@ -182,9 +182,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst_controls"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13f7265e5aea5e19834597a7a93cb23a38eb89f87765d871c12e766b86db53c1"
+checksum = "e981b812763293a28d6c7b5aa8931eef3d2d6eca1335efe407d0e4cbd457505c"
 dependencies = [
  "amethyst_assets",
  "amethyst_core",
@@ -199,15 +199,15 @@ dependencies = [
 
 [[package]]
 name = "amethyst_core"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21774ca95806e70a4313c05004be1374abf3943ffb22f38bc034a753aad101ea"
+checksum = "b083e0bff9bc9efb21d77c6024dbb368adf6f26630cf18342d068449ec7af246"
 dependencies = [
  "alga",
  "alga_derive",
  "amethyst_error",
  "approx 0.3.2",
- "derivative",
+ "derivative 2.1.1",
  "derive-new",
  "fnv",
  "getset",
@@ -222,9 +222,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst_derive"
-version = "0.8.0"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "202a626825e752f4fc82275dc0e383571a591da0dbbf88b81877c06f371c24cf"
+checksum = "c8c5fed3a12586a411bddfd444212b06067ce450cbd3b5dc05d9787c610760ef"
 dependencies = [
  "heck",
  "proc-macro-crate",
@@ -236,36 +236,36 @@ dependencies = [
 
 [[package]]
 name = "amethyst_error"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "070352f8f0f5325f5d4177b8e7752f83954d67979430b3c35fc3726b0eed5dac"
+checksum = "1d9924e6f490107304c3ac2f40938d84fa65d9284fc7e621e29e1d943d1a68c1"
 dependencies = [
  "backtrace",
 ]
 
 [[package]]
 name = "amethyst_input"
-version = "0.11.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3aa792677569b96f705b35f135f874c31cffdcc529270c7f46a70a85d9fe34d8"
+checksum = "258c38e3ba429a0329148404705b3ed502d455b3dc167560ac66a2f779e5ba1b"
 dependencies = [
  "amethyst_config",
  "amethyst_core",
  "amethyst_error",
  "amethyst_window",
- "derivative",
+ "derivative 2.1.1",
  "derive-new",
  "fnv",
  "serde",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "winit",
 ]
 
 [[package]]
 name = "amethyst_locale"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7802a8beb42bd1d00af21cf182134e8dd8963bb8fd08be4637c3ca6a0aab6f6"
+checksum = "f2267d164da40bd35827954141700ffd9e116b2c48255d0b080bd891c5b2a483"
 dependencies = [
  "amethyst_assets",
  "amethyst_core",
@@ -277,9 +277,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst_network"
-version = "0.8.0"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc13d9f22f9497e08d4dacedede83496859df09b2946acad6138f6464f5dec4d"
+checksum = "a6fef1f527a6c99f4aebaab898b0cb1fe24bca66f80716c30417ad54e579446c"
 dependencies = [
  "amethyst_core",
  "amethyst_error",
@@ -290,9 +290,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst_rendy"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "661791abc37876714437db9dbbfd1e70c9a8ddd29eace7e5a762c2cf5bc1f6ee"
+checksum = "3bfe40a714d32e2fdaa7b30e99705957e93cc9c71b61096a4e3012d564f52b1a"
 dependencies = [
  "amethyst_assets",
  "amethyst_config",
@@ -301,27 +301,28 @@ dependencies = [
  "amethyst_error",
  "amethyst_window",
  "approx 0.3.2",
- "derivative",
+ "derivative 2.1.1",
  "derive-new",
  "failure",
  "fnv",
  "genmesh",
  "glsl-layout",
+ "gltf",
  "lazy_static",
  "log",
  "palette",
  "rendy",
  "ron",
  "serde",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "static_assertions 1.1.0",
 ]
 
 [[package]]
 name = "amethyst_ui"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2044d3705fe6726414be8b22607e6eb4d9928cffe8ad17982479d330c3705ac"
+checksum = "6794603bf9e1cc7190c41ce3f85989163a008046584861fe4806ed9417d8ebfb"
 dependencies = [
  "amethyst_assets",
  "amethyst_audio",
@@ -332,7 +333,7 @@ dependencies = [
  "amethyst_rendy",
  "amethyst_window",
  "clipboard",
- "derivative",
+ "derivative 2.1.1",
  "derive-new",
  "failure",
  "fnv",
@@ -345,7 +346,7 @@ dependencies = [
  "rand 0.7.3",
  "ron",
  "serde",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "unicode-normalization",
  "unicode-segmentation",
  "winit",
@@ -353,9 +354,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst_utils"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "180715cc173d539c5b2af6c6da08a387d0f5aade75ba74ef8fe35eb457ba0a1a"
+checksum = "3fe6e52df6e15ec04901e06e9020e853b7071b2967d2400f5f08551298e0b5db"
 dependencies = [
  "amethyst_assets",
  "amethyst_controls",
@@ -365,6 +366,7 @@ dependencies = [
  "amethyst_rendy",
  "amethyst_window",
  "derive-new",
+ "dunce",
  "log",
  "serde",
  "specs-derive",
@@ -373,9 +375,9 @@ dependencies = [
 
 [[package]]
 name = "amethyst_window"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a48007acbceb9e95f34e5c08223a3eb3e7553d47111b7a195b0277209b16c93"
+checksum = "62d5f0f2d198f0ab4e83efae01981bd4c3f9cb36d47df015c50e50624a344acc"
 dependencies = [
  "amethyst_config",
  "amethyst_core",
@@ -488,7 +490,7 @@ dependencies = [
  "addr2line",
  "cfg-if",
  "libc",
- "miniz_oxide",
+ "miniz_oxide 0.4.0",
  "object",
  "rustc-demangle",
 ]
@@ -558,6 +560,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39092a32794787acd8525ee150305ff051b0aa6cc2abaf193924f5ab05425f39"
 
 [[package]]
+name = "bytemuck"
+version = "1.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db7a1029718df60331e557c9e83a55523c955e5dd2a7bfeffad6bbd50b538ae9"
+
+[[package]]
 name = "byteorder"
 version = "1.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -571,9 +579,9 @@ checksum = "0e4cec68f03f32e44924783795810fa50a7035d8c8ebe78580ad7e6c703fba38"
 
 [[package]]
 name = "cc"
-version = "1.0.58"
+version = "1.0.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9a06fb2e53271d7c279ec1efea6ab691c35a2ae67ec0d91d7acec0caf13b518"
+checksum = "66120af515773fb005778dc07c261bd201ec8ce50bd6e7144c927753fe013381"
 
 [[package]]
 name = "cexpr"
@@ -604,9 +612,9 @@ dependencies = [
 
 [[package]]
 name = "chrono"
-version = "0.4.13"
+version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c74d84029116787153e02106bf53e66828452a4b325cc8652b788b5967c0a0b6"
+checksum = "942f72db697d8767c22d46a598e01f2d3b475501ea43d0db4f16d90259182d0b"
 dependencies = [
  "num-integer",
  "num-traits 0.2.12",
@@ -943,6 +951,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "deflate"
+version = "0.8.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73770f8e1fe7d64df17ca66ad28994a0a623ea497fa69486e14984e715c5d174"
+dependencies = [
+ "adler32",
+ "byteorder",
+]
+
+[[package]]
 name = "derivative"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -951,6 +969,17 @@ dependencies = [
  "proc-macro2 0.4.30",
  "quote 0.6.13",
  "syn 0.15.44",
+]
+
+[[package]]
+name = "derivative"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb582b60359da160a9477ee80f15c8d784c477e69c217ef2cdd4169c24ea380f"
+dependencies = [
+ "proc-macro2 1.0.19",
+ "quote 1.0.7",
+ "syn 1.0.38",
 ]
 
 [[package]]
@@ -1042,6 +1071,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dunce"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b2641c4a7c0c4101df53ea572bffdc561c146f6c2eb09e4df02bc4811e3feeb4"
+
+[[package]]
 name = "dwarf_seeks_fortune"
 version = "0.1.0"
 dependencies = [
@@ -1072,9 +1107,9 @@ checksum = "bbbaaaf38131deb9ca518a274a45bfdb8771f139517b073b16c2d3d32ae5037b"
 
 [[package]]
 name = "either"
-version = "1.5.3"
+version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb1f6b1ce1c140482ea30ddd3335fc0024ac7ee112895426e0a629a6c20adfe3"
+checksum = "cd56b59865bce947ac5958779cfa508f6c3b9497cc762b7e24a12d11ccde2c4f"
 
 [[package]]
 name = "env_logger"
@@ -1152,11 +1187,10 @@ dependencies = [
 
 [[package]]
 name = "fern"
-version = "0.5.9"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e69ab0d5aca163e388c3a49d284fed6c3d0810700e77c5ae2756a50ec1a4daaa"
+checksum = "8c9a4820f0ccc8a7afd67c39a0f1a0f4b07ca1725164271a64939d7aeb9af065"
 dependencies = [
- "chrono",
  "colored",
  "log",
 ]
@@ -1188,7 +1222,7 @@ dependencies = [
  "intl-memoizer",
  "intl_pluralrules",
  "rental",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "unic-langid",
 ]
 
@@ -1327,7 +1361,7 @@ dependencies = [
  "ash",
  "byteorder",
  "core-graphics 0.17.3",
- "derivative",
+ "derivative 1.0.4",
  "gfx-hal",
  "lazy_static",
  "log",
@@ -1402,6 +1436,43 @@ dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
  "syn 1.0.38",
+]
+
+[[package]]
+name = "gltf"
+version = "0.15.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d6fb0d1d772daf10ea74528c3aeb12215f6d5b820adf2ecfc93a6578d6779c3c"
+dependencies = [
+ "base64 0.11.0",
+ "byteorder",
+ "gltf-json",
+ "image 0.23.8",
+ "lazy_static",
+]
+
+[[package]]
+name = "gltf-derive"
+version = "0.15.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6636de7bf52227363554f1ca2d9cd180fc666129ddd0933097e1f227dfa7293"
+dependencies = [
+ "inflections",
+ "proc-macro2 1.0.19",
+ "quote 1.0.7",
+ "syn 1.0.38",
+]
+
+[[package]]
+name = "gltf-json"
+version = "0.15.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3fc3deb81e6fa04bf808f6be7c3983229552a95b77f687ad96af00f6d3e7d6c"
+dependencies = [
+ "gltf-derive",
+ "serde",
+ "serde_derive",
+ "serde_json",
 ]
 
 [[package]]
@@ -1509,6 +1580,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "image"
+version = "0.23.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "543904170510c1b5fb65140485d84de4a57fddb2ed685481e9020ce3d2c9f64c"
+dependencies = [
+ "bytemuck",
+ "byteorder",
+ "jpeg-decoder",
+ "num-iter",
+ "num-rational 0.3.0",
+ "num-traits 0.2.12",
+ "png 0.16.7",
+]
+
+[[package]]
 name = "inflate"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1516,6 +1602,12 @@ checksum = "1cdb29978cc5797bd8dcc8e5bf7de604891df2a8dc576973d71a281e916db2ff"
 dependencies = [
  "adler32",
 ]
+
+[[package]]
+name = "inflections"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a257582fdcde896fd96463bf2d40eefea0580021c0712a0e2b028b60b47a837a"
 
 [[package]]
 name = "intl-memoizer"
@@ -1539,9 +1631,9 @@ dependencies = [
 
 [[package]]
 name = "inventory"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "621b50c176968fd3b0bd71f821a28a0ea98db2b5aea966b2fbb8bd1b7d310328"
+checksum = "49c68da9c8b1bda33dc6f55b2a9b4f44eca5ba2b2a1a308eab40db9fb7e200cb"
 dependencies = [
  "ctor",
  "ghost",
@@ -1550,9 +1642,9 @@ dependencies = [
 
 [[package]]
 name = "inventory-impl"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f99a4111304bade76468d05beab3487c226e4fe4c4de1c4e8f006e815762db73"
+checksum = "4143007b389ae51577282e3c95cf5a7ae0c9e06cafa927508300ceedcbc0354c"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
@@ -1607,9 +1699,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "lazycell"
-version = "1.2.1"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b294d6fa9ee409a054354afc4352b0b9ef7ca222c69b8812cbea9e7d2bf3783f"
+checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "lewton"
@@ -1812,6 +1904,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e21c73734c69dc95696c9ed8926a2b393171d98b3f5f5935686a26a487ab9b90"
 dependencies = [
  "cc",
+]
+
+[[package]]
+name = "miniz_oxide"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "791daaae1ed6889560f8c4359194f56648355540573244a5448a83ba1ecc7435"
+dependencies = [
+ "adler32",
 ]
 
 [[package]]
@@ -2155,7 +2256,7 @@ dependencies = [
  "cloudabi",
  "libc",
  "redox_syscall",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "winapi",
 ]
 
@@ -2241,7 +2342,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63daf481fdd0defa2d1d2be15c674fbfa1b0fd71882c303a91f9a79b3252c359"
 dependencies = [
  "bitflags",
- "deflate",
+ "deflate 0.7.20",
  "inflate",
  "num-iter",
 ]
@@ -2254,8 +2355,20 @@ checksum = "ef859a23054bbfee7811284275ae522f0434a3c8e7f4b74bd4a35ae7e1c4a283"
 dependencies = [
  "bitflags",
  "crc32fast",
- "deflate",
+ "deflate 0.7.20",
  "inflate",
+]
+
+[[package]]
+name = "png"
+version = "0.16.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dfe7f9f1c730833200b134370e1d5098964231af8450bce9b78ee3ab5278b970"
+dependencies = [
+ "bitflags",
+ "crc32fast",
+ "deflate 0.8.6",
+ "miniz_oxide 0.3.7",
 ]
 
 [[package]]
@@ -2684,7 +2797,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94a32282d82bd3ef04c15edf3d6762a8bea38a6575490344188a9bbb110c6c6a"
 dependencies = [
- "derivative",
+ "derivative 1.0.4",
  "failure",
  "gfx-hal",
  "relevant",
@@ -2699,7 +2812,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ca7bcc3cb86a7945ecc5f0d7121e47a0b5979c3c57d3a5e6facc8738338651d8"
 dependencies = [
- "derivative",
+ "derivative 1.0.4",
  "failure",
  "gfx-hal",
  "log",
@@ -2713,7 +2826,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a733600fa7aa962919999ffe20bbf3f9c1c36230fedd9abf9e78caffe9db7093"
 dependencies = [
- "derivative",
+ "derivative 1.0.4",
  "either",
  "failure",
  "gfx-hal",
@@ -2737,7 +2850,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "417485444f959d67f3b1ec5ad7de340e389548ab404df0bb809bc821128660d3"
 dependencies = [
- "derivative",
+ "derivative 1.0.4",
  "either",
  "failure",
  "gfx-hal",
@@ -2759,7 +2872,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b34a289735fd2a15482aaf9fb5ba824678768dd985e7d17545a7354836d5ebd4"
 dependencies = [
  "bitflags",
- "derivative",
+ "derivative 1.0.4",
  "either",
  "failure",
  "gfx-hal",
@@ -2786,7 +2899,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1cf6b3fc8a012b69062419caf086d35f83d9af57bf30a6971691731b4816a47f"
 dependencies = [
  "colorful",
- "derivative",
+ "derivative 1.0.4",
  "failure",
  "gfx-hal",
  "hibitset",
@@ -2824,7 +2937,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3c94df60f828ae6e0c9f50bf0faeaf0125ef728ec66029c25d59c91fd6d41ee"
 dependencies = [
  "crossbeam-channel 0.3.9",
- "derivative",
+ "derivative 1.0.4",
  "failure",
  "gfx-hal",
  "log",
@@ -2841,7 +2954,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6dd3a577f3b58cd2ea98f4480d32493d80f8c3aaf1852388efec58c33d3ac222"
 dependencies = [
- "derivative",
+ "derivative 1.0.4",
  "failure",
  "gfx-hal",
  "log",
@@ -2857,7 +2970,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "911dbc17c26ec93c8cfecf6a82e5e288d503183e46ac57c7395826aea2bf259f"
 dependencies = [
- "derivative",
+ "derivative 1.0.4",
  "failure",
  "gfx-hal",
  "image 0.22.5",
@@ -2877,7 +2990,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aa01882dc9f3f64684393724d0d49d2315b612eeeb029eded2181385d796c75f"
 dependencies = [
- "derivative",
+ "derivative 1.0.4",
  "gfx-backend-vulkan",
  "gfx-hal",
  "lazy_static",
@@ -2893,7 +3006,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9954dda560d8d5fbf619a46b0619aa6e0f990bd439ab974641bdbe99a5f9c93f"
 dependencies = [
- "derivative",
+ "derivative 1.0.4",
  "failure",
  "gfx-hal",
  "log",
@@ -3074,9 +3187,9 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "serde"
-version = "1.0.114"
+version = "1.0.115"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5317f7588f0a5078ee60ef675ef96735a1442132dc645eb1d12c018620ed8cd3"
+checksum = "e54c9a88f2da7238af84b5101443f0c0d0a3bbdc455e34a5c9497b1903ed55d5"
 dependencies = [
  "serde_derive",
 ]
@@ -3092,9 +3205,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.114"
+version = "1.0.115"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a0be94b04690fbaed37cddffc5c134bf537c8e3329d53e982fe04c374978f8e"
+checksum = "609feed1d0a73cc36a0182a840a9b37b4a82f0b1150369f0536a9e3f2a31dc48"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
@@ -3170,7 +3283,7 @@ dependencies = [
  "mopa",
  "rayon",
  "shred-derive",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "tynm",
 ]
 
@@ -3226,9 +3339,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.4.1"
+version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3757cb9d89161a2f24e1cf78efa0c1fcff485d18e3f55e0aa3480824ddaa0f3f"
+checksum = "fbee7696b84bbf3d89a1c2eccff0850e3047ed46bfcd2e92c29a2d074d57e252"
 dependencies = [
  "serde",
 ]
@@ -3449,9 +3562,9 @@ checksum = "707151f004e8db265b83b1c7509d6c3b4c2c2bc8696113cbe0a8e595c2fdbd3b"
 
 [[package]]
 name = "tinyvec"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "53953d2d3a5ad81d9f844a32f14ebb121f50b650cd59d0ee2a07cf13c617efed"
+checksum = "238ce071d267c5710f9d31451efec16c5ee22de34df17cc05e56cbc92e967117"
 
 [[package]]
 name = "toml"

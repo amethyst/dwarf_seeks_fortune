@@ -9,8 +9,9 @@ edition = "2018"
 [dependencies]
 dsf_precompile = { path = "../dsf_precompile" }
 
-amethyst = { version = "0.15.0", features = [] }
+# Amethyst version and features used in this workspace are specified in the dwarf_seeks_fortune crate.
+amethyst = { }
 
 log = { version = "0.4.6", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
-rand = "0.7"
+rand = { version = "0.7.3" }

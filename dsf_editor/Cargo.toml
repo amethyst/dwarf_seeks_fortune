@@ -10,7 +10,8 @@ edition = "2018"
 dsf_precompile = { path = "../dsf_precompile" }
 dsf_core = { path = "../dsf_core" }
 
-amethyst = { version = "0.15.0", features = [] }
+# Amethyst version and features used in this workspace are specified in the dwarf_seeks_fortune crate.
+amethyst = { }
 
 log = { version = "0.4.6", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
