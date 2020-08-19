@@ -1,5 +1,5 @@
 use amethyst::utils::application_root_dir;
-use dsf_core::resources::{AnimType, SpriteType, UiType};
+use dsf_core::resources::{AnimType, SoundType, SpriteType, UiType};
 use std::fs;
 
 /// This specifies all assets that must be loaded by the LoadingState.
@@ -7,6 +7,7 @@ pub struct LoadingConfig {
     pub uis: Vec<(UiType, &'static str)>,
     pub animations: Vec<(AnimType, &'static str)>,
     pub stills: Vec<(SpriteType, &'static str, &'static str)>,
+    pub sound_effects: Vec<(SoundType, &'static str)>,
     pub music_tracks: Vec<String>,
 }
 
@@ -17,6 +18,7 @@ impl LoadingConfig {
             animations: Self::animations_to_be_loaded(),
             stills: Self::stills_to_be_loaded(),
             music_tracks: Self::music_to_be_loaded(),
+            sound_effects: Self::sound_effects_to_be_loaded(),
         }
     }
 
@@ -108,5 +110,18 @@ impl LoadingConfig {
             .filter(|option| option.is_some())
             .map(|option| option.unwrap())
             .collect()
+    }
+
+    fn sound_effects_to_be_loaded() -> Vec<(SoundType, &'static str)> {
+        vec![
+            (SoundType::Jump, "audio/jump01.wav"),
+            (SoundType::Step, "audio/step01.wav"),
+            (SoundType::Step, "audio/step02.wav"),
+            (SoundType::Step, "audio/step03.wav"),
+            (SoundType::Step, "audio/step04.wav"),
+            (SoundType::Step, "audio/step05.wav"),
+            (SoundType::Step, "audio/step06.wav"),
+            (SoundType::Step, "audio/step07.wav"),
+        ]
     }
 }

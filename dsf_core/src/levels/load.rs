@@ -96,6 +96,16 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     Ok(())
 }
 
+fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) -> Entity {
+    builder
+        .with(Transparent)
+        .with(Velocity::default())
+        .with(SteeringIntent::default())
+        .with(Steering::new(*pos, tile_def.dimens))
+        .with(Player::default())
+        .build()
+}
+
 pub fn add_background(world: &mut World, pos: &Pos, dimens: &Pos) {
     let transform = load_transform(
         pos,
@@ -180,16 +190,6 @@ fn build_frames(world: &mut World, tile_def: &TileDefinition) {
         .with(pos_ghost_transform)
         .with(DebugPosGhostTag)
         .build();
-}
-
-fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) -> Entity {
-    builder
-        .with(Transparent)
-        .with(Velocity::default())
-        .with(SteeringIntent::default())
-        .with(Steering::new(*pos, tile_def.dimens))
-        .with(Player::default())
-        .build()
 }
 
 pub fn load_transform(pos: &Pos, depth: &DepthLayer, dimens: &Pos, asset: &AssetType) -> Transform {

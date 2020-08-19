@@ -1,5 +1,7 @@
 use crate::components::*;
 use crate::resources::*;
+use crate::systems::SoundEvent;
+use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::{Time, Transform};
 use amethyst::{
     ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorage},
@@ -60,6 +62,7 @@ pub struct SteeringSystem;
 impl<'s> System<'s> for SteeringSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        Write<'s, EventChannel<SoundEvent>>,
         WriteStorage<'s, SteeringIntent>,
         ReadStorage<'s, Transform>,
         WriteStorage<'s, Steering>,
@@ -70,7 +73,15 @@ impl<'s> System<'s> for SteeringSystem {
 
     fn run(
         &mut self,
-        (mut steering_intents, transforms, mut steerings, tile_map, mut history, time): Self::SystemData,
+        (
+            mut sound_channel,
+            mut steering_intents,
+            transforms,
+            mut steerings,
+            tile_map,
+            mut history,
+            time,
+        ): Self::SystemData,
     ) {
         for (intent, transform, steering) in
             (&mut steering_intents, &transforms, &mut steerings).join()
@@ -103,6 +114,7 @@ impl<'s> System<'s> for SteeringSystem {
                 && intent.jump
                 && !is_underneath_ceiling(steering, &tile_map)
             {
+                sound_channel.single_write(SoundEvent::new(SoundType::Jump));
                 steering.mode = SteeringMode::Jumping {
                     x_movement: intent.walk,
                     starting_y_pos: transform.translation().y,
@@ -140,12 +152,14 @@ impl<'s> System<'s> for SteeringSystem {
                         if offset_from_destination < f32::EPSILON && intent.walk.is_positive() {
                             if !is_against_wall_right(&steering, steering.pos.y as f32, &tile_map) {
                                 steering.destination.x = steering.pos.x + 1;
+                                sound_channel.single_write(SoundEvent::new(SoundType::Step));
                             }
                         } else if offset_from_destination > -f32::EPSILON
                             && intent.walk.is_negative()
                         {
                             if !is_against_wall_left(&steering, steering.pos.y as f32, &tile_map) {
                                 steering.destination.x = steering.pos.x - 1;
+                                sound_channel.single_write(SoundEvent::new(SoundType::Step));
                             }
                         } else if !intent
                             .walk

@@ -14,7 +14,7 @@ use dsf_precompile::MyPrefabData;
 
 use crate::state_main_menu::MainMenuState;
 use crate::util_loading::LoadingConfig;
-use amethyst::audio::{AudioSink, Mp3Format};
+use amethyst::audio::{AudioSink, Mp3Format, WavFormat};
 use amethyst::utils::application_root_dir;
 use dsf_editor::resources::EditorConfig;
 
@@ -88,6 +88,23 @@ impl SimpleState for LoadingState {
                         }),
                     )
                 });
+        // Take the Assets instance we previously filled with stills and animations and
+        // add sound effects.
+        let assets = loading_config.sound_effects.drain(..).fold(
+            assets,
+            |assets, (sound_type, file_path)| {
+                let loader = data.world.read_resource::<Loader>();
+                assets.put_sound(
+                    sound_type,
+                    loader.load(
+                        file_path,
+                        WavFormat,
+                        &mut self.progress,
+                        &data.world.read_resource(),
+                    ),
+                )
+            },
+        );
         data.world.insert(assets);
 
         // Set audio volume:

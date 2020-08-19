@@ -18,6 +18,7 @@ use dsf_core::systems;
 
 use crate::state_loading::LoadingState;
 use dsf_core::resources::Music;
+use dsf_core::systems::PlaySfxSystem;
 use dsf_precompile::PrecompiledDefaultsBundle;
 use dsf_precompile::PrecompiledRenderBundle;
 use dsf_precompile::{start_game, MyPrefabData};
@@ -56,6 +57,7 @@ fn main() -> amethyst::Result<()> {
             "dj",
             &[],
         )
+        .with(PlaySfxSystem::default(), "play_sfx_system", &[])
         .with(systems::DummySystem, "dummy_system", &[])
         .with_bundle(PrecompiledRenderBundle {
             display_config_path,

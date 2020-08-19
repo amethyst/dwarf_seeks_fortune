@@ -1,9 +1,11 @@
 use crate::components::Pos;
+use amethyst::audio::SourceHandle;
 use amethyst::{
     assets::{Handle, Prefab},
     renderer::SpriteSheet,
 };
 use dsf_precompile::MyPrefabData;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -11,6 +13,7 @@ use std::collections::HashMap;
 pub struct Assets {
     stills: HashMap<SpriteType, Handle<SpriteSheet>>,
     animated: HashMap<AnimType, Handle<Prefab<MyPrefabData>>>,
+    sounds: HashMap<SoundType, Vec<SourceHandle>>,
 }
 
 impl Assets {
@@ -25,6 +28,17 @@ impl Assets {
         asset: Handle<Prefab<MyPrefabData>>,
     ) -> Self {
         self.animated.insert(asset_type, asset);
+        self
+    }
+
+    pub fn put_sound(mut self, sound_type: SoundType, asset: SourceHandle) -> Self {
+        if !self.sounds.contains_key(&sound_type) {
+            self.sounds.insert(sound_type, vec![]);
+        }
+        self.sounds
+            .get_mut(&sound_type)
+            .expect("Should not panic.")
+            .push(asset);
         self
     }
 
@@ -50,6 +64,15 @@ impl Assets {
             })
             .expect("Fallback asset also missing!"))
         .clone()
+    }
+
+    pub fn get_sound(&self, asset_type: &SoundType) -> SourceHandle {
+        let sounds_of_that_type = self
+            .sounds
+            .get(asset_type)
+            .expect(&*format!("Sounds of type {:?} are missing!", asset_type));
+        let index = rand::thread_rng().gen_range(0, sounds_of_that_type.len());
+        (*sounds_of_that_type.get(index).expect("Should not panic.")).clone()
     }
 }
 
@@ -105,4 +128,10 @@ pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
             _ => Pos::new(128, 128),
         },
     }
+}
+
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
+pub enum SoundType {
+    Jump,
+    Step,
 }

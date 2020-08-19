@@ -1,3 +1,4 @@
+mod audio;
 mod camera;
 mod debug;
 mod movement;
@@ -7,6 +8,7 @@ mod tools;
 mod ui;
 mod win;
 
+pub use self::audio::*;
 pub use self::camera::*;
 pub use self::debug::*;
 pub use self::movement::*;
