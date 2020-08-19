@@ -9,6 +9,6 @@ edition = "2018"
 [dependencies]
 
 # Amethyst version and features used in this workspace are specified in the dwarf_seeks_fortune crate.
-amethyst = { }
+amethyst = { version = "*" }
 
 serde = { version = "1.0", features = ["derive"] }
