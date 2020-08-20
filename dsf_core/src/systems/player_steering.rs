@@ -110,17 +110,18 @@ impl<'s> System<'s> for SteeringSystem {
                     starting_y_pos: transform.translation().y,
                     starting_time: time.absolute_time_seconds(),
                 };
-            } else if steering.is_grounded()
-                && intent.jump
-                && !is_underneath_ceiling(steering, &tile_map)
-            {
-                sound_channel.single_write(SoundEvent::new(SoundType::Jump));
-                steering.mode = SteeringMode::Jumping {
-                    x_movement: intent.walk,
-                    starting_y_pos: transform.translation().y,
-                    starting_time: time.absolute_time_seconds(),
-                };
-                steering.direction = Direction2D::from(intent.walk, Direction1D::Neutral);
+            } else if steering.is_grounded() && intent.jump {
+                if is_underneath_ceiling(steering, &tile_map) {
+                    sound_channel.single_write(SoundEvent::new(SoundType::CannotPerformAction));
+                } else {
+                    sound_channel.single_write(SoundEvent::new(SoundType::Jump));
+                    steering.mode = SteeringMode::Jumping {
+                        x_movement: intent.walk,
+                        starting_y_pos: transform.translation().y,
+                        starting_time: time.absolute_time_seconds(),
+                    };
+                    steering.direction = Direction2D::from(intent.walk, Direction1D::Neutral);
+                }
             } else if steering.jump_has_peaked(time.absolute_time_seconds()) {
                 steering.mode = steering.mode.jump_to_fall();
             } else if steering.is_grounded()

@@ -134,4 +134,7 @@ pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
 pub enum SoundType {
     Jump,
     Step,
+    /// This will be played when the player tries something that is not possible, such as trying to
+    /// jump while underneath a 2-high ledge.
+    CannotPerformAction,
 }

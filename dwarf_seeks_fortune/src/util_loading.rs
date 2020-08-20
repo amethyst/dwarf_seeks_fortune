@@ -122,6 +122,7 @@ impl LoadingConfig {
             (SoundType::Step, "audio/step05.wav"),
             (SoundType::Step, "audio/step06.wav"),
             (SoundType::Step, "audio/step07.wav"),
+            (SoundType::CannotPerformAction, "audio/nonono.wav"),
         ]
     }
 }
