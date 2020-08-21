@@ -3,9 +3,9 @@
 #[macro_use]
 extern crate log;
 
+mod loading_config;
 mod state_loading;
 mod state_main_menu;
-mod loading_config;
 
 use amethyst::{
     assets::{PrefabLoaderSystemDesc, Processor},

@@ -50,6 +50,10 @@
         ),
     ],
     sound_effects: [
+        (Mining, "audio/mining.wav"),
+        (ToolPickup, "audio/tool_pickup_01.wav"),
+        (ToolPickup, "audio/tool_pickup_02.wav"),
+        (ToolPickup, "audio/tool_pickup_03.wav"),
         (Jump, "audio/jump01.wav"),
         (Step, "audio/step01.wav"),
         (Step, "audio/step02.wav"),

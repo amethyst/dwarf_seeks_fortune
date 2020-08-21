@@ -12,8 +12,8 @@ use amethyst::{
 };
 use dsf_precompile::MyPrefabData;
 
-use crate::state_main_menu::MainMenuState;
 use crate::loading_config::LoadingConfig;
+use crate::state_main_menu::MainMenuState;
 use amethyst::audio::{AudioSink, Mp3Format, WavFormat};
 use amethyst::utils::application_root_dir;
 use dsf_editor::resources::EditorConfig;

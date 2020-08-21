@@ -9,6 +9,8 @@ use amethyst::{
 use crate::components::*;
 use crate::levels::*;
 use crate::resources::*;
+use crate::systems::SoundEvent;
+use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::Parent;
 use amethyst::prelude::{Builder, WorldExt};
 
@@ -25,6 +27,7 @@ pub struct PickupSystem;
 impl<'s> System<'s> for PickupSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        Write<'s, EventChannel<SoundEvent>>,
         WriteStorage<'s, Player>,
         ReadStorage<'s, Steering>,
         ReadStorage<'s, Tool>,
@@ -35,7 +38,7 @@ impl<'s> System<'s> for PickupSystem {
 
     fn run(
         &mut self,
-        (mut players, steerings, tools, transforms, lazy, entities): Self::SystemData,
+        (mut sound_channel, mut players, steerings, tools, transforms, lazy, entities): Self::SystemData,
     ) {
         let player = (&mut players, &entities, &steerings, &transforms)
             .join()
@@ -52,6 +55,7 @@ impl<'s> System<'s> for PickupSystem {
             if player.equipped.is_some() {
                 return;
             }
+            // Find the first tool that intersects with the player:
             let tool_opt = (&tools, &transforms, &entities)
                 .join()
                 .find(|(_, transform, _)| {
@@ -63,6 +67,7 @@ impl<'s> System<'s> for PickupSystem {
                         && pos.y + dimens.y / 2. > key_y - TOOL_HEIGHT / 3.
                 });
             if let Some((tool, _, tool_entity)) = tool_opt {
+                sound_channel.single_write(SoundEvent::new(SoundType::ToolPickup));
                 player.equipped = Some(tool.tool_type);
                 let (sprite, sprite_nr) = (tool.sprite, tool.sprite_nr);
                 lazy.exec_mut(move |world| {
@@ -91,6 +96,7 @@ pub struct UseToolSystem;
 impl<'s> System<'s> for UseToolSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        Write<'s, EventChannel<SoundEvent>>,
         WriteStorage<'s, Player>,
         ReadStorage<'s, Steering>,
         ReadStorage<'s, EquippedTag>,
@@ -103,6 +109,7 @@ impl<'s> System<'s> for UseToolSystem {
     fn run(
         &mut self,
         (
+            mut sound_channel,
             mut players,
             steerings,
             equipped_tags,
@@ -141,6 +148,7 @@ impl<'s> System<'s> for UseToolSystem {
                         .unwrap_or(true)
                 });
                 if at_least_one_is_breakable && none_are_unbreakable {
+                    sound_channel.single_write(SoundEvent::new(SoundType::Mining));
                     player.equipped = None;
                     targeted_blocks.iter().for_each(|pos| {
                         tile_map.remove_tile(pos);
