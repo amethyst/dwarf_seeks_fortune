@@ -212,9 +212,8 @@ pub enum SteeringMode {
         x_movement: Direction1D,
         /// The y-coordinate that the entity had when it  first started falling.
         starting_y_pos: f32,
-        /// A time in seconds since the start of the game. This is the time at which the entity
-        /// started falling.
-        starting_time: f64,
+        /// The time in seconds since the entity started falling.
+        duration: f32,
     },
     /// The entity is jumping. The character may have an x-velocity.
     /// While jumping, the character's y-coordinate describes a certain curve.
@@ -226,9 +225,8 @@ pub enum SteeringMode {
         x_movement: Direction1D,
         /// The y-coordinate that the entity had when it started the jump.
         starting_y_pos: f32,
-        /// A time in seconds since the start of the game. This is the time at which the entity
-        /// started jumping.
-        starting_time: f64,
+        /// The time in seconds since the character started their jump.
+        duration: f32,
     },
 }
 
@@ -242,16 +240,10 @@ impl SteeringMode {
     /// Calculate the y offset from the initial y-position at the time this movement began.
     /// This method is only valid for SteeringMode::Falling and SteeringMode::Jumping. It will
     /// return 0. otherwise.
-    pub fn calc_delta_y(&self, time: f64) -> f32 {
+    pub fn calc_delta_y(&self, duration: f32) -> f32 {
         match self {
-            SteeringMode::Jumping { starting_time, .. } => {
-                let t = time - starting_time;
-                (-50. * (t - 0.209).powf(2.) + 2.2) as f32
-            }
-            SteeringMode::Falling { starting_time, .. } => {
-                let t = time - starting_time;
-                (t * -15.) as f32
-            }
+            SteeringMode::Jumping { .. } => -50. * (duration - 0.209).powf(2.) + 2.2,
+            SteeringMode::Falling { .. } => duration * -15.,
             _ => 0.,
         }
     }
@@ -260,16 +252,40 @@ impl SteeringMode {
         if let SteeringMode::Jumping {
             x_movement,
             starting_y_pos,
-            starting_time,
+            duration,
         } = *self
         {
             SteeringMode::Falling {
                 x_movement,
-                starting_y_pos: starting_y_pos + self.calc_delta_y(starting_time + 0.209),
-                starting_time: starting_time + 0.209,
+                starting_y_pos: starting_y_pos + self.calc_delta_y(0.209),
+                duration: duration - 0.209,
             }
         } else {
             panic!("Not allowed.");
+        }
+    }
+
+    pub fn add_to_duration(&self, delta_time: f32) -> Self {
+        match *self {
+            SteeringMode::Jumping {
+                x_movement,
+                starting_y_pos,
+                duration,
+            } => SteeringMode::Jumping {
+                x_movement,
+                starting_y_pos,
+                duration: duration + delta_time,
+            },
+            SteeringMode::Falling {
+                x_movement,
+                starting_y_pos,
+                duration,
+            } => SteeringMode::Falling {
+                x_movement,
+                starting_y_pos,
+                duration: duration + delta_time,
+            },
+            _ => panic!("Not allowed to call this on SteeringMode that is not Falling or Jumping."),
         }
     }
 }
@@ -306,13 +322,9 @@ impl Steering {
         }
     }
 
-    pub fn jump_has_peaked(&self, time: f64) -> bool {
-        if let SteeringMode::Jumping {
-            starting_time: start_time,
-            ..
-        } = self.mode
-        {
-            time - start_time > 0.209
+    pub fn jump_has_peaked(&self) -> bool {
+        if let SteeringMode::Jumping { duration, .. } = self.mode {
+            duration > 0.209
         } else {
             false
         }

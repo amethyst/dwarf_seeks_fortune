@@ -155,8 +155,12 @@ impl SimpleState for PlayState {
         }
     }
 
-    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+    fn fixed_update(&mut self, data: StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         self.dispatcher.dispatch(&data.world);
+        Trans::None
+    }
+
+    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
         // Execute a pass similar to a system
         data.world.exec(
             #[allow(clippy::type_complexity)]

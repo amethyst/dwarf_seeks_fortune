@@ -32,7 +32,7 @@ impl<'s> System<'s> for RewindControlSystem {
                     if rewind.is_ready() {
                         rewind.cooldown + config.seconds_per_rewind_frame
                     } else {
-                        rewind.cooldown - time.delta_seconds()
+                        rewind.cooldown - time.fixed_seconds()
                     }
                 }
             };

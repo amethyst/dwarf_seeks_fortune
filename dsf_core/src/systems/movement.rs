@@ -1,6 +1,7 @@
 use crate::components::*;
 
 use crate::resources::*;
+use amethyst::core::duration_to_nanos;
 use amethyst::core::num::FloatConst;
 use amethyst::{
     core::timing::Time,
@@ -22,9 +23,9 @@ impl<'s> System<'s> for VelocitySystem {
     fn run(&mut self, (mut transforms, velocities, time): Self::SystemData) {
         for (transform, velocity) in (&mut transforms, &velocities).join() {
             transform
-                .set_translation_x(transform.translation().x + time.delta_seconds() * velocity.x);
+                .set_translation_x(transform.translation().x + time.fixed_seconds() * velocity.x);
             transform
-                .set_translation_y(transform.translation().y + time.delta_seconds() * velocity.y);
+                .set_translation_y(transform.translation().y + time.fixed_seconds() * velocity.y);
         }
     }
 }
@@ -66,19 +67,25 @@ impl<'s> System<'s> for MovementSystem {
                         transform.set_translation_y(centered_y);
                     }
                 }
-                SteeringMode::Falling { starting_y_pos, .. } => {
+                SteeringMode::Falling {
+                    starting_y_pos,
+                    duration,
+                    ..
+                } => {
                     // Set y-position directly, based on movement function. We don't use velocity for this.
                     velocity.y = 0.0;
-                    transform.set_translation_y(
-                        starting_y_pos + steering.mode.calc_delta_y(time.absolute_time_seconds()),
-                    );
+                    transform
+                        .set_translation_y(starting_y_pos + steering.mode.calc_delta_y(duration));
                 }
-                SteeringMode::Jumping { starting_y_pos, .. } => {
+                SteeringMode::Jumping {
+                    starting_y_pos,
+                    duration,
+                    ..
+                } => {
                     // Set y-position directly, based on movement function. We don't use velocity for this.
                     velocity.y = 0.0;
-                    transform.set_translation_y(
-                        starting_y_pos + steering.mode.calc_delta_y(time.absolute_time_seconds()),
-                    );
+                    transform
+                        .set_translation_y(starting_y_pos + steering.mode.calc_delta_y(duration));
                 }
             }
 
@@ -133,12 +140,12 @@ impl<'s> System<'s> for LevelWrappingSystem {
                     SteeringMode::Falling {
                         x_movement,
                         starting_y_pos,
-                        starting_time,
+                        duration,
                     } => {
                         steering.mode = SteeringMode::Falling {
                             x_movement,
                             starting_y_pos: starting_y_pos + tile_map.dimens.y as f32,
-                            starting_time,
+                            duration,
                         }
                     }
                     _ => (),

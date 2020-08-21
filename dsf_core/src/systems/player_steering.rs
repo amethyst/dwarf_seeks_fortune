@@ -31,7 +31,7 @@ impl<'s> System<'s> for PlayerSystem {
             player.jump_grace_timer = if initiate_jump {
                 Some(0.)
             } else if let Some(time_passed) = player.jump_grace_timer {
-                let time_passed = time_passed + time.delta_seconds();
+                let time_passed = time_passed + time.fixed_seconds();
                 if time_passed < config.jump_allowance {
                     Some(time_passed)
                 } else {
@@ -90,6 +90,10 @@ impl<'s> System<'s> for SteeringSystem {
             let (anchored_x, anchored_y) = steering.to_anchor_coords(transform);
             steering.pos = Pos::new(anchored_x.round() as i32, anchored_y.round() as i32);
 
+            if steering.is_mid_air() {
+                steering.mode = steering.mode.add_to_duration(time.fixed_seconds());
+            }
+
             // The following if-else construction checks if the steering mode should be changed.
             let has_ground_beneath_feet = is_grounded(&steering, &tile_map);
             if steering.is_falling()
@@ -108,7 +112,7 @@ impl<'s> System<'s> for SteeringSystem {
                 steering.mode = SteeringMode::Falling {
                     x_movement: Direction1D::Neutral,
                     starting_y_pos: transform.translation().y,
-                    starting_time: time.absolute_time_seconds(),
+                    duration: 0.,
                 };
             } else if steering.is_grounded() && intent.jump {
                 if is_underneath_ceiling(steering, &tile_map) {
@@ -118,11 +122,11 @@ impl<'s> System<'s> for SteeringSystem {
                     steering.mode = SteeringMode::Jumping {
                         x_movement: intent.walk,
                         starting_y_pos: transform.translation().y,
-                        starting_time: time.absolute_time_seconds(),
+                        duration: 0.,
                     };
                     steering.direction = Direction2D::from(intent.walk, Direction1D::Neutral);
                 }
-            } else if steering.jump_has_peaked(time.absolute_time_seconds()) {
+            } else if steering.jump_has_peaked() {
                 steering.mode = steering.mode.jump_to_fall();
             } else if steering.is_grounded()
                 && aligned_with_grid(steering.destination.x as f32, anchored_x, intent.walk)
@@ -191,7 +195,7 @@ impl<'s> System<'s> for SteeringSystem {
                                 steering.mode = SteeringMode::Falling {
                                     x_movement: Direction1D::Neutral,
                                     starting_y_pos: transform.translation().y,
-                                    starting_time: time.absolute_time_seconds(),
+                                    duration: 0.,
                                 };
                             } else {
                                 steering.mode = SteeringMode::Grounded;
@@ -209,7 +213,7 @@ impl<'s> System<'s> for SteeringSystem {
                 SteeringMode::Falling {
                     x_movement,
                     starting_y_pos,
-                    starting_time,
+                    duration,
                 } => {
                     if x_movement.is_neutral() {
                         // No horizontal movement.
@@ -220,7 +224,7 @@ impl<'s> System<'s> for SteeringSystem {
                             steering.mode = SteeringMode::Falling {
                                 x_movement: Direction1D::Neutral,
                                 starting_y_pos,
-                                starting_time,
+                                duration,
                             };
                         } else if aligned_with_grid(
                             steering.destination.x as f32,
@@ -235,7 +239,7 @@ impl<'s> System<'s> for SteeringSystem {
                             steering.mode = SteeringMode::Falling {
                                 x_movement: Direction1D::Neutral,
                                 starting_y_pos,
-                                starting_time,
+                                duration,
                             };
                         } else if aligned_with_grid(
                             steering.destination.x as f32,
@@ -249,13 +253,13 @@ impl<'s> System<'s> for SteeringSystem {
                 SteeringMode::Jumping {
                     x_movement,
                     starting_y_pos,
-                    starting_time,
+                    duration,
                 } => {
                     if !intent.jump_direction.is_neutral() {
                         steering.mode = SteeringMode::Jumping {
                             x_movement: intent.jump_direction,
                             starting_y_pos,
-                            starting_time,
+                            duration,
                         };
                         steering.direction =
                             Direction2D::from(intent.jump_direction, Direction1D::Neutral);
