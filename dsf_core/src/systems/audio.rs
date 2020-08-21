@@ -45,8 +45,12 @@ impl<'s> System<'s> for PlaySfxSystem {
             .expect("`PlaySfxSystem::setup` was not called before `PlaySfxSystem::run`");
 
         for event in sound_events.read(reader_id) {
-            if let Some(source) = sources.get(&assets.get_sound(&event.sound_type)) {
-                output.play_once(source, 1.0);
+            let source = assets
+                .get_sound(&event.sound_type)
+                .map(|source_handle| sources.get(&source_handle))
+                .flatten();
+            if let Some(source) = source {
+                output.play_once(source, 0.5);
             }
         }
     }

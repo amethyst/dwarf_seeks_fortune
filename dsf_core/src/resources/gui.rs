@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use amethyst::prelude::WorldExt;
 
 use amethyst::ui::UiPrefab;
+use serde::{Deserialize, Serialize};
 
 use amethyst::{assets::Handle, ecs::prelude::Entity, prelude::*};
 
@@ -17,22 +18,24 @@ impl UiHandles {
         self
     }
 
-    pub fn clone_handle(&self, key: &UiType) -> Handle<UiPrefab> {
-        (*self
-            .map
+    fn clone_handle(&self, key: &UiType) -> Option<Handle<UiPrefab>> {
+        self.map
             .get(key)
-            .unwrap_or_else(|| panic!("Tried loading UI element {:?} but failed!", key)))
-        .clone()
+            .or_else(|| {
+                error!("Tried using UI element {:?} but that element was not loaded! To use this element, add it to the LoadingConfig.", key);
+                None
+            })
+            .map(|handle| (*handle).clone())
     }
 
-    /// Convenience method that grabs the correct UiHandle and usues it to create an entity.
+    /// Convenience method that grabs the correct UiHandle and uses it to create an entity.
     pub fn add_ui(key: &UiType, world: &mut World) -> Option<Entity> {
         let handle = world.read_resource::<UiHandles>().clone_handle(key);
-        Some(world.create_entity().with(handle).build())
+        handle.map(|handle| world.create_entity().with(handle).build())
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum UiType {
     /// Small debug FPS meter.
     Fps,

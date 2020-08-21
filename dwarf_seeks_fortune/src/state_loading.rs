@@ -13,7 +13,7 @@ use amethyst::{
 use dsf_precompile::MyPrefabData;
 
 use crate::state_main_menu::MainMenuState;
-use crate::util_loading::LoadingConfig;
+use crate::loading_config::LoadingConfig;
 use amethyst::audio::{AudioSink, Mp3Format, WavFormat};
 use amethyst::utils::application_root_dir;
 use dsf_editor::resources::EditorConfig;
@@ -36,8 +36,8 @@ impl SimpleState for LoadingState {
             creator.create("ui/loading.ron", &mut self.progress)
         }));
 
-        // Create a LoadingConfig to tell us what to actually load.
-        let mut loading_config = LoadingConfig::new();
+        // Create a LoadingConfig to tell us what assets to actually load.
+        let mut loading_config = load_loading_config();
 
         // Load all UI handles.
         let ui_handles =
@@ -142,6 +142,20 @@ impl SimpleState for LoadingState {
             Completion::Loading => Trans::None,
         }
     }
+}
+
+fn load_loading_config() -> LoadingConfig {
+    let config_dir = application_root_dir()
+        .expect("Failed to get application root directory!")
+        .join("../assets/")
+        .join("config/");
+    LoadingConfig::load(&config_dir.join("loading.ron")).unwrap_or_else(|error| {
+        error!(
+            "Failed to load loading config! Falling back to default. Error: {:?}",
+            error
+        );
+        LoadingConfig::default()
+    })
 }
 
 fn load_configs(world: &mut World) {

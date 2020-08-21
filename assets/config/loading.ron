@@ -1,0 +1,72 @@
+// Serialised version of a LoadingConfig struct.
+(
+    uis: [
+        (Fps, "ui/fps.ron"),
+        (WinMessage, "ui/win_message.ron"),
+        (Save, "ui/save.ron"),
+        (Editor, "ui/editor.ron"),
+        (MainMenu, "ui/main_menu.ron"),
+    ],
+    animations: [
+        (NotFound, "prefab/anim_not_found.ron"),
+        (Mob, "prefab/anim_mob.ron"),
+        (Miner, "prefab/anim_miner.ron"),
+    ],
+    stills: [
+        (
+            NotFound,
+            "textures/not_found.png",
+            "prefab/still_not_found.ron",
+        ),
+        (
+            Ladder,
+            "textures/ladder.png",
+            "prefab/still_ladder.ron",
+        ),
+        (
+            Frame,
+            "textures/frame.png",
+            "prefab/still_frame.ron",
+        ),
+        (
+            Blocks,
+            "textures/blocks.png",
+            "prefab/still_blocks.ron",
+        ),
+        (
+            Tools,
+            "textures/tools.png",
+            "prefab/still_tools.ron",
+        ),
+        (
+            Door,
+            "textures/door.png",
+            "prefab/still_door.ron",
+        ),
+        (
+            Selection,
+            "textures/selection.png",
+            "prefab/still_selection.ron",
+        ),
+    ],
+    sound_effects: [
+        (Jump, "audio/jump01.wav"),
+        (Step, "audio/step01.wav"),
+        (Step, "audio/step02.wav"),
+        (Step, "audio/step03.wav"),
+        (Step, "audio/step04.wav"),
+        (Step, "audio/step05.wav"),
+        (Step, "audio/step06.wav"),
+        (Step, "audio/step07.wav"),
+        (CannotPerformAction, "audio/nonono.wav"),
+    ],
+    music_tracks: [
+        "audio/music/Loyalty_Freak_Music_-_01_-_Once_more_with_you.mp3",
+        "audio/music/Loyalty_Freak_Music_-_02_-_One_Cool_Minute.mp3",
+        "audio/music/Loyalty_Freak_Music_-_03_-_Old_Key.mp3",
+        "audio/music/Loyalty_Freak_Music_-_04_-_Static_Shoes.mp3",
+        "audio/music/Loyalty_Freak_Music_-_05_-_Waiting_TTTT.mp3",
+        "audio/music/Loyalty_Freak_Music_-_06_-_Lag.mp3",
+        "audio/music/Loyalty_Freak_Music_-_07_-_No_Cadillac.mp3",
+    ],
+)

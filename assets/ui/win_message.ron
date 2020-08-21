@@ -1,7 +1,7 @@
 #![enable(implicit_some)]
 Label(
     transform: (
-        id: "fps_text",
+        id: "win_msg_text",
         anchor: Middle,
         x: 0.,
         y: -256.,

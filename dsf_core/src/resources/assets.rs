@@ -66,13 +66,18 @@ impl Assets {
         .clone()
     }
 
-    pub fn get_sound(&self, asset_type: &SoundType) -> SourceHandle {
-        let sounds_of_that_type = self
+    pub fn get_sound(&self, asset_type: &SoundType) -> Option<SourceHandle> {
+        self
             .sounds
             .get(asset_type)
-            .expect(&*format!("Sounds of type {:?} are missing!", asset_type));
-        let index = rand::thread_rng().gen_range(0, sounds_of_that_type.len());
-        (*sounds_of_that_type.get(index).expect("Should not panic.")).clone()
+            .or_else(|| {
+                error!("There are no sounds of type {:?}. Add them to the LoadingConfig to start using them.", asset_type);
+                None
+            })
+            .map(|sounds_of_that_type| {
+                let random_index = rand::thread_rng().gen_range(0, sounds_of_that_type.len());
+                (*sounds_of_that_type.get(random_index).expect("Should not panic.")).clone()
+            })
     }
 }
 
