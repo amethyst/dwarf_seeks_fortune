@@ -30,6 +30,11 @@ where
     ordered.serialize(serializer)
 }
 
+/// This resource stores tile definitions. It is used in both the level editor and the actual game.
+/// Definitions are loaded from a file. Each tile definition describes the properties of a type of
+/// tile or entity that can be encountered in a level. Level files only contain string references to
+/// tile definitions. This protects level files from becoming outdated when tile definitions are
+/// updated.
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
@@ -69,6 +74,8 @@ impl<'a> TileDefinitions {
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileDefinition {
+    /// Z-layering information. What should be drawn behind this tile and what should be drawn in
+    /// front of this tile?
     pub depth: DepthLayer,
     /// How wide and high is the tile?
     pub dimens: Pos,
@@ -85,6 +92,8 @@ pub struct TileDefinition {
     pub collision: Option<CollisionDefinition>,
     /// The graphical asset to use for this tile. Is optional, because not all tiles have an asset.
     pub asset: Option<AssetType>,
+    /// Use this if there are any special components or child-entities that should be attached to
+    /// this tile.
     pub archetype: Archetype,
 }
 

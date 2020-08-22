@@ -1,6 +1,8 @@
 #![allow(dead_code, unused_imports, unused_variables)]
 #![forbid(unsafe_code)]
 
+//! This crate houses all code for the level editor.
+
 #[macro_use]
 extern crate log;
 

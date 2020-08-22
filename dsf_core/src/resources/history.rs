@@ -1,6 +1,9 @@
 use crate::components::*;
 
 /// Holds the full history of the current game. Used to rewind games to an earlier point.
+///
+/// NB: Rewinding is currently considered a debug-only feature. It isn't currently ready for use in
+/// real game play. In the future, it will either be made an official feature or removed altogether.
 #[derive(Debug)]
 pub struct History {
     /// If this is true, then a new Frame should be created this tick, even if nothing changed.

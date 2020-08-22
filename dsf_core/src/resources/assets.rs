@@ -135,15 +135,25 @@ pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
     }
 }
 
+/// Identifies a type of sound effect. Each of these sound types could be represented by any number
+/// of sound files that the game will randomly pick from.
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum SoundType {
+    /// Sound will be played when the player initiates a jump.
     Jump,
+    /// The player's footstep. Sound file must be a single footstep. Sound must not be too loud or
+    /// noticeable.
     Step,
     /// This will be played when the player tries something that is not possible, such as trying to
     /// jump while underneath a 2-high ledge.
     CannotPerformAction,
+    /// When the player starts to use a mining tool, ie: a tool that breaks blocks.
     Mining,
+    /// Played when the player picks up any tool.
     ToolPickup,
+    /// Played when the player picks up a key.
     KeyPickup,
+    /// Played when the player completes a level by reaching the exit door after having picked up
+    /// all keys.
     Win,
 }

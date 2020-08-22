@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use amethyst::{assets::Handle, ecs::prelude::Entity, prelude::*};
 
+/// This resource stores handles to UI prefabs that were loaded in the LoadingState.
 #[derive(Default, Debug)]
 pub struct UiHandles {
     map: HashMap<UiType, Handle<UiPrefab>>,
@@ -29,6 +30,7 @@ impl UiHandles {
     }
 
     /// Convenience method that grabs the correct UiHandle and uses it to create an entity.
+    /// This is the recommended way to create a GUI.
     pub fn add_ui(key: &UiType, world: &mut World) -> Option<Entity> {
         let handle = world.read_resource::<UiHandles>().clone_handle(key);
         handle.map(|handle| world.create_entity().with(handle).build())
