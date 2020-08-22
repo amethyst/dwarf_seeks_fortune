@@ -1,11 +1,7 @@
 use amethyst::{
     core::Time,
-    ecs::{
-        prelude::{Entity, Read, System, WriteStorage},
-        ReaderId, Write,
-    },
-    shrev::EventChannel,
-    ui::{UiEvent, UiFinder, UiText},
+    ecs::prelude::{Entity, Read, System, WriteStorage},
+    ui::{UiFinder, UiText},
     utils::fps_counter::FpsCounter,
 };
 

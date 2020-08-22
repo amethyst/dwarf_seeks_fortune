@@ -1,8 +1,4 @@
-use amethyst::{
-    assets::Loader,
-    audio::{AudioSink, OggFormat, SourceHandle},
-    ecs::prelude::{World, WorldExt},
-};
+use amethyst::audio::SourceHandle;
 use rand::prelude::SliceRandom;
 use rand::thread_rng;
 

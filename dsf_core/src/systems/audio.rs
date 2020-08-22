@@ -1,15 +1,12 @@
 use crate::resources::{Assets, SoundType};
 use amethyst::assets::AssetStorage;
 use amethyst::audio::output::Output;
-use amethyst::audio::{AudioEmitter, Source};
+use amethyst::audio::Source;
 use amethyst::core::ecs::shrev::EventChannel;
-use amethyst::core::ecs::{Join, Read, ReaderId, System, WriteStorage};
+use amethyst::core::ecs::{Read, ReaderId, System};
 use amethyst::core::shred::SystemData;
-use amethyst::core::Time;
+
 use amethyst::prelude::World;
-use amethyst::utils::application_root_dir;
-use std::fs::File;
-use std::io::Read as ReadIO;
 
 #[derive(Debug, Clone)]
 pub struct SoundEvent {

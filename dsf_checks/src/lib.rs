@@ -1,4 +1,4 @@
-#![allow(dead_code, unused_imports, unused_variables)]
+// #![allow(dead_code, unused_imports, unused_variables)]
 #![forbid(unsafe_code)]
 
 #[macro_use]

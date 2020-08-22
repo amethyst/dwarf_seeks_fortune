@@ -1,11 +1,8 @@
 use amethyst::{
-    assets::{Handle, Prefab},
     core::math::Vector3,
     core::timing::Time,
     core::transform::Transform,
-    ecs::prelude::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage},
-    input::{InputHandler, StringBindings},
-    renderer::sprite::SpriteRender,
+    ecs::prelude::{Join, Read, ReadStorage, System, WriteStorage},
 };
 
 use crate::components::*;

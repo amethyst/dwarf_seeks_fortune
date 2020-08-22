@@ -23,13 +23,12 @@ impl<'s> System<'s> for ChooseBrushSystem {
         Write<'s, EventReaders>,
         Read<'s, EventChannel<InputEvent<StringBindings>>>,
         Read<'s, LazyUpdate>,
-        Read<'s, TileDefinitions>,
         Write<'s, EditorData>,
     );
 
     fn run(
         &mut self,
-        (cursors, mut readers, event_channel, lazy, tile_defs, mut editor_data): Self::SystemData,
+        (cursors, mut readers, event_channel, lazy, mut editor_data): Self::SystemData,
     ) {
         let cursor_exists = (&cursors).join().next().is_some();
         if !cursor_exists {

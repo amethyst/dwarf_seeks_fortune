@@ -1,8 +1,3 @@
-use amethyst::core::ecs::shrev::EventChannel;
-
-use amethyst::input::{InputEvent, StringBindings, VirtualKeyCode};
-use amethyst::prelude::WorldExt;
-
 use amethyst::{
     assets::{Handle, Prefab},
     core::transform::Transform,
@@ -10,11 +5,9 @@ use amethyst::{
     renderer::sprite::SpriteRender,
 };
 
-use dsf_core::components::{Background, Pos};
-use dsf_core::levels::{
-    load_anim_asset, load_still_asset, load_transform, TileDefinition, TileDefinitions,
-};
-use dsf_core::resources::{Assets, EventReaders};
+use dsf_core::components::Background;
+use dsf_core::levels::{load_anim_asset, load_still_asset, load_transform, TileDefinitions};
+use dsf_core::resources::Assets;
 use dsf_precompile::MyPrefabData;
 
 use crate::components::*;

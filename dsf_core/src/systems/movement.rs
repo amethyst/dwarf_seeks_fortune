@@ -1,7 +1,7 @@
 use crate::components::*;
 
 use crate::resources::*;
-use amethyst::core::duration_to_nanos;
+
 use amethyst::core::num::FloatConst;
 use amethyst::{
     core::timing::Time,
@@ -43,7 +43,10 @@ impl<'s> System<'s> for MovementSystem {
         Read<'s, Time>,
     );
 
-    fn run(&mut self, (steerings, mut transforms, mut velocities, config, time): Self::SystemData) {
+    fn run(
+        &mut self,
+        (steerings, mut transforms, mut velocities, config, _time): Self::SystemData,
+    ) {
         for (transform, steering, velocity) in (&mut transforms, &steerings, &mut velocities).join()
         {
             let (centered_x, centered_y) = steering.to_centered_coords(steering.pos);

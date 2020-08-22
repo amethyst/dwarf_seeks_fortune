@@ -10,7 +10,7 @@ use amethyst::{
     renderer::sprite::SpriteRender,
     StateData, Trans,
 };
-use amethyst::{GameData, SimpleState, SimpleTrans, State};
+use amethyst::{GameData, SimpleState, SimpleTrans};
 
 use dsf_precompile::AnimationId;
 

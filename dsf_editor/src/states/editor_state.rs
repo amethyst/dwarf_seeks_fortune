@@ -5,16 +5,14 @@ use amethyst::{
     animation::{
         get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
     },
-    core::{math::Vector3, transform::Transform, Parent},
-    ecs::{prelude::World, Entities, Entity, Join, ReadStorage, WriteStorage},
+    ecs::{prelude::World, Entities, Join, ReadStorage, WriteStorage},
     input::{is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
     prelude::*,
-    renderer::{palette::Srgba, resources::Tint, sprite::SpriteRender, Transparent},
+    renderer::sprite::SpriteRender,
     StateData, Trans,
 };
 use dsf_precompile::AnimationId;
 
-use crate::components::*;
 use crate::resources::*;
 use crate::states::file_actions::{auto_save, auto_save_file, load_auto_save};
 use crate::systems;
@@ -22,13 +20,10 @@ use crate::systems;
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::input::StringBindings;
-use dsf_core::components::{Background, Pos};
+
 use dsf_core::entities::*;
 use dsf_core::levels::*;
-use dsf_core::resources::{
-    get_asset_dimensions, setup_debug_lines, AssetType, Assets, EventReaders, SpriteType,
-    UiHandles, UiType,
-};
+use dsf_core::resources::{setup_debug_lines, EventReaders, UiHandles, UiType};
 use dsf_core::states::{window_event_handler, PlayState};
 
 pub struct EditorState {
