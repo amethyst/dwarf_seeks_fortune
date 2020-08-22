@@ -7,6 +7,8 @@ use amethyst::{
 
 use crate::components::*;
 use crate::resources::*;
+use crate::systems::SoundEvent;
+use amethyst::core::ecs::shrev::EventChannel;
 
 /// Key width and height, hardcoded for now.
 const KEY_WIDTH: f32 = 2.;
@@ -22,6 +24,7 @@ pub struct KeyCollectionSystem;
 impl<'s> System<'s> for KeyCollectionSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        Write<'s, EventChannel<SoundEvent>>,
         ReadStorage<'s, Player>,
         ReadStorage<'s, Steering>,
         ReadStorage<'s, Key>,
@@ -33,7 +36,16 @@ impl<'s> System<'s> for KeyCollectionSystem {
 
     fn run(
         &mut self,
-        (player_tags, steerings, keys, key_displays, transforms, mut win, entities): Self::SystemData,
+        (
+            mut sound_channel,
+            player_tags,
+            steerings,
+            keys,
+            key_displays,
+            transforms,
+            mut win,
+            entities,
+        ): Self::SystemData,
     ) {
         let player_collider = (&player_tags, &steerings, &transforms)
             .join()
@@ -58,6 +70,7 @@ impl<'s> System<'s> for KeyCollectionSystem {
                 .map(|(key, _, entity)| (key, entity))
                 .next();
             if let Some((key, key_entity)) = collected_key {
+                sound_channel.single_write(SoundEvent::new(SoundType::KeyPickup));
                 win.set_key_collected(&key.pos);
                 entities.delete(key_entity).expect("Failed to delete key.");
                 for (key_display, display_entity) in (&key_displays, &entities).join() {
@@ -79,6 +92,7 @@ pub struct WinSystem;
 impl<'s> System<'s> for WinSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        Write<'s, EventChannel<SoundEvent>>,
         ReadStorage<'s, Player>,
         ReadStorage<'s, Steering>,
         ReadStorage<'s, ExitDoor>,
@@ -87,7 +101,10 @@ impl<'s> System<'s> for WinSystem {
         Read<'s, LazyUpdate>,
     );
 
-    fn run(&mut self, (players, steerings, doors, transforms, mut win, lazy): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut sound_channel, players, steerings, doors, transforms, mut win, lazy): Self::SystemData,
+    ) {
         if win.reached_open_door || !win.all_keys_collected() {
             return;
         }
@@ -109,6 +126,7 @@ impl<'s> System<'s> for WinSystem {
                     && pos.y - dimens.y / 2. < door_y + DOOR_HEIGHT / 3.
                     && pos.y + dimens.y / 2. > door_y - DOOR_HEIGHT / 3.
                 {
+                    sound_channel.single_write(SoundEvent::new(SoundType::Win));
                     win.reached_open_door = true;
                     lazy.exec_mut(move |world| {
                         UiHandles::add_ui(&UiType::WinMessage, world);

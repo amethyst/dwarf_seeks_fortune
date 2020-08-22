@@ -144,4 +144,6 @@ pub enum SoundType {
     CannotPerformAction,
     Mining,
     ToolPickup,
+    KeyPickup,
+    Win,
 }
