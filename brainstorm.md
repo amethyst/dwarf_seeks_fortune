@@ -1,12 +1,6 @@
 # Brainstorm ideas:
 Here are some ideas for the game.
 
-## Implement first:
-These tools are very basic puzzle elements that are applicable in many situations. They should be implemented first.
-- A tool that can break one block deep horizontally
-- A tool that can break two blocks deep horizontally
-- A tool that can break one block deep vertically
-- A tool that can break two blocks deep vertically
 ## Miscellaneous ideas: 
 - Tools
     - Pushable block. Can be pushed around to serve as a stepping stone to access a previously inaccessible location. Can only be pushed horizontally or made to fall downwards.

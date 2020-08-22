@@ -144,6 +144,8 @@ impl SimpleState for LoadingState {
     }
 }
 
+/// Load the LoadingConfig from file. The LoadingConfig contains information on what assets must be
+/// loaded by this LoadingState.
 fn load_loading_config() -> LoadingConfig {
     let config_dir = application_root_dir()
         .expect("Failed to get application root directory!")
@@ -158,6 +160,8 @@ fn load_loading_config() -> LoadingConfig {
     })
 }
 
+/// Load various configuration resources from their respective files and insert them into the World
+/// as resources.
 fn load_configs(world: &mut World) {
     let config_dir = application_root_dir()
         .expect("Failed to get application root directory!")

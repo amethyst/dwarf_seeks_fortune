@@ -11,6 +11,7 @@ use crate::systems::SoundEvent;
 use amethyst::core::ecs::shrev::EventChannel;
 
 /// Key width and height, hardcoded for now.
+/// TODO: Get rid of these hardcoded constants.
 const KEY_WIDTH: f32 = 2.;
 const KEY_HEIGHT: f32 = 2.;
 const DOOR_WIDTH: f32 = 4.;
@@ -85,7 +86,8 @@ impl<'s> System<'s> for KeyCollectionSystem {
     }
 }
 
-/// Checks if the player has won the game.
+/// Checks if the player has finished the level.
+/// The player finishes the level when they collect all keys and then reach the exit door.
 #[derive(Default)]
 pub struct WinSystem;
 

@@ -8,6 +8,7 @@ use amethyst::{
     input::{InputHandler, StringBindings},
 };
 
+/// Sets the player intention to move.
 #[derive(Default)]
 pub struct PlayerSystem;
 

@@ -42,8 +42,8 @@ You might need to install some dependencies. Please refer to [this section](http
 - [x] In-game level editor. Allows for rapid iteration when designing levels.
 - [x] Time rewinding mechanic to help fix mistakes when solving the puzzles. Might be removed if it proves superfluous or reductive to the experience. For now, it serves as a handy debugging tool.
 - [x] Derpy movement mechanics akin to those of the game this is based on. This game purposely refrains from using a full physics simulation, opting instead for predictable grid-based movements suitable for a puzzle game.
-- [ ] Multiple playable levels.
-- [ ] Sound effects and music.
+- [x] Multiple playable levels.
+- [x] Sound effects and music.
 
 ## Art
 At the moment, everything is temporary, placeholder, programmer art. There will be some real art assets soon.
