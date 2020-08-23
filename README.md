@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/Jazarro/dwarf_seeks_fortune.svg?branch=master)](https://travis-ci.com/Jazarro/dwarf_seeks_fortune)
+[![Build Status](https://travis-ci.org/amethyst/dwarf_seeks_fortune.svg?branch=master)](https://travis-ci.com/Jazarro/dwarf_seeks_fortune)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
 # Dwarf Seeks Fortune
