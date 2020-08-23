@@ -28,8 +28,8 @@ Currently, there is support for two different kinds of tools. The exact shape of
 
 Here are some screenshots, showing how the tools work. The player is facing right, the gold-coloured blocks are the ones that the tool would break.
 
-![Screenshot](demonstrate_hammer_use.png)
-![Screenshot](demonstrate_pick_use.png)
+![Screenshot](screenshots/demonstrate_hammer_use.png)
+![Screenshot](screenshots/demonstrate_pick_use.png)
 
 ## A note on jumping
 This game is specifically NOT about hand-eye coordination or pixel-perfect jumps. To that end, jumps are either easy, or impossible.

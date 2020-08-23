@@ -4,10 +4,12 @@
 # Dwarf Seeks Fortune
 A 2D puzzle platformer made with the Amethyst game engine. This game is an homage to the 1988 classic [King's Valley II](https://en.wikipedia.org/wiki/King%27s_Valley_II). 
 
-![Screenshot](art.png)
+![Screenshot](docs/screenshots/art.png)
 
 ## Gameplay
 You're a dwarf, digging through the ancient ruins of your ancestors. Each level presents a different puzzle. The aim is to collect all keys, after which the door to the next level is unlocked. Puzzle elements include one-time-use tools that must be picked up and used in a specific order at specific locations.
+
+![Screenshot](docs/screenshots/gameplay.gif)
 
 ## Design goals:
 - This project aims to be a helpful resource for people learning Amethyst. Code should ideally be  thoroughly documented and easy to understand. It should be kept up to date with the latest version of Amethyst and should follow best practices.
