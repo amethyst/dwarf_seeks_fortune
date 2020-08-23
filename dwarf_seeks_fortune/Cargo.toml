@@ -14,9 +14,9 @@ dsf_editor = { path = "../dsf_editor" }
 dsf_checks = { path = "../dsf_checks" }
 
 # Windows / Linux users, use the following line:
-amethyst = { version = "=0.15.1", features = ["vulkan"] }
+amethyst = { version = "=0.15.3", features = ["vulkan"] }
 # Mac users, use the following line:
-#amethyst = {version = "=0.15.1", features = ["metal"]}
+#amethyst = {version = "=0.15.3", features = ["metal"]}
 
 log = { version = "0.4.6", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
