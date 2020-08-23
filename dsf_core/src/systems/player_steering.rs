@@ -16,17 +16,21 @@ impl<'s> System<'s> for PlayerSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Player>,
+        ReadStorage<'s, Steering>,
         WriteStorage<'s, SteeringIntent>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, MovementConfig>,
         Read<'s, Time>,
     );
 
-    fn run(&mut self, (mut players, mut steering_intents, input, config, time): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut players, steerings, mut steering_intents, input, config, time): Self::SystemData,
+    ) {
         let input_x = input.axis_value("move_x").unwrap_or(0.0);
         let input_y = input.axis_value("move_y").unwrap_or(0.0);
         let jump_down = input.action_is_down("jump").unwrap_or(false);
-        for (player, steering_intent) in (&mut players, &mut steering_intents).join() {
+        for (player, intent, steering) in (&mut players, &mut steering_intents, &steerings).join() {
             let initiate_jump = jump_down && !player.pressing_jump;
             player.pressing_jump = jump_down;
             player.jump_grace_timer = if initiate_jump {
@@ -41,15 +45,40 @@ impl<'s> System<'s> for PlayerSystem {
             } else {
                 None
             };
-            let old_walk = steering_intent.walk;
-            steering_intent.walk = Direction1D::new(input_x);
-            if steering_intent.walk_invalidated && old_walk != steering_intent.walk {
-                steering_intent.walk_invalidated = false;
+            let old_walk = intent.walk;
+            let new_walk = Direction1D::new(input_x);
+            let turn_around = steering.is_grounded()
+                && steering.facing.x.is_opposite(&new_walk)
+                && old_walk.is_neutral();
+            player.turn_around_timer = if turn_around {
+                // Player wants to turn around, initialise turn-around timer.
+                Some(0.)
+            } else if new_walk.is_neutral() {
+                // Player has let go of controls, forcefully reset timer.
+                None
+            } else if let Some(time_passed) = player.turn_around_timer {
+                let time_passed = time_passed + time.fixed_seconds();
+                if time_passed < config.turn_allowance {
+                    Some(time_passed)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
+            if player.turn_around_timer.is_some() {
+                intent.face = new_walk;
+            } else {
+                intent.walk = new_walk;
             }
-            steering_intent.climb = Direction1D::new(input_y);
-            steering_intent.jump = player.equipped.is_none() && initiate_jump;
-            steering_intent.jump_direction = if player.jump_grace_timer.is_some() {
-                steering_intent.walk
+            if intent.walk_invalidated && old_walk != intent.walk {
+                intent.walk_invalidated = false;
+            }
+            intent.climb = Direction1D::new(input_y);
+            intent.jump = player.equipped.is_none() && initiate_jump;
+            intent.jump_direction = if player.jump_grace_timer.is_some() {
+                intent.walk
             } else {
                 Direction1D::Neutral
             };
@@ -95,6 +124,10 @@ impl<'s> System<'s> for SteeringSystem {
                 steering.mode = steering.mode.add_to_duration(time.fixed_seconds());
             }
 
+            if !intent.face.is_neutral() {
+                steering.facing.x = intent.face;
+            }
+
             // The following if-else construction checks if the steering mode should be changed.
             let has_ground_beneath_feet = is_grounded(&steering, &tile_map);
             if steering.is_falling()
@@ -125,7 +158,7 @@ impl<'s> System<'s> for SteeringSystem {
                         starting_y_pos: transform.translation().y,
                         duration: 0.,
                     };
-                    steering.direction = Direction2D::from(intent.walk, Direction1D::Neutral);
+                    steering.facing = Direction2D::from(intent.walk, Direction1D::Neutral);
                 }
             } else if steering.jump_has_peaked() {
                 steering.mode = steering.mode.jump_to_fall();
@@ -153,7 +186,7 @@ impl<'s> System<'s> for SteeringSystem {
             match steering.mode {
                 SteeringMode::Grounded => {
                     if !intent.walk.is_neutral() {
-                        steering.direction = Direction2D::from(intent.walk, Direction1D::Neutral);
+                        steering.facing = Direction2D::from(intent.walk, Direction1D::Neutral);
                         let offset_from_destination = steering.destination.x as f32 - anchored_x;
                         if offset_from_destination < f32::EPSILON && intent.walk.is_positive() {
                             if !is_against_wall_right(&steering, steering.pos.y as f32, &tile_map) {
@@ -179,7 +212,7 @@ impl<'s> System<'s> for SteeringSystem {
                 }
                 SteeringMode::Climbing => {
                     if !intent.climb.is_neutral() {
-                        steering.direction = Direction2D::from(Direction1D::Neutral, intent.climb);
+                        steering.facing = Direction2D::from(Direction1D::Neutral, intent.climb);
                         let offset_from_discrete_pos = steering.destination.y as f32 - anchored_y;
                         if offset_from_discrete_pos < f32::EPSILON && intent.climb.is_positive() {
                             if can_climb_up(steering, &tile_map) {
@@ -262,7 +295,7 @@ impl<'s> System<'s> for SteeringSystem {
                             starting_y_pos,
                             duration,
                         };
-                        steering.direction =
+                        steering.facing =
                             Direction2D::from(intent.jump_direction, Direction1D::Neutral);
                     }
                     if x_movement.is_neutral() {
@@ -285,10 +318,6 @@ impl<'s> System<'s> for SteeringSystem {
                     }
                 }
             };
-
-            if steering.direction.is_opposite(&steering.facing) {
-                steering.facing = steering.direction;
-            }
 
             // Push frame on history if player position changed.
             if old_pos != steering.pos || history.force_key_frame {
