@@ -2,4 +2,5 @@
 (
     player_speed: 10.0,
     jump_allowance: 0.1,
+    turn_allowance: 0.1,
 )
