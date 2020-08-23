@@ -144,6 +144,9 @@ pub enum SoundType {
     /// The player's footstep. Sound file must be a single footstep. Sound must not be too loud or
     /// noticeable.
     Step,
+    /// One step while climbing on a ladder. Sound file must be just a single footstep. Sound must
+    /// not be too loud or noticeable.
+    LadderStep,
     /// This will be played when the player tries something that is not possible, such as trying to
     /// jump while underneath a 2-high ledge.
     CannotPerformAction,

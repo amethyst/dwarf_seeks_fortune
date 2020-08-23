@@ -216,6 +216,7 @@ impl<'s> System<'s> for SteeringSystem {
                         let offset_from_discrete_pos = steering.destination.y as f32 - anchored_y;
                         if offset_from_discrete_pos < f32::EPSILON && intent.climb.is_positive() {
                             if can_climb_up(steering, &tile_map) {
+                                sound_channel.single_write(SoundEvent::new(SoundType::LadderStep));
                                 steering.destination.y = steering.pos.y + 1;
                             } else {
                                 steering.mode = SteeringMode::Grounded;
@@ -224,6 +225,7 @@ impl<'s> System<'s> for SteeringSystem {
                             && intent.climb.is_negative()
                         {
                             if can_climb_down(steering, &tile_map) {
+                                sound_channel.single_write(SoundEvent::new(SoundType::LadderStep));
                                 steering.destination.y = steering.pos.y - 1;
                             } else if above_air(steering, &tile_map) {
                                 steering.mode = SteeringMode::Falling {

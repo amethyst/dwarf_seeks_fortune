@@ -67,6 +67,11 @@
         (Step, "audio/step05.wav"),
         (Step, "audio/step06.wav"),
         (Step, "audio/step07.wav"),
+        (LadderStep, "audio/ladder_01.wav"),
+        (LadderStep, "audio/ladder_02.wav"),
+        (LadderStep, "audio/ladder_03.wav"),
+        (LadderStep, "audio/ladder_04.wav"),
+        (LadderStep, "audio/ladder_05.wav"),
         (CannotPerformAction, "audio/nonono.wav"),
     ],
     music_tracks: [
