@@ -129,24 +129,21 @@ impl<'s> System<'s> for UseToolSystem {
             }
             let targeted_blocks = match player.equipped {
                 Some(ToolType::BreakBlocksHorizontally(depth)) => {
-                    Some(tiles_to_side(depth, steering))
+                    let player_is_not_too_far_away_from_wall =
+                        at_least_one_is_breakable(&tiles_to_side(1, steering), &tile_map);
+                    if player_is_not_too_far_away_from_wall {
+                        Some(tiles_to_side(depth, steering))
+                    } else {
+                        None
+                    }
                 }
                 Some(ToolType::BreakBlocksBelow(depth)) => Some(tiles_below(depth, steering)),
                 _ => None,
             };
             if let Some(targeted_blocks) = targeted_blocks {
-                let at_least_one_is_breakable = targeted_blocks.iter().any(|pos| {
-                    tile_map
-                        .get_tile(pos)
-                        .map(|block| block.is_breakable())
-                        .unwrap_or(false)
-                });
-                let none_are_unbreakable = targeted_blocks.iter().all(|pos| {
-                    tile_map
-                        .get_tile(pos)
-                        .map(|block| block.is_breakable())
-                        .unwrap_or(true)
-                });
+                let at_least_one_is_breakable =
+                    at_least_one_is_breakable(&targeted_blocks, &tile_map);
+                let none_are_unbreakable = none_are_unbreakable(&targeted_blocks, &tile_map);
                 if at_least_one_is_breakable && none_are_unbreakable {
                     sound_channel.single_write(SoundEvent::new(SoundType::Mining));
                     player.equipped = None;
@@ -167,6 +164,24 @@ impl<'s> System<'s> for UseToolSystem {
             }
         }
     }
+}
+
+fn at_least_one_is_breakable(blocks: &Vec<Pos>, tile_map: &TileMap) -> bool {
+    blocks.iter().any(|pos| {
+        tile_map
+            .get_tile(pos)
+            .map(|block| block.is_breakable())
+            .unwrap_or(false)
+    })
+}
+
+fn none_are_unbreakable(blocks: &Vec<Pos>, tile_map: &TileMap) -> bool {
+    blocks.iter().all(|pos| {
+        tile_map
+            .get_tile(pos)
+            .map(|block| block.is_breakable())
+            .unwrap_or(true)
+    })
 }
 
 fn tiles_to_side(depth: u8, steering: &Steering) -> Vec<Pos> {
