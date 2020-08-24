@@ -8,6 +8,8 @@ use amethyst::{
 /// This will result in annoying runtime errors.
 /// This system exists to solve this problem!
 /// Add the component to this system temporarily, and the game will stop crashing.
+///
+/// ... It's not pretty, I know.
 pub struct DummySystem;
 
 impl<'s> System<'s> for DummySystem {
