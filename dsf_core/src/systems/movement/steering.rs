@@ -46,7 +46,7 @@ impl<'s> System<'s> for SteeringSystem {
                 steering.mode = steering.mode.add_to_duration(time.fixed_seconds());
             }
 
-            if !intent.face.is_neutral() {
+            if steering.is_grounded() && !intent.face.is_neutral() {
                 steering.facing.x = intent.face;
             }
 
@@ -76,11 +76,10 @@ impl<'s> System<'s> for SteeringSystem {
                 } else {
                     sound_channel.single_write(SoundEvent::new(SoundType::Jump));
                     steering.mode = SteeringMode::Jumping {
-                        x_movement: intent.walk,
+                        x_movement: intent.face,
                         starting_y_pos: transform.translation().y,
                         duration: 0.,
                     };
-                    steering.facing = Direction2D::from(intent.walk, Direction1D::Neutral);
                 }
             } else if steering.jump_has_peaked() {
                 steering.mode = steering.mode.jump_to_fall();
