@@ -72,8 +72,4 @@ pub struct MovementConfig {
     /// still register. If you start moving sideways later than that, it will not work and the
     /// character will simply jump straight up into the air instead.
     pub jump_allowance: f32,
-    /// How many seconds must pass after turning around whilst standing still before the character
-    /// starts walking. This gives the player a bit of time to let go of the walking controls if
-    /// they just want to turn around, but not want to start walking.
-    pub turn_allowance: f32,
 }

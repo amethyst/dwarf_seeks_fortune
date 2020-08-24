@@ -49,13 +49,6 @@ impl<'s> System<'s> for MovementSystem {
     ) {
         for (transform, steering, velocity) in (&mut transforms, &steerings, &mut velocities).join()
         {
-            // Flip sprite if character is facing left:
-            transform.set_rotation_y_axis(if steering.facing.x == Direction1D::Negative {
-                f32::PI()
-            } else {
-                0.
-            });
-
             let (centered_x, centered_y) = steering.to_centered_coords(steering.pos);
             let (desired_pos_x, desired_pos_y) = steering.to_centered_coords(steering.destination);
             match steering.mode {
@@ -70,8 +63,8 @@ impl<'s> System<'s> for MovementSystem {
                     velocity.x = 0.0;
                     // If climbing:
                     let delta = desired_pos_y - transform.translation().y;
-                    if steering.facing.y.aligns_with(delta) {
-                        velocity.y = steering.facing.y.signum() * config.player_speed;
+                    if steering.direction.y.aligns_with(delta) {
+                        velocity.y = steering.direction.y.signum() * config.player_speed;
                     } else {
                         velocity.y = 0.0;
                         transform.set_translation_y(centered_y);
@@ -102,8 +95,8 @@ impl<'s> System<'s> for MovementSystem {
             // Set x-velocity based on current and desired position.
             // If necessary, adjust x-position, snap to grid.
             let delta = desired_pos_x - transform.translation().x;
-            if steering.facing.x.aligns_with(delta) {
-                velocity.x = steering.facing.x.signum() * config.player_speed;
+            if steering.direction.x.aligns_with(delta) {
+                velocity.x = steering.direction.x.signum() * config.player_speed;
             } else {
                 velocity.x = 0.0;
                 transform.set_translation_x(centered_x);
@@ -127,6 +120,11 @@ impl<'s> System<'s> for LevelWrappingSystem {
 
     fn run(&mut self, (mut steerings, mut transforms, tile_map): Self::SystemData) {
         for (transform, steering) in (&mut transforms, &mut steerings).join() {
+            transform.set_rotation_y_axis(if steering.facing.x == Direction1D::Negative {
+                f32::PI()
+            } else {
+                0.
+            });
             if transform.translation().x < tile_map.pos.x as f32 {
                 transform.set_translation_x(transform.translation().x + tile_map.dimens.x as f32);
                 steering.pos.x += tile_map.dimens.x;

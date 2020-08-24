@@ -28,17 +28,6 @@ pub struct Player {
     /// speed. This fixes the problem that if the player presses jump and move at the same time,
     /// jump is sometimes registered before move and the character only jumps up, not sideways.
     pub jump_grace_timer: Option<f32>,
-    /// How many seconds have passed since the character turned around while standing still?
-    ///
-    /// This value is usually None. When the player is standing still and presses move in the
-    /// opposite direction that they're facing, they will turn around and this value will be
-    /// initialised at Some(0.0). The delta_seconds is added to this value every tick. Once it
-    /// surpasses a certain threshold or the player stops pressing move, this value is reset to None.
-    ///
-    /// As long as the timer hasn't run out yet, the player will not start moving. This fixes the
-    /// problem that tapping RIGHT while facing left will not only turn around, but will also move
-    /// 1 tile to the right.
-    pub turn_around_timer: Option<f32>,
 }
 
 impl Component for Player {

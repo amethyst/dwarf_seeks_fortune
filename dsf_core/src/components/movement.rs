@@ -146,7 +146,14 @@ pub struct Steering {
     pub pos: Pos,
     /// Width and height of the entity.
     pub dimens: Pos,
-    /// Direction the entity is facing along the x-axis and y-axis.
+    /// Direction the entity is travelling along the x-axis and y-axis.
+    /// This is always Neutral if the entity is not moving.
+    pub direction: Direction2D,
+    /// Almost the same as direction, except that after the entity stops moving, direction becomes
+    /// Neutral and facing remains Positive or Negative.
+    ///
+    /// Facing is always equal to direction, except if the entity is not moving. In that case,
+    /// facing is equal to the last value that direction had before it became neutral.
     pub facing: Direction2D,
     pub destination: Pos,
     pub mode: SteeringMode,
@@ -174,10 +181,6 @@ pub struct SteeringIntent {
     ///
     /// This feature exists solely for players, to make movement feel better.
     pub walk_invalidated: bool,
-    /// The entity wishes to face this direction. Only for player characters. Note that entities
-    /// will still face the direction they are walking in, this value is just for when you
-    /// want to face a certain direction without walking.
-    pub face: Direction1D,
     /// The entity wishes to walk along the floor in this direction.
     pub walk: Direction1D,
     /// The entity wishes to climb on a ladder in this direction.
@@ -292,6 +295,7 @@ impl Steering {
         Steering {
             pos,
             dimens,
+            direction: Direction2D::default(),
             facing: Direction2D::new(1., 0.),
             destination: pos,
             mode: SteeringMode::Grounded,
