@@ -11,3 +11,4 @@ Here are some ideas for the game.
     - Rocket boots, jetpack or car that, if used on a sufficiently long straight track, will exceed 88 MPH and travel through time, delivering the player to a different section of the level. If you do not include this in the game, you're clearly chicken, McFly.
 - Other
     - Trap that flings knife? More generically; tripwires or pressure plates that are activated by the player and that may trigger a variety of effects.
+    - Pockets of natural gas that will explode if you create a spark (IE use a tool) or use fire or explosives nearby. You could perhaps use this to set up elaborate chain reactions. As always, it is important that the player is able to predict exactly what the results of his actions are going to be. Explosions must be predictable in how they are triggered and what damage they cause. 
