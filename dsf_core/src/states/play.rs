@@ -37,6 +37,7 @@ impl<'a, 'b> PlayState {
         let level_file = application_root_dir()
             .expect("Root dir not found!")
             .join("../assets/")
+            .join("world/")
             .join("levels/")
             .join("demo_level.ron");
         PlayState::new(level_file)

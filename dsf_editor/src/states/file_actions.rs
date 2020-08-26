@@ -60,5 +60,6 @@ fn get_levels_dir() -> PathBuf {
     application_root_dir()
         .expect("Root dir not found!")
         .join("../assets/")
+        .join("world/")
         .join("levels/")
 }

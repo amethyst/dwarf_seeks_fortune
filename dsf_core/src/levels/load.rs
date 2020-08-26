@@ -22,8 +22,8 @@ pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
     let file = application_root_dir()
         .expect("Root dir not found!")
         .join("../assets/")
-        .join("tiles/")
-        .join("tiles.ron");
+        .join("world/")
+        .join("tile_references.ron");
     TileDefinitions::load(file)
 }
 
