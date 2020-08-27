@@ -17,7 +17,7 @@ use amethyst::{
 use dsf_core::systems;
 
 use crate::state_loading::LoadingState;
-use dsf_core::resources::Music;
+use dsf_core::resources::{create_default_adventure, Music};
 use dsf_core::systems::PlaySfxSystem;
 use dsf_precompile::PrecompiledDefaultsBundle;
 use dsf_precompile::PrecompiledRenderBundle;
@@ -30,6 +30,7 @@ fn main() -> amethyst::Result<()> {
     let config_dir = assets_dir.join("config/");
     let display_config_path = config_dir.join("display.ron");
     let bindings_config_path = config_dir.join("input.ron");
+    create_default_adventure();
 
     let game_data = GameDataBuilder::default()
         .with_bundle(PrecompiledDefaultsBundle {

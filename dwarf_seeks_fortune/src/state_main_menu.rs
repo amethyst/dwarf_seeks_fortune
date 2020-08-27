@@ -7,7 +7,7 @@ use amethyst::{
 use dsf_checks::states::MovementTestState;
 
 use dsf_core::resources::{DebugConfig, UiHandles, UiType};
-use dsf_core::states::{window_event_handler, PlayState};
+use dsf_core::states::{window_event_handler, LevelSelectState};
 use dsf_editor::states::EditorState;
 
 const PLAY_BUTTON_ID: &str = "play";
@@ -79,7 +79,7 @@ impl SimpleState for MainMenuState {
                 target,
             }) => {
                 if Some(target) == self.play_button {
-                    Trans::Push(Box::new(PlayState::demo()))
+                    Trans::Push(Box::new(LevelSelectState::demo()))
                 } else if Some(target) == self.editor_button {
                     Trans::Push(Box::new(EditorState::new(data.world)))
                 } else if Some(target) == self.movement_test_button {

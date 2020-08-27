@@ -1,3 +1,4 @@
+mod adventure;
 mod assets;
 mod config;
 mod debug_lines;
@@ -8,6 +9,7 @@ mod music;
 mod tilemap;
 mod win;
 
+pub use self::adventure::*;
 pub use self::assets::*;
 pub use self::config::*;
 pub use self::debug_lines::*;
