@@ -49,7 +49,7 @@ impl<'a, 'b> LevelSelectState {
         LevelSelectState {
             adventure_file,
             dispatcher: DispatcherBuilder::new()
-                .with(systems::VelocitySystem, "velocity_system", &[])
+                // .with(systems::VelocitySystem, "velocity_system", &[])
                 .build(),
         }
     }
@@ -58,11 +58,13 @@ impl<'a, 'b> LevelSelectState {
         Trans::None
     }
 }
+
 impl SimpleState for LevelSelectState {
     fn on_start(&mut self, data: StateData<GameData>) {
         info!("LevelSelectState on_start");
         self.dispatcher.setup(data.world);
-        load_adventure(&self.adventure_file, data.world);
+        create_camera(data.world);
+        load_adventure(&self.adventure_file, data.world).expect("Failed to load adventure!");
     }
 
     fn on_stop(&mut self, data: StateData<GameData>) {

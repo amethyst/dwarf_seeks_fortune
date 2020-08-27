@@ -101,6 +101,7 @@ pub enum SpriteType {
     Tools,
     Door,
     Selection,
+    LevelSelect,
 }
 
 impl Default for SpriteType {

@@ -7,24 +7,31 @@ use amethyst::utils::application_root_dir;
 use serde::{Deserialize, Serialize};
 
 use crate::components::Pos;
-use crate::levels::Level;
+use crate::levels::{load_asset_from_world, load_transform, DepthLayer, Level};
+use crate::resources::{AssetType, SpriteType};
+use amethyst::config::ConfigError;
+use std::collections::HashMap;
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Adventure {
-    nodes: Vec<AdventureNode>,
-    roads: Vec<Road>,
+    nodes: HashMap<Pos, MapElement>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum MapElement {
+    Road,
+    Node(AdventureNode),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AdventureNode {
-    pub id: u16,
     pub name: String,
+    // pub description: String,
     pub details: NodeDetails,
-    pub pos: Pos,
-    /// If true, the player must defeat this node before they can move further.
-    /// If false, nodes behind this node are reachable and playable even if this node was never
-    /// entered.
-    pub blocking: bool,
+    // If true, the player must defeat this node before they can move further.
+    // If false, nodes behind this node are reachable and playable even if this node was never
+    // entered.
+    // pub blocking: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -64,13 +71,18 @@ pub fn create_default_adventure() {
         .map(|(level_name, result)| (level_name, result.expect("Should never panic.")))
         .enumerate()
         .for_each(|(index, (level_name, level))| {
-            adventure.nodes.push(AdventureNode {
-                id: index as u16,
-                name: level_name.clone(),
-                details: NodeDetails::Level(level_name.clone()),
-                pos: Pos::new(index as i32 * 2, 0),
-                blocking: false,
-            });
+            adventure.nodes.insert(
+                Pos::new((index * 2) as i32, 0),
+                MapElement::Node(AdventureNode {
+                    name: level_name.clone(),
+                    details: NodeDetails::Level(level_name.clone()),
+                }),
+            );
+            if index > 0 {
+                adventure
+                    .nodes
+                    .insert(Pos::new((index * 2 - 1) as i32, 0), MapElement::Road);
+            }
         });
 
     adventure
@@ -119,10 +131,44 @@ fn level_files() -> Vec<String> {
         .collect()
 }
 
-pub fn load_adventure(path: &PathBuf, world: &mut World) {
-    let adventure = Adventure::load(path);
+pub fn load_adventure(path: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
+    let adventure = Adventure::load(path)?;
     println!("{:?}", adventure);
-    // for node in adventure.nodes {
-    //     world.create_entity().build();
-    // }
+    for (pos, map_element) in &adventure.nodes {
+        match map_element {
+            MapElement::Road => load_road(pos, world),
+            MapElement::Node(node) => load_node(pos, node, world),
+        }
+    }
+    Ok(())
+}
+
+fn load_road(pos: &Pos, world: &mut World) {
+    let sprite_render_road = load_asset_from_world(&SpriteType::LevelSelect, 1, world);
+    let transform = load_transform(
+        pos,
+        &DepthLayer::Blocks,
+        &Pos::new(1, 1),
+        &AssetType::Still(SpriteType::LevelSelect, 1),
+    );
+    world
+        .create_entity()
+        .with(transform)
+        .with(sprite_render_road.clone())
+        .build();
+}
+
+fn load_node(pos: &Pos, node: &AdventureNode, world: &mut World) {
+    let sprite_render_node = load_asset_from_world(&SpriteType::LevelSelect, 0, world);
+    let transform = load_transform(
+        pos,
+        &DepthLayer::Blocks,
+        &Pos::new(1, 1),
+        &AssetType::Still(SpriteType::LevelSelect, 0),
+    );
+    world
+        .create_entity()
+        .with(transform)
+        .with(sprite_render_node.clone())
+        .build();
 }

@@ -48,6 +48,11 @@
             "textures/selection.png",
             "prefab/still_selection.ron",
         ),
+        (
+            LevelSelect,
+            "textures/level_select.png",
+            "prefab/still_level_select.ron",
+        ),
     ],
     sound_effects: [
         (Mining, "audio/mining.wav"),
