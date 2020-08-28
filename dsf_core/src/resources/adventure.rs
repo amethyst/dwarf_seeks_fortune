@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::components::*;
 use crate::levels::{load_asset_from_world, load_transform, DepthLayer, Level};
 use crate::resources::{AssetType, SpriteType};
+use crate::utility::files::{get_adventures_dir, get_levels_dir};
 use amethyst::config::ConfigError;
 use amethyst::renderer::palette::Srgba;
 use amethyst::renderer::resources::Tint;
@@ -95,21 +96,6 @@ pub fn create_default_adventure() {
     adventure
         .write(get_adventures_dir().join("default.ron"))
         .expect("Failed to create default adventure that contains all levels.");
-}
-
-fn get_adventures_dir() -> PathBuf {
-    get_world_dir().join("adventures/")
-}
-
-fn get_levels_dir() -> PathBuf {
-    get_world_dir().join("levels/")
-}
-
-fn get_world_dir() -> PathBuf {
-    application_root_dir()
-        .expect("Root dir not found!")
-        .join("../assets/")
-        .join("world/")
 }
 
 fn level_files() -> Vec<String> {

@@ -23,6 +23,7 @@ use crate::levels::*;
 use crate::resources::*;
 use crate::states::window_event_handler;
 use crate::systems;
+use crate::utility::files::get_adventures_dir;
 use amethyst::core::ecs::{Dispatcher, DispatcherBuilder};
 use amethyst::core::SystemExt;
 
@@ -35,12 +36,7 @@ pub struct LevelSelectState {
 impl<'a, 'b> LevelSelectState {
     /// Creates a LevelSelectState that starts in demo mode. It loads the default adventure.
     pub fn demo() -> Self {
-        let adventure_file = application_root_dir()
-            .expect("Root dir not found!")
-            .join("../assets/")
-            .join("world/")
-            .join("adventures/")
-            .join("default.ron");
+        let adventure_file = get_adventures_dir().join("default.ron");
         LevelSelectState::new(adventure_file)
     }
 

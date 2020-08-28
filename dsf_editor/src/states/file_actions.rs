@@ -6,6 +6,7 @@ use amethyst::{
 };
 
 use dsf_core::levels::Level;
+use dsf_core::utility::files::get_levels_dir;
 use std::path::PathBuf;
 
 /// Returns a PathBuf to the file that is used to store auto saves.
@@ -54,12 +55,4 @@ fn write_level_file(level_file: PathBuf, world: &mut World) -> Result<(), Config
     let data = world.write_resource::<EditorData>();
     let level: Level = (*data).level.clone().into();
     level.write(level_file)
-}
-
-fn get_levels_dir() -> PathBuf {
-    application_root_dir()
-        .expect("Root dir not found!")
-        .join("../assets/")
-        .join("world/")
-        .join("levels/")
 }

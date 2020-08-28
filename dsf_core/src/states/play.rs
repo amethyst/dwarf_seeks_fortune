@@ -23,6 +23,7 @@ use crate::levels::*;
 use crate::resources::*;
 use crate::states::window_event_handler;
 use crate::systems;
+use crate::utility::files::get_levels_dir;
 use amethyst::core::ecs::{Dispatcher, DispatcherBuilder};
 use amethyst::core::SystemExt;
 
@@ -34,12 +35,7 @@ pub struct PlayState {
 impl<'a, 'b> PlayState {
     /// Creates a PlayState that starts in demo mode. It loads the demo level.
     pub fn demo() -> Self {
-        let level_file = application_root_dir()
-            .expect("Root dir not found!")
-            .join("../assets/")
-            .join("world/")
-            .join("levels/")
-            .join("demo_level.ron");
+        let level_file = get_levels_dir().join("demo_level.ron");
         PlayState::new(level_file)
     }
 
