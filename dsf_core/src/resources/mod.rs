@@ -7,6 +7,7 @@ mod gui;
 mod history;
 mod music;
 mod tilemap;
+mod userdata;
 mod win;
 
 pub use self::adventure::*;
@@ -18,4 +19,5 @@ pub use self::gui::*;
 pub use self::history::*;
 pub use self::music::*;
 pub use self::tilemap::*;
+pub use self::userdata::*;
 pub use self::win::*;

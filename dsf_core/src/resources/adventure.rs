@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::components::*;
 use crate::levels::{load_asset_from_world, load_transform, DepthLayer, Level};
-use crate::resources::{AssetType, SpriteType};
+use crate::resources::{AssetType, SpriteType, UserCache};
 use crate::utility::files::{get_adventures_dir, get_levels_dir};
 use amethyst::config::ConfigError;
 use amethyst::renderer::palette::Srgba;
@@ -20,6 +20,13 @@ pub struct PositionOnMap {
     pub pos: Pos,
 }
 
+impl PositionOnMap {
+    pub fn new(pos: Pos) -> Self {
+        PositionOnMap { pos }
+    }
+}
+
+/// All adventures must start at position (0, 0).
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Adventure {
     pub(crate) nodes: HashMap<Pos, MapElement>,
@@ -126,7 +133,6 @@ fn level_files() -> Vec<String> {
 
 pub fn load_adventure(path: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
     let adventure = Adventure::load(path)?;
-    println!("{:?}", adventure);
     for (pos, map_element) in &adventure.nodes {
         match map_element {
             MapElement::Road => load_road(pos, world),
@@ -134,15 +140,25 @@ pub fn load_adventure(path: &PathBuf, world: &mut World) -> Result<(), ConfigErr
         }
     }
     world.insert(adventure);
-    world.insert(PositionOnMap::default());
-    load_cursor(world);
+    let initial_cursor_pos = cursor_position(path, world);
+    load_cursor(world, &initial_cursor_pos);
+    world.insert(PositionOnMap::new(initial_cursor_pos));
     Ok(())
 }
 
-fn load_cursor(world: &mut World) {
+fn cursor_position(path: &PathBuf, world: &mut World) -> Pos {
+    world.read_resource::<UserCache>().get_initial_cursor_pos(
+        path.file_name()
+            .expect("This should not happen.")
+            .to_str()
+            .expect("Adventure file name did not contain valid unicode."),
+    )
+}
+
+fn load_cursor(world: &mut World, pos: &Pos) {
     let sprite_render = load_asset_from_world(&SpriteType::LevelSelect, 3, world);
     let transform = load_transform(
-        &Pos::new(0, 0),
+        &pos,
         &DepthLayer::Player,
         &Pos::new(1, 1),
         &AssetType::Still(SpriteType::LevelSelect, 3),

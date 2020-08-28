@@ -1,7 +1,7 @@
 use amethyst::prelude::WorldExt;
 use amethyst::ui::UiCreator;
 use amethyst::ui::UiLoader;
-use dsf_core::resources::{Assets, DebugConfig, MovementConfig, Music, UiHandles};
+use dsf_core::resources::{Assets, DebugConfig, MovementConfig, Music, UiHandles, UserCache};
 
 use amethyst::{
     assets::{AssetStorage, Completion, Loader, PrefabLoader, ProgressCounter, RonFormat},
@@ -16,6 +16,7 @@ use crate::loading_config::LoadingConfig;
 use crate::state_main_menu::MainMenuState;
 use amethyst::audio::{AudioSink, Mp3Format, WavFormat};
 use amethyst::utils::application_root_dir;
+use dsf_core::utility::files::get_user_cache_file;
 use dsf_editor::resources::EditorConfig;
 
 /// This state is briefly active when the game is first started up. It loads all assets used in the
@@ -194,4 +195,15 @@ fn load_configs(world: &mut World) {
             EditorConfig::default()
         }),
     );
+    world.insert(if get_user_cache_file().is_file() {
+        UserCache::load(get_user_cache_file()).unwrap_or_else(|error| {
+            error!(
+                "Failed to load user cache! Falling back to default. Error: {:?}",
+                error
+            );
+            UserCache::default()
+        })
+    } else {
+        UserCache::default()
+    });
 }

@@ -24,7 +24,7 @@ use crate::resources::*;
 use crate::states::{window_event_handler, PlayState};
 use crate::systems;
 use crate::utility::files::{get_adventures_dir, get_levels_dir};
-use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read};
+use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::core::SystemExt;
 
 /// This can be used to either select an adventure from the world or a level from an adventure.
@@ -74,9 +74,28 @@ impl<'a, 'b> LevelSelectState {
         )
     }
 
+    /// Prepare to start or resume.
     fn perform_setup(&self, world: &mut World) {
         create_camera(world);
         load_adventure(&self.adventure_file, world).expect("Failed to load adventure!");
+    }
+
+    /// Prepare to either stop or pause.
+    fn perform_shutdown(&self, world: &mut World) {
+        world.delete_all();
+        world.exec(
+            |(pos_on_map, mut user_cache): (Read<PositionOnMap>, Write<UserCache>)| {
+                user_cache.save_adventure_map_pos(
+                    self.adventure_file
+                        .file_name()
+                        .expect("This should not happen.")
+                        .to_str()
+                        .expect("Adventure file name did not contain valid unicode.")
+                        .to_string(),
+                    pos_on_map.pos,
+                );
+            },
+        );
     }
 }
 
@@ -89,12 +108,12 @@ impl SimpleState for LevelSelectState {
 
     fn on_stop(&mut self, data: StateData<GameData>) {
         info!("LevelSelectState on_stop");
-        data.world.delete_all();
+        self.perform_shutdown(data.world);
     }
 
     fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("LevelSelectState on_pause");
-        data.world.delete_all();
+        self.perform_shutdown(data.world);
     }
 
     fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
