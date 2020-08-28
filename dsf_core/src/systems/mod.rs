@@ -1,3 +1,4 @@
+mod adventure;
 mod audio;
 mod camera;
 mod debug;
@@ -7,6 +8,7 @@ mod rewind;
 mod tools;
 mod win;
 
+pub use self::adventure::*;
 pub use self::audio::*;
 pub use self::camera::*;
 pub use self::debug::*;

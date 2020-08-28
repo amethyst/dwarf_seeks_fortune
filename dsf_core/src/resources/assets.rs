@@ -148,6 +148,8 @@ pub enum SoundType {
     /// One step while climbing on a ladder. Sound file must be just a single footstep. Sound must
     /// not be too loud or noticeable.
     LadderStep,
+    /// One step when on the adventure and level selection screen.
+    MapStep,
     /// This will be played when the player tries something that is not possible, such as trying to
     /// jump while underneath a 2-high ledge.
     CannotPerformAction,

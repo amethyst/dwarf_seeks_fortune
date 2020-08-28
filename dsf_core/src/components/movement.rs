@@ -125,6 +125,18 @@ impl Pos {
     pub fn new(x: i32, y: i32) -> Self {
         Pos { x, y }
     }
+
+    pub fn append_x(&self, x: i32) -> Self {
+        Pos::new(self.x + x, self.y)
+    }
+
+    pub fn append_y(&self, y: i32) -> Self {
+        Pos::new(self.x, self.y + y)
+    }
+
+    pub fn append_xy(&self, x: i32, y: i32) -> Self {
+        Pos::new(self.x + x, self.y + y)
+    }
 }
 
 /// Remembers the direction an entity is moving in. Also keeps a destination as a discrete position.

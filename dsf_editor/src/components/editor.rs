@@ -54,12 +54,3 @@ impl PaintedTile {
         PaintedTile { pos }
     }
 }
-
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
-#[prefab(Component)]
-#[serde(deny_unknown_fields)]
-pub struct EditorRootTag;
-
-impl Component for EditorRootTag {
-    type Storage = NullStorage<Self>;
-}

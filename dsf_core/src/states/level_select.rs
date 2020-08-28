@@ -49,7 +49,7 @@ impl<'a, 'b> LevelSelectState {
         LevelSelectState {
             adventure_file,
             dispatcher: DispatcherBuilder::new()
-                // .with(systems::VelocitySystem, "velocity_system", &[])
+                .with(systems::MapCursorSystem, "map_cursor_system", &[])
                 .build(),
         }
     }

@@ -6,15 +6,22 @@ use amethyst::prelude::*;
 use amethyst::utils::application_root_dir;
 use serde::{Deserialize, Serialize};
 
-use crate::components::Pos;
+use crate::components::*;
 use crate::levels::{load_asset_from_world, load_transform, DepthLayer, Level};
 use crate::resources::{AssetType, SpriteType};
 use amethyst::config::ConfigError;
+use amethyst::renderer::palette::Srgba;
+use amethyst::renderer::resources::Tint;
 use std::collections::HashMap;
 
 #[derive(Debug, Deserialize, Serialize, Default)]
+pub struct PositionOnMap {
+    pub pos: Pos,
+}
+
+#[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Adventure {
-    nodes: HashMap<Pos, MapElement>,
+    pub(crate) nodes: HashMap<Pos, MapElement>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -140,7 +147,26 @@ pub fn load_adventure(path: &PathBuf, world: &mut World) -> Result<(), ConfigErr
             MapElement::Node(node) => load_node(pos, node, world),
         }
     }
+    world.insert(adventure);
+    load_cursor(world);
     Ok(())
+}
+
+fn load_cursor(world: &mut World) {
+    let sprite_render = load_asset_from_world(&SpriteType::LevelSelect, 3, world);
+    let transform = load_transform(
+        &Pos::new(0, 0),
+        &DepthLayer::Player,
+        &Pos::new(1, 1),
+        &AssetType::Still(SpriteType::LevelSelect, 3),
+    );
+    world
+        .create_entity()
+        .with(MapCursor::default())
+        .with(Tint(Srgba::new(0.5, 0., 0., 1.)))
+        .with(transform)
+        .with(sprite_render.clone())
+        .build();
 }
 
 fn load_road(pos: &Pos, world: &mut World) {

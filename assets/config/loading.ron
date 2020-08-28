@@ -78,6 +78,7 @@
         (LadderStep, "audio/ladder_04.wav"),
         (LadderStep, "audio/ladder_05.wav"),
         (CannotPerformAction, "audio/nonono.wav"),
+        (MapStep, "audio/soft_shuffle.wav"),
     ],
     music_tracks: [
         "audio/music/Loyalty_Freak_Music_-_01_-_Once_more_with_you.mp3",
