@@ -21,10 +21,10 @@ use dsf_precompile::AnimationId;
 use crate::entities::*;
 use crate::levels::*;
 use crate::resources::*;
-use crate::states::window_event_handler;
+use crate::states::{window_event_handler, PlayState};
 use crate::systems;
-use crate::utility::files::get_adventures_dir;
-use amethyst::core::ecs::{Dispatcher, DispatcherBuilder};
+use crate::utility::files::{get_adventures_dir, get_levels_dir};
+use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read};
 use amethyst::core::SystemExt;
 
 /// This can be used to either select an adventure from the world or a level from an adventure.
@@ -50,8 +50,33 @@ impl<'a, 'b> LevelSelectState {
         }
     }
 
-    fn handle_action(&mut self, action: &str, world: &mut World) -> SimpleTrans {
-        Trans::None
+    /// Call this when the user tries to select a node.
+    /// This function will check what node the user currently has selected and act accordingly.
+    ///
+    /// - If the user selected a road, nothing will happen.
+    /// - If the user selected a level, that level will be opened in the Play state.
+    /// - If the user selected an adventure, that adventure will be opened in a nested LevelSelect state.
+    fn select_node(world: &mut World) -> SimpleTrans {
+        world.exec(
+            |(adventure, pos_on_map): (Read<Adventure>, Read<PositionOnMap>)| {
+                let selected_node = adventure.nodes.get(&pos_on_map.pos);
+                match selected_node {
+                    Some(MapElement::Node(AdventureNode {
+                        details: NodeDetails::Level(level_name),
+                        ..
+                    })) => {
+                        let play_state = PlayState::new(get_levels_dir().join(level_name));
+                        Trans::Push(Box::new(play_state))
+                    }
+                    _ => Trans::None,
+                }
+            },
+        )
+    }
+
+    fn perform_setup(&self, world: &mut World) {
+        create_camera(world);
+        load_adventure(&self.adventure_file, world).expect("Failed to load adventure!");
     }
 }
 
@@ -59,13 +84,22 @@ impl SimpleState for LevelSelectState {
     fn on_start(&mut self, data: StateData<GameData>) {
         info!("LevelSelectState on_start");
         self.dispatcher.setup(data.world);
-        create_camera(data.world);
-        load_adventure(&self.adventure_file, data.world).expect("Failed to load adventure!");
+        self.perform_setup(data.world);
     }
 
     fn on_stop(&mut self, data: StateData<GameData>) {
         info!("LevelSelectState on_stop");
         data.world.delete_all();
+    }
+
+    fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        info!("LevelSelectState on_pause");
+        data.world.delete_all();
+    }
+
+    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        info!("LevelSelectState on_resume");
+        self.perform_setup(data.world);
     }
 
     fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
@@ -83,13 +117,13 @@ impl SimpleState for LevelSelectState {
             }
             // Ui event. Button presses, mouse hover, etc...
             StateEvent::Ui(_) => Trans::None,
-            StateEvent::Input(input_event) => {
-                if let InputEvent::ActionPressed(action) = input_event {
-                    self.handle_action(&action, data.world)
-                } else {
-                    Trans::None
-                }
-            }
+            StateEvent::Input(input_event) => match input_event {
+                InputEvent::KeyReleased {
+                    key_code: VirtualKeyCode::Return,
+                    scancode: _,
+                } => Self::select_node(data.world),
+                _ => Trans::None,
+            },
         }
     }
 

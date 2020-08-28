@@ -134,6 +134,7 @@ pub fn load_adventure(path: &PathBuf, world: &mut World) -> Result<(), ConfigErr
         }
     }
     world.insert(adventure);
+    world.insert(PositionOnMap::default());
     load_cursor(world);
     Ok(())
 }
