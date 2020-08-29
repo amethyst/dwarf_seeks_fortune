@@ -1,10 +1,13 @@
 use crate::components::{Direction2D, MapCursor, Pos};
-use crate::resources::{Adventure, MovementConfig, PositionOnMap, SoundType};
+use crate::resources::{
+    Adventure, AdventureNode, MapElement, MovementConfig, NodeDetails, PositionOnMap, SoundType,
+};
 use crate::systems::SoundEvent;
-use amethyst::core::ecs::{Join, Read, System, Write, WriteStorage};
+use amethyst::core::ecs::{Entity, Join, LazyUpdate, Read, System, World, Write, WriteStorage};
 use amethyst::core::{Time, Transform};
 use amethyst::input::{InputHandler, StringBindings};
 use amethyst::shrev::EventChannel;
+use amethyst::ui::{UiFinder, UiText};
 
 /// Responsible for moving the map cursor in the adventure and level selection.
 pub struct MapCursorSystem;
@@ -20,6 +23,7 @@ impl<'s> System<'s> for MapCursorSystem {
         Read<'s, MovementConfig>,
         Read<'s, Adventure>,
         Write<'s, PositionOnMap>,
+        Read<'s, LazyUpdate>,
     );
 
     fn run(
@@ -33,6 +37,7 @@ impl<'s> System<'s> for MapCursorSystem {
             config,
             adventure,
             mut pos_on_map,
+            lazy,
         ): Self::SystemData,
     ) {
         for (cursor, transform) in (&mut cursors, &mut transforms).join() {
@@ -47,6 +52,7 @@ impl<'s> System<'s> for MapCursorSystem {
                     transform,
                     &adventure,
                     &mut sound_channel,
+                    &lazy,
                 );
                 cursor.cooldown = config.map_cursor_move_high_cooldown;
             } else if cursor.last_direction.is_opposite(&new_direction) {
@@ -64,6 +70,7 @@ impl<'s> System<'s> for MapCursorSystem {
                         transform,
                         &adventure,
                         &mut sound_channel,
+                        &lazy,
                     );
                 }
             }
@@ -80,6 +87,7 @@ fn move_cursor(
     transform: &mut Transform,
     adventure: &Adventure,
     sound_channel: &mut EventChannel<SoundEvent>,
+    lazy: &LazyUpdate,
 ) {
     let target_pos = if !direction.x.is_neutral() {
         pos_on_map.pos.append_x(direction.x.signum_i())
@@ -92,5 +100,37 @@ fn move_cursor(
         transform.set_translation_x(pos_on_map.pos.x as f32 + 0.5);
         transform.set_translation_y(pos_on_map.pos.y as f32 + 0.5);
         sound_channel.single_write(SoundEvent::new(SoundType::MapStep));
+        lazy.exec(|world| update_ui(world));
     }
+}
+
+fn update_ui(world: &mut World) {
+    world.exec(
+        |(mut ui_text, finder, adventure, pos_on_map): (
+            WriteStorage<UiText>,
+            UiFinder,
+            Read<Adventure>,
+            Read<PositionOnMap>,
+        )| {
+            let label_title = {
+                let label_title_entity = finder.find("label_node_title");
+                if let Some(fps_entity) = label_title_entity {
+                    ui_text.get_mut(fps_entity)
+                } else {
+                    None
+                }
+            };
+            if let Some(mut label_title) = label_title {
+                let selected = adventure.nodes.get(&pos_on_map.pos);
+                let selected_title = match selected {
+                    Some(MapElement::Node(AdventureNode {
+                        details: NodeDetails::Level(file_name),
+                        ..
+                    })) => file_name.clone(),
+                    _ => "Nothing".to_string(),
+                };
+                label_title.text = format!("Selected: {:?}", selected_title);
+            }
+        },
+    );
 }

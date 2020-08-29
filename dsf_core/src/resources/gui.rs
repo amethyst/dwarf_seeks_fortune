@@ -51,4 +51,7 @@ pub enum UiType {
     Paused,
     /// The main menu.
     MainMenu,
+    /// For the adventure and level select screen. Contains the details of the selected node,
+    /// such as name and description.
+    LevelSelect,
 }

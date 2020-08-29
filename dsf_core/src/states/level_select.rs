@@ -76,6 +76,8 @@ impl<'a, 'b> LevelSelectState {
 
     /// Prepare to start or resume.
     fn perform_setup(&self, world: &mut World) {
+        UiHandles::add_ui(&UiType::Fps, world);
+        UiHandles::add_ui(&UiType::LevelSelect, world);
         create_camera(world);
         load_adventure(&self.adventure_file, world).expect("Failed to load adventure!");
     }

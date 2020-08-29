@@ -1,11 +1,12 @@
 // Serialised version of a LoadingConfig struct.
 (
     uis: [
-        (Fps, "ui/fps.ron"),
-        (WinMessage, "ui/win_message.ron"),
-        (Save, "ui/save.ron"),
         (Editor, "ui/editor.ron"),
+        (Fps, "ui/fps.ron"),
+        (LevelSelect, "ui/level_select.ron"),
         (MainMenu, "ui/main_menu.ron"),
+        (Save, "ui/save.ron"),
+        (WinMessage, "ui/win_message.ron"),
     ],
     animations: [
         (NotFound, "prefab/anim_not_found.ron"),
