@@ -54,4 +54,6 @@ pub enum UiType {
     /// For the adventure and level select screen. Contains the details of the selected node,
     /// such as name and description.
     LevelSelect,
+    /// Debug controls explanation. Tells players that F5 resets level.
+    Play,
 }

@@ -110,6 +110,7 @@ impl<'a, 'b> PlayState {
     fn reset_level(&self, world: &mut World) {
         world.delete_all();
         UiHandles::add_ui(&UiType::Fps, world);
+        UiHandles::add_ui(&UiType::Play, world);
         create_camera(world);
         load_level(&self.level_file, world).expect("Failed to load level!");
     }

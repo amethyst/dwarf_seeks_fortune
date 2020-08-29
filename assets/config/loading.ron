@@ -5,6 +5,7 @@
         (Fps, "ui/fps.ron"),
         (LevelSelect, "ui/level_select.ron"),
         (MainMenu, "ui/main_menu.ron"),
+        (Play, "ui/play.ron"),
         (Save, "ui/save.ron"),
         (WinMessage, "ui/win_message.ron"),
     ],

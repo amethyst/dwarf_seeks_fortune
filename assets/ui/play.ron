@@ -1,0 +1,18 @@
+#![enable(implicit_some)]
+Label(
+    transform: (
+        id: "play_text",
+        anchor: TopLeft,
+        x: 350.,
+        y: -25.,
+        width: 200.,
+        height: 50.,
+        transparent: true,
+    ),
+    text: (
+        text: "F5 to reset",
+        font_size: 25.,
+        color: (1., 1., 1., 1.),
+        font: File("font/square.ttf", ("TTF", ())),
+    ),
+)
