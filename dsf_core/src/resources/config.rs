@@ -86,3 +86,17 @@ pub struct MovementConfig {
     /// step takes much shorter.
     pub map_cursor_move_low_cooldown: f32,
 }
+
+#[derive(Debug, Deserialize, Serialize, Default)]
+#[serde(default)]
+#[serde(deny_unknown_fields)]
+pub struct AudioConfig {
+    /// What volume the music should be played at. If this value is None, the music will not be
+    /// played at all.
+    /// The volume should be a value in the range [0.0, 1.0].
+    pub music_volume: Option<f32>,
+    /// What volume the sound effects should be played at. If this value is None, the music will
+    /// not be played at all.
+    /// The volume should be a value in the range [0.0, 1.0].
+    pub sound_effects_volume: Option<f32>,
+}

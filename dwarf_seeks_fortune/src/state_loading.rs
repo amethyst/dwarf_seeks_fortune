@@ -1,7 +1,9 @@
 use amethyst::prelude::WorldExt;
 use amethyst::ui::UiCreator;
 use amethyst::ui::UiLoader;
-use dsf_core::resources::{Assets, DebugConfig, MovementConfig, Music, UiHandles, UserCache};
+use dsf_core::resources::{
+    Assets, AudioConfig, DebugConfig, MovementConfig, Music, UiHandles, UserCache,
+};
 
 use amethyst::{
     assets::{AssetStorage, Completion, Loader, PrefabLoader, ProgressCounter, RonFormat},
@@ -108,23 +110,30 @@ impl SimpleState for LoadingState {
         );
         data.world.insert(assets);
 
-        // Set audio volume:
-        data.world.write_resource::<AudioSink>().set_volume(0.25);
-        // Create a music player.
-        let music_handles = loading_config
-            .music_tracks
-            .drain(..)
-            .map(|music_file_path| {
-                let loader = data.world.read_resource::<Loader>();
-                loader.load(
-                    music_file_path,
-                    Mp3Format,
-                    &mut self.progress,
-                    &data.world.read_resource(),
-                )
-            })
-            .collect();
-        data.world.insert(Music::new(music_handles));
+        let music_resource =
+            if let Some(volume) = data.world.read_resource::<AudioConfig>().music_volume {
+                // Set music volume:
+                data.world.write_resource::<AudioSink>().set_volume(volume);
+                // Load music handles.
+                let music_handles = loading_config
+                    .music_tracks
+                    .drain(..)
+                    .map(|music_file_path| {
+                        let loader = data.world.read_resource::<Loader>();
+                        loader.load(
+                            music_file_path,
+                            Mp3Format,
+                            &mut self.progress,
+                            &data.world.read_resource(),
+                        )
+                    })
+                    .collect();
+                Music::new(music_handles)
+            } else {
+                // Music volume is None, don't load the music tracks at all.
+                Music::new(vec![])
+            };
+        data.world.insert(music_resource);
     }
 
     fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
@@ -193,6 +202,15 @@ fn load_configs(world: &mut World) {
                 error
             );
             EditorConfig::default()
+        }),
+    );
+    world.insert(
+        AudioConfig::load(&config_dir.join("audio.ron")).unwrap_or_else(|error| {
+            error!(
+                "Failed to load audio config! Falling back to default. Error: {:?}",
+                error
+            );
+            AudioConfig::default()
         }),
     );
     world.insert(if get_user_cache_file().is_file() {

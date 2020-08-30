@@ -1,0 +1,5 @@
+// Serialised version of a AudioConfig struct.
+(
+    music_volume: Some(0.5),
+    sound_effects_volume: Some(0.8),
+)

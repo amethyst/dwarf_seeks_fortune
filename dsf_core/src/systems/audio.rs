@@ -1,4 +1,4 @@
-use crate::resources::{Assets, SoundType};
+use crate::resources::{Assets, AudioConfig, SoundType};
 use amethyst::assets::AssetStorage;
 use amethyst::audio::output::Output;
 use amethyst::audio::Source;
@@ -8,6 +8,8 @@ use amethyst::core::shred::SystemData;
 
 use amethyst::prelude::World;
 
+/// Elsewhere in the application, you can broadcast SoundEvents. The PlaySfxSystem below listens
+/// for such events and actually plays the sound effect that was requested.
 #[derive(Debug, Clone)]
 pub struct SoundEvent {
     sound_type: SoundType,
@@ -29,25 +31,28 @@ pub struct PlaySfxSystem {
 
 impl<'s> System<'s> for PlaySfxSystem {
     type SystemData = (
+        Read<'s, AudioConfig>,
         Read<'s, EventChannel<SoundEvent>>,
         Read<'s, Assets>,
         Read<'s, AssetStorage<Source>>,
         Read<'s, Output>,
     );
 
-    fn run(&mut self, (sound_events, assets, sources, output): Self::SystemData) {
+    fn run(&mut self, (config, sound_events, assets, sources, output): Self::SystemData) {
         let reader_id = self
             .reader_id
             .as_mut()
             .expect("`PlaySfxSystem::setup` was not called before `PlaySfxSystem::run`");
 
         for event in sound_events.read(reader_id) {
-            let source = assets
-                .get_sound(&event.sound_type)
-                .map(|source_handle| sources.get(&source_handle))
-                .flatten();
-            if let Some(source) = source {
-                output.play_once(source, 0.5);
+            if let Some(volume) = config.sound_effects_volume {
+                let source = assets
+                    .get_sound(&event.sound_type)
+                    .map(|source_handle| sources.get(&source_handle))
+                    .flatten();
+                if let Some(source) = source {
+                    output.play_once(source, volume);
+                }
             }
         }
     }
