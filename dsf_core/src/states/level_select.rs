@@ -46,6 +46,11 @@ impl<'a, 'b> LevelSelectState {
             adventure_file,
             dispatcher: DispatcherBuilder::new()
                 .with(systems::MapCursorSystem, "map_cursor_system", &[])
+                .with(
+                    systems::LevelSelectUiUpdateSystem,
+                    "level_select_ui_update_system",
+                    &[],
+                )
                 .build(),
         }
     }
