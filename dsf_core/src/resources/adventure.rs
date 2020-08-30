@@ -139,9 +139,16 @@ pub fn load_adventure(path: &PathBuf, world: &mut World) -> Result<(), ConfigErr
             MapElement::Node(node) => load_node(pos, node, world),
         }
     }
-    world.insert(adventure);
-    let initial_cursor_pos = cursor_position(path, world);
+    let initial_cursor_pos = {
+        let last_known_pos = cursor_position(path, world);
+        if adventure.nodes.contains_key(&last_known_pos) {
+            last_known_pos
+        } else {
+            Pos::default()
+        }
+    };
     load_cursor(world, &initial_cursor_pos);
+    world.insert(adventure);
     world.insert(PositionOnMap::new(initial_cursor_pos));
     Ok(())
 }
