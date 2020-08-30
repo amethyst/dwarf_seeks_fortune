@@ -1,9 +1,9 @@
-use crate::components::{Direction2D, MapCursor, Pos};
+use crate::components::{Direction2D, MapCursor};
 use crate::resources::{
     Adventure, AdventureNode, MapElement, MovementConfig, NodeDetails, PositionOnMap, SoundType,
 };
 use crate::systems::SoundEvent;
-use amethyst::core::ecs::{Entity, Join, LazyUpdate, Read, System, World, Write, WriteStorage};
+use amethyst::core::ecs::{Join, Read, System, Write, WriteStorage};
 use amethyst::core::{Time, Transform};
 use amethyst::input::{InputHandler, StringBindings};
 use amethyst::shrev::EventChannel;

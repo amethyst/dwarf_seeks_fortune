@@ -32,6 +32,8 @@ impl<'s> System<'s> for LevelWrappingSystem {
                 transform.set_translation_y(transform.translation().y + tile_map.dimens.y as f32);
                 steering.pos.y += tile_map.dimens.y;
                 steering.destination.y += tile_map.dimens.y;
+                // Ignore warning, we'll want to add more patterns in the future.
+                #[allow(clippy::single_match)]
                 match steering.mode {
                     SteeringMode::Falling {
                         x_movement,

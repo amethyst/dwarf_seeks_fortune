@@ -1,9 +1,6 @@
 use crate::resources::{EditorData, LevelEdit};
 use amethyst::config::ConfigError;
-use amethyst::{
-    prelude::{Config, World, WorldExt},
-    utils::application_root_dir,
-};
+use amethyst::prelude::{Config, World, WorldExt};
 
 use dsf_core::levels::Level;
 use dsf_core::utility::files::get_levels_dir;
@@ -26,6 +23,7 @@ pub fn load_auto_save() -> Result<LevelEdit, ConfigError> {
 }
 
 /// Load and return the level with the given name.
+#[allow(dead_code)] //Not used yet, but will be used in the future.
 pub fn load(name: String) -> Result<LevelEdit, ConfigError> {
     let level_file = get_levels_dir().join(name + ".ron");
     read_level_file(level_file)
@@ -46,6 +44,7 @@ pub fn auto_save(world: &mut World) -> Result<(), ConfigError> {
 /// TODO: check if name is reserved (ie: auto_save)
 /// TODO: check if level already exists, if so maybe ask to overwrite?
 ///     (or keep track of which one we loaded, so we know whether it's safe to overwrite)
+#[allow(dead_code)] //Not used yet, but will be used in the future.
 pub fn save(name: String, world: &mut World) -> Result<(), ConfigError> {
     let level_file = get_levels_dir().join(name + ".ron");
     write_level_file(level_file, world)

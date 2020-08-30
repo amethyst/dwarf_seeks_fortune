@@ -19,7 +19,12 @@ fn get_root_dir() -> PathBuf {
 }
 
 fn create_if_missing(path: PathBuf) -> PathBuf {
-    fs::create_dir_all(&path).expect(&format!("Failed to create directory {:?}", &path));
+    fs::create_dir_all(&path).unwrap_or_else(|err| {
+        panic!(
+            "Failed to create directory {:?} because error {:?}",
+            &path, err
+        )
+    });
     path
 }
 

@@ -1,13 +1,7 @@
 use crate::components::Direction2D;
 use serde::{Deserialize, Serialize};
 
-use amethyst::{
-    assets::PrefabData,
-    core::transform::Transform,
-    derive::PrefabData,
-    ecs::{prelude::Entity, Component, DenseVecStorage, WriteStorage},
-    error::Error,
-};
+use amethyst::ecs::{Component, DenseVecStorage};
 
 /// This is used in the adventure and level selector. The entity with this component represents
 /// where the player is on the map.

@@ -63,7 +63,7 @@ impl<'s> System<'s> for PlayerSystem {
                 None
             };
 
-            if !player.turn_around_timer.is_some() {
+            if player.turn_around_timer.is_none() {
                 intent.walk = new_walk;
             }
             intent.face = new_walk;

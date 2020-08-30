@@ -11,7 +11,6 @@ use amethyst::{
     ecs::{prelude::World, Entities, Join, ReadStorage, WriteStorage},
     input::{is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
     renderer::sprite::SpriteRender,
-    utils::application_root_dir,
     StateData, Trans,
 };
 use amethyst::{GameData, SimpleState, SimpleTrans};

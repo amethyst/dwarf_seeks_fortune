@@ -3,10 +3,7 @@ use crate::resources::*;
 use crate::systems::SoundEvent;
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::{Time, Transform};
-use amethyst::{
-    ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorage},
-    input::{InputHandler, StringBindings},
-};
+use amethyst::ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorage};
 
 #[derive(Default)]
 pub struct SteeringSystem;

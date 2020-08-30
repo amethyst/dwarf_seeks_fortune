@@ -1,9 +1,9 @@
 use std::fs;
-use std::io::Error;
+
 use std::path::PathBuf;
 
 use amethyst::prelude::*;
-use amethyst::utils::application_root_dir;
+
 use serde::{Deserialize, Serialize};
 
 use crate::components::*;
@@ -77,15 +77,15 @@ pub fn create_default_adventure() {
         .filter(|(level_name, result)| {
             result
                 .as_ref()
-                .or_else(|err| {
+                .map_err(|err| {
                     error!("Failed to load level {:?}: {:?}", level_name, err);
-                    Err(err)
+                    err
                 })
                 .is_ok()
         })
         .map(|(level_name, result)| (level_name, result.expect("Should never panic.")))
         .enumerate()
-        .for_each(|(index, (level_name, level))| {
+        .for_each(|(index, (level_name, _level))| {
             adventure.nodes.insert(
                 Pos::new((index * 2) as i32, 0),
                 MapElement::Node(AdventureNode {
@@ -175,7 +175,7 @@ fn load_cursor(world: &mut World, pos: &Pos) {
         .with(MapCursor::default())
         .with(Tint(Srgba::new(0.5, 0., 0., 1.)))
         .with(transform)
-        .with(sprite_render.clone())
+        .with(sprite_render)
         .build();
 }
 
@@ -190,11 +190,11 @@ fn load_road(pos: &Pos, world: &mut World) {
     world
         .create_entity()
         .with(transform)
-        .with(sprite_render_road.clone())
+        .with(sprite_render_road)
         .build();
 }
 
-fn load_node(pos: &Pos, node: &AdventureNode, world: &mut World) {
+fn load_node(pos: &Pos, _node: &AdventureNode, world: &mut World) {
     let sprite_render_node = load_asset_from_world(&SpriteType::LevelSelect, 0, world);
     let transform = load_transform(
         pos,
@@ -205,6 +205,6 @@ fn load_node(pos: &Pos, node: &AdventureNode, world: &mut World) {
     world
         .create_entity()
         .with(transform)
-        .with(sprite_render_node.clone())
+        .with(sprite_render_node)
         .build();
 }

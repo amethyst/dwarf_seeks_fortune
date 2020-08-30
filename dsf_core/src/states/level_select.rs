@@ -4,28 +4,19 @@ use amethyst::prelude::WorldExt;
 
 use amethyst::StateEvent;
 use amethyst::{
-    animation::{
-        get_animation_set, AnimationCommand, AnimationControlSet, AnimationSet, EndControl,
-    },
-    core::timing::Time,
-    ecs::{prelude::World, Entities, Join, ReadStorage, WriteStorage},
+    ecs::prelude::World,
     input::{is_close_requested, is_key_down, InputEvent, VirtualKeyCode},
-    renderer::sprite::SpriteRender,
-    utils::application_root_dir,
     StateData, Trans,
 };
 use amethyst::{GameData, SimpleState, SimpleTrans};
 
-use dsf_precompile::AnimationId;
-
 use crate::entities::*;
-use crate::levels::*;
+
 use crate::resources::*;
 use crate::states::{window_event_handler, PlayState};
 use crate::systems;
 use crate::utility::files::{get_adventures_dir, get_levels_dir};
 use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
-use amethyst::core::SystemExt;
 
 /// This can be used to either select an adventure from the world or a level from an adventure.
 pub struct LevelSelectState {

@@ -1,5 +1,5 @@
 use crate::components::Pos;
-use crate::utility::files::{get_levels_dir, get_user_cache_file};
+use crate::utility::files::get_user_cache_file;
 use amethyst::config::Config;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -24,7 +24,7 @@ impl UserCache {
     pub fn get_initial_cursor_pos(&self, adventure_file_name: &str) -> Pos {
         self.adventure_map_pos
             .get(adventure_file_name)
-            .map(|pos| pos.clone())
-            .unwrap_or_else(|| Pos::default())
+            .copied()
+            .unwrap_or_else(Pos::default)
     }
 }

@@ -32,12 +32,9 @@ impl Assets {
     }
 
     pub fn put_sound(mut self, sound_type: SoundType, asset: SourceHandle) -> Self {
-        if !self.sounds.contains_key(&sound_type) {
-            self.sounds.insert(sound_type, vec![]);
-        }
         self.sounds
-            .get_mut(&sound_type)
-            .expect("Should not panic.")
+            .entry(sound_type)
+            .or_insert_with(Vec::new)
             .push(asset);
         self
     }

@@ -30,6 +30,7 @@ pub struct PlaySfxSystem {
 }
 
 impl<'s> System<'s> for PlaySfxSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         Read<'s, AudioConfig>,
         Read<'s, EventChannel<SoundEvent>>,

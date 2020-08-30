@@ -166,7 +166,7 @@ impl<'s> System<'s> for UseToolSystem {
     }
 }
 
-fn at_least_one_is_breakable(blocks: &Vec<Pos>, tile_map: &TileMap) -> bool {
+fn at_least_one_is_breakable(blocks: &[Pos], tile_map: &TileMap) -> bool {
     blocks.iter().any(|pos| {
         tile_map
             .get_tile(pos)
@@ -175,7 +175,7 @@ fn at_least_one_is_breakable(blocks: &Vec<Pos>, tile_map: &TileMap) -> bool {
     })
 }
 
-fn none_are_unbreakable(blocks: &Vec<Pos>, tile_map: &TileMap) -> bool {
+fn none_are_unbreakable(blocks: &[Pos], tile_map: &TileMap) -> bool {
     blocks.iter().all(|pos| {
         tile_map
             .get_tile(pos)
