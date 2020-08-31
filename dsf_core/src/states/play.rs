@@ -22,8 +22,10 @@ use crate::levels::*;
 use crate::resources::*;
 use crate::states::window_event_handler;
 use crate::systems;
+use crate::systems::SoundEvent;
 use crate::utility::files::get_levels_dir;
 use amethyst::core::ecs::{Dispatcher, DispatcherBuilder};
+use amethyst::core::shrev::EventChannel;
 use amethyst::core::SystemExt;
 
 pub struct PlayState {
@@ -95,6 +97,9 @@ impl<'a, 'b> PlayState {
             self.update_time_scale(world, new_scale);
             Trans::None
         } else if action == "restart" {
+            world
+                .write_resource::<EventChannel<SoundEvent>>()
+                .single_write(SoundEvent::new(SoundType::LvlReset));
             self.reset_level(world);
             Trans::None
         } else {

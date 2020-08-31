@@ -159,4 +159,7 @@ pub enum SoundType {
     /// Played when the player completes a level by reaching the exit door after having picked up
     /// all keys.
     Win,
+    /// Plays when the player resets the puzzle to the beginning
+    /// (probably because they made a mistake).
+    LvlReset,
 }

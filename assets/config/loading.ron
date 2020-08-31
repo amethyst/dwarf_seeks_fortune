@@ -81,6 +81,11 @@
         (LadderStep, "audio/ladder_05.wav"),
         (CannotPerformAction, "audio/nonono.wav"),
         (MapStep, "audio/soft_shuffle.wav"),
+        (LvlReset, "audio/lvl_reset_01.wav"),
+        (LvlReset, "audio/lvl_reset_02.wav"),
+        (LvlReset, "audio/lvl_reset_03.wav"),
+        (LvlReset, "audio/lvl_reset_04.wav"),
+        (LvlReset, "audio/lvl_reset_05.wav"),
     ],
     music_tracks: [
         "audio/music/Loyalty_Freak_Music_-_01_-_Once_more_with_you.mp3",
