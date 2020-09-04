@@ -1,5 +1,30 @@
-[workspace]
+[package]
+name = "dwarf_seeks_fortune"
+version = "0.1.0"
+authors = ["Jazarro <nospam.git@boschman.io>"]
+edition = "2018"
 
+[dependencies]
+
+# ---------- Mac users, configuration required: -------------
+# -----------------------------------------------------------
+# Windows / Linux users, use the following line:
+amethyst = { version = "=0.15.3", features = ["vulkan"] }
+# Mac users, use the following line:
+#amethyst = {version = "=0.15.3", features = ["metal"]}
+# -----------------------------------------------------------
+# -----------------------------------------------------------
+
+log = { version = "0.4.6", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+
+dsf_precompile = { path = "dsf_precompile" }
+dsf_core = { path = "dsf_core" }
+dsf_editor = { path = "dsf_editor" }
+dsf_checks = { path = "dsf_checks" }
+
+
+[workspace]
 members = [
     # Prepares some bundles. The main reason this is split off is to improve compilation times.
     "dsf_precompile",
@@ -9,8 +34,4 @@ members = [
     "dsf_editor",
     # Contains all code partaining to the automated checks.
     "dsf_checks",
-    # The main binary, contains the starting point of the application. Glues everything together.
-    # If you're looking to change vulkan to metal, go to this crate's Cargo.toml. This is the only place where that
-    # feature is specified.
-    "dwarf_seeks_fortune",
 ]

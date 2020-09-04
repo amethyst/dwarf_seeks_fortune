@@ -3,14 +3,12 @@
 #[macro_use]
 extern crate log;
 
-mod loading_config;
 mod state_loading;
 mod state_main_menu;
 
 use amethyst::{
     assets::{PrefabLoaderSystemDesc, Processor},
     audio::{DjSystemDesc, Source},
-    utils::application_root_dir,
     GameDataBuilder, LoggerConfig,
 };
 
@@ -19,17 +17,15 @@ use dsf_core::systems;
 use crate::state_loading::LoadingState;
 use dsf_core::resources::{create_default_adventure, Music};
 use dsf_core::systems::PlaySfxSystem;
+use dsf_core::utility::files::{get_assets_dir, get_config_dir};
 use dsf_precompile::PrecompiledDefaultsBundle;
 use dsf_precompile::PrecompiledRenderBundle;
 use dsf_precompile::{start_game, MyPrefabData};
 
 fn main() -> amethyst::Result<()> {
     amethyst::Logger::from_config(LoggerConfig::default()).start();
-    let app_root = application_root_dir()?;
-    let assets_dir = app_root.join("../assets/");
-    let config_dir = assets_dir.join("config/");
-    let display_config_path = config_dir.join("display.ron");
-    let bindings_config_path = config_dir.join("input.ron");
+    let display_config_path = get_config_dir().join("display.ron");
+    let bindings_config_path = get_config_dir().join("input.ron");
     create_default_adventure();
 
     let game_data = GameDataBuilder::default()
@@ -65,7 +61,7 @@ fn main() -> amethyst::Result<()> {
         })?;
 
     start_game(
-        assets_dir,
+        get_assets_dir(),
         game_data,
         Some(Box::new(LoadingState::default())),
     );

@@ -14,11 +14,10 @@ use amethyst::{
 };
 use dsf_precompile::MyPrefabData;
 
-use crate::loading_config::LoadingConfig;
 use crate::state_main_menu::MainMenuState;
 use amethyst::audio::{AudioSink, Mp3Format, WavFormat};
-use amethyst::utils::application_root_dir;
-use dsf_core::utility::files::get_user_cache_file;
+use dsf_core::utility::files::{get_config_dir, get_user_cache_file};
+use dsf_core::utility::loading_config::LoadingConfig;
 use dsf_editor::resources::EditorConfig;
 
 /// This state is briefly active when the game is first started up. It loads all assets used in the
@@ -157,11 +156,7 @@ impl SimpleState for LoadingState {
 /// Load the LoadingConfig from file. The LoadingConfig contains information on what assets must be
 /// loaded by this LoadingState.
 fn load_loading_config() -> LoadingConfig {
-    let config_dir = application_root_dir()
-        .expect("Failed to get application root directory!")
-        .join("../assets/")
-        .join("config/");
-    LoadingConfig::load(&config_dir.join("loading.ron")).unwrap_or_else(|error| {
+    LoadingConfig::load(&get_config_dir().join("loading.ron")).unwrap_or_else(|error| {
         error!(
             "Failed to load loading config! Falling back to default. Error: {:?}",
             error
@@ -173,10 +168,7 @@ fn load_loading_config() -> LoadingConfig {
 /// Load various configuration resources from their respective files and insert them into the World
 /// as resources.
 fn load_configs(world: &mut World) {
-    let config_dir = application_root_dir()
-        .expect("Failed to get application root directory!")
-        .join("../assets/")
-        .join("config/");
+    let config_dir = get_config_dir();
     world.insert(
         DebugConfig::load(&config_dir.join("debug.ron")).unwrap_or_else(|error| {
             error!(

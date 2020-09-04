@@ -7,7 +7,6 @@ use amethyst::{
     ecs::{prelude::World, Entities, Entity, EntityBuilder, Join, ReadStorage},
     prelude::*,
     renderer::{sprite::SpriteRender, Transparent},
-    utils::application_root_dir,
 };
 use dsf_precompile::MyPrefabData;
 
@@ -16,14 +15,11 @@ use crate::components::*;
 use crate::levels::{Archetype, DepthLayer, Level, TileDefinition, TileDefinitions};
 use crate::resources::*;
 
+use crate::utility::files::get_world_dir;
 use std::path::PathBuf;
 
 pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
-    let file = application_root_dir()
-        .expect("Root dir not found!")
-        .join("../assets/")
-        .join("world/")
-        .join("tile_references.ron");
+    let file = get_world_dir().join("tile_references.ron");
     TileDefinitions::load(file)
 }
 
