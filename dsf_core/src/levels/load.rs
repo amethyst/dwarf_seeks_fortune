@@ -131,11 +131,29 @@ fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
             .iter()
             .enumerate()
             .for_each(|(index, key)| {
+                // Temporary bit of code to arrange the key displays on the door in a
+                // visually pleasing manner. Rewrite this later, when we know exactly what we
+                // want to do with the door.
+                let i = if index < 2 {
+                    index + 5
+                } else if index < 4 {
+                    index + 7
+                } else if index < 5 {
+                    index
+                } else if index < 7 {
+                    index - 5
+                } else if index < 9 {
+                    index
+                } else if index < 11 {
+                    index - 7
+                } else {
+                    index
+                };
                 let mut transform = Transform::default();
-                let x_offset = index % 4;
-                let y_offset = index / 4;
-                transform.set_translation_x((-1. + x_offset as f32) * 64.);
-                transform.set_translation_y((1. + y_offset as f32) * 64.);
+                let x_offset = i % 4;
+                let y_offset = i / 4;
+                transform.set_translation_x((-1.5 + x_offset as f32) * 64.);
+                transform.set_translation_y((-1.5 + y_offset as f32) * 64.);
                 transform.set_translation_z(1.); //One higher than parent.
                 transform.set_scale(Vector3::new(0.5, 0.5, 1.0));
                 let sprite = load_asset_from_world(&SpriteType::Blocks, 3, world);
