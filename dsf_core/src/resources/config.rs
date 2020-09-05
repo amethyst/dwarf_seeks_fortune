@@ -1,3 +1,5 @@
+use crate::utility::files::get_user_settings_dir;
+use amethyst::config::Config;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Default)]
@@ -97,4 +99,54 @@ pub struct AudioConfig {
     /// not be played at all.
     /// The volume should be a value in the range [0.0, 1.0].
     pub sound_effects_volume: Option<f32>,
+}
+
+impl AudioConfig {
+    /// Add the given delta to the current music volume and write the SoundConfig to a user
+    /// settings file.
+    pub fn add_to_music_volume(&mut self, delta: f32) {
+        self.music_volume = Self::add_volume(self.music_volume, delta);
+        self.write(get_user_settings_dir().join("audio.ron"))
+            .expect("Failed to write user audio settings file.");
+    }
+
+    /// Add the given delta to the current sound effects volume and write the SoundConfig to a user
+    /// settings file.
+    pub fn add_to_sfx_volume(&mut self, delta: f32) {
+        self.sound_effects_volume = Self::add_volume(self.sound_effects_volume, delta);
+        self.write(get_user_settings_dir().join("audio.ron"))
+            .expect("Failed to write user audio settings file.");
+    }
+
+    /// Add the delta to the starting volume. Clamp to range [0, 1].
+    /// A value of zero is interpreted as None (sound off).
+    fn add_volume(starting_volume: Option<f32>, delta: f32) -> Option<f32> {
+        let current_volume = starting_volume.unwrap_or(0.0);
+        let new_volume = (current_volume + delta).max(0.0).min(1.0);
+        Some(new_volume).and_then(|volume| {
+            if volume.abs() < f32::EPSILON {
+                None
+            } else {
+                Some(volume)
+            }
+        })
+    }
+
+    /// Return a pretty printed representation of the music volume.
+    pub fn format_music_volume(&self) -> String {
+        Self::format_volume(self.music_volume)
+    }
+
+    /// Return a pretty printed representation of the sound effects volume.
+    pub fn format_sfx_volume(&self) -> String {
+        Self::format_volume(self.sound_effects_volume)
+    }
+
+    /// Return a pretty printed representation of the given volume value.
+    fn format_volume(volume: Option<f32>) -> String {
+        match volume {
+            Some(volume) => format!("{:.2}", volume),
+            None => "Off".to_string(),
+        }
+    }
 }

@@ -56,4 +56,5 @@ pub enum UiType {
     LevelSelect,
     /// Debug controls explanation. Tells players that F5 resets level.
     Play,
+    Settings,
 }

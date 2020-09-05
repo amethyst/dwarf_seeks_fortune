@@ -7,11 +7,12 @@ use amethyst::{
 use dsf_checks::states::MovementTestState;
 
 use dsf_core::resources::{DebugConfig, UiHandles, UiType};
-use dsf_core::states::{window_event_handler, LevelSelectState};
+use dsf_core::states::{window_event_handler, LevelSelectState, SettingsState};
 use dsf_editor::states::EditorState;
 
 const PLAY_BUTTON_ID: &str = "play";
 const EDITOR_BUTTON_ID: &str = "editor";
+const SETTINGS_BUTTON_ID: &str = "settings";
 const MOVEMENT_TEST_BUTTON_ID: &str = "movement_test";
 const EXIT_BUTTON_ID: &str = "exit";
 
@@ -20,6 +21,7 @@ pub struct MainMenuState {
     ui: Option<Entity>,
     play_button: Option<Entity>,
     editor_button: Option<Entity>,
+    settings_button: Option<Entity>,
     movement_test_button: Option<Entity>,
     exit_button: Option<Entity>,
 }
@@ -38,6 +40,7 @@ impl MainMenuState {
         data.world.exec(|ui_finder: UiFinder<'_>| {
             self.play_button = ui_finder.find(PLAY_BUTTON_ID);
             self.editor_button = ui_finder.find(EDITOR_BUTTON_ID);
+            self.settings_button = ui_finder.find(SETTINGS_BUTTON_ID);
             self.movement_test_button = ui_finder.find(MOVEMENT_TEST_BUTTON_ID);
             self.exit_button = ui_finder.find(EXIT_BUTTON_ID);
         });
@@ -55,6 +58,7 @@ impl SimpleState for MainMenuState {
         data.world.delete_all();
         self.play_button = None;
         self.editor_button = None;
+        self.settings_button = None;
         self.movement_test_button = None;
         self.exit_button = None;
     }
@@ -82,6 +86,8 @@ impl SimpleState for MainMenuState {
                     Trans::Push(Box::new(LevelSelectState::demo()))
                 } else if Some(target) == self.editor_button {
                     Trans::Push(Box::new(EditorState::new(data.world)))
+                } else if Some(target) == self.settings_button {
+                    Trans::Push(Box::new(SettingsState::default()))
                 } else if Some(target) == self.movement_test_button {
                     Trans::Push(Box::new(MovementTestState::default()))
                 } else if Some(target) == self.exit_button {

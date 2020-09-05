@@ -8,6 +8,7 @@
         (Play, "ui/play.ron"),
         (Save, "ui/save.ron"),
         (WinMessage, "ui/win_message.ron"),
+        (Settings, "ui/settings.ron"),
     ],
     animations: [
         (NotFound, "prefab/anim_not_found.ron"),
