@@ -21,7 +21,6 @@ serde = { version = "1.0", features = ["derive"] }
 dsf_precompile = { path = "dsf_precompile" }
 dsf_core = { path = "dsf_core" }
 dsf_editor = { path = "dsf_editor" }
-dsf_checks = { path = "dsf_checks" }
 
 
 [workspace]
@@ -33,5 +32,8 @@ members = [
     # Contains all code partaining to the level editor.
     "dsf_editor",
     # Contains all code partaining to the automated checks.
+    # This crate is not currently in use, but will in time become a separate binary crate.
+    # The plan is for it to simulate game play to do various things like prove levels are solvable and prove that
+    # players can or can not make certain jumps.
     "dsf_checks",
 ]

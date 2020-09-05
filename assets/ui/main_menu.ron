@@ -105,31 +105,9 @@ Container(
         ),
         Button(
             transform: (
-                id: "movement_test",
-                x: 0.0,
-                y: -120.0,
-                width: 300.0,
-                height: 50.0,
-                anchor: Middle,
-                mouse_reactive: true,
-            ),
-            button: (
-                text: "Movement Test",
-                font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
-                font_size: 36.0,
-                normal_image: SolidColor(0.5, 0.5, 0.5, 1.),
-                hover_image: SolidColor(0.5, 0.5, 0.5, 1.),
-                press_image: SolidColor(0.5, 0.5, 0.5, 1.),
-                normal_text_color: (0.2, 0.2, 0.2, 1.0),
-                hover_text_color: (0.7, 0.7, 0.7, 1.0),
-                press_text_color: (1.0, 1.0, 1.0, 1.0),
-            )
-        ),
-        Button(
-            transform: (
                 id: "exit",
                 x: 0.0,
-                y: -210.0,
+                y: -120.0,
                 width: 300.0,
                 height: 50.0,
                 anchor: Middle,

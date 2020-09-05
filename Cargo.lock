@@ -1081,7 +1081,6 @@ name = "dwarf_seeks_fortune"
 version = "0.1.0"
 dependencies = [
  "amethyst",
- "dsf_checks",
  "dsf_core",
  "dsf_editor",
  "dsf_precompile",
