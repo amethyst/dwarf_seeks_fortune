@@ -16,7 +16,9 @@ use dsf_precompile::MyPrefabData;
 
 use crate::state_main_menu::MainMenuState;
 use amethyst::audio::{AudioSink, Mp3Format, WavFormat};
-use dsf_core::utility::files::{get_config_dir, get_user_cache_file};
+use dsf_core::utility::files::{
+    get_config_dir, get_default_settings_dir, get_user_cache_file, get_user_settings_dir,
+};
 use dsf_core::utility::loading_config::LoadingConfig;
 use dsf_editor::resources::EditorConfig;
 
@@ -168,6 +170,7 @@ fn load_loading_config() -> LoadingConfig {
 /// Load various configuration resources from their respective files and insert them into the World
 /// as resources.
 fn load_configs(world: &mut World) {
+    load_audio_config(world);
     let config_dir = get_config_dir();
     world.insert(
         DebugConfig::load(&config_dir.join("debug.ron")).unwrap_or_else(|error| {
@@ -196,15 +199,6 @@ fn load_configs(world: &mut World) {
             EditorConfig::default()
         }),
     );
-    world.insert(
-        AudioConfig::load(&config_dir.join("audio.ron")).unwrap_or_else(|error| {
-            error!(
-                "Failed to load audio config! Falling back to default. Error: {:?}",
-                error
-            );
-            AudioConfig::default()
-        }),
-    );
     world.insert(if get_user_cache_file().is_file() {
         UserCache::load(get_user_cache_file()).unwrap_or_else(|error| {
             error!(
@@ -216,4 +210,33 @@ fn load_configs(world: &mut World) {
     } else {
         UserCache::default()
     });
+}
+
+fn load_audio_config(world: &mut World) {
+    let user_settings_file = get_user_settings_dir().join("audio.ron");
+    let audio_settings = if user_settings_file.exists() {
+        AudioConfig::load(&user_settings_file).unwrap_or_else(|error| {
+            error!(
+                "Failed to load the user-specific audio settings file from {:?}! Falling back to default settings file. Error: {:?}",
+                user_settings_file, error
+            );
+            load_default_audio_config()
+        })
+    } else {
+        load_default_audio_config()
+    };
+    world.insert(audio_settings);
+}
+
+fn load_default_audio_config() -> AudioConfig {
+    let file = get_default_settings_dir().join("audio.ron");
+    AudioConfig::load(&file).unwrap_or_else(
+        |error| {
+            error!(
+                "Failed to load the default audio settings file from {:?}! Falling back to Default implementation. Error: {:?}",
+                file, error
+            );
+            AudioConfig::default()
+        },
+    )
 }

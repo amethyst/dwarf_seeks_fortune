@@ -2,9 +2,14 @@ use amethyst::utils::application_root_dir;
 use std::fs;
 use std::path::PathBuf;
 
+pub fn get_default_settings_dir() -> PathBuf {
+    create_if_missing(get_config_dir().join("default_settings/"))
+}
+
 pub fn get_config_dir() -> PathBuf {
     create_if_missing(get_assets_dir().join("config/"))
 }
+
 pub fn get_adventures_dir() -> PathBuf {
     create_if_missing(get_world_dir().join("adventures/"))
 }
@@ -20,6 +25,7 @@ pub fn get_world_dir() -> PathBuf {
 pub fn get_assets_dir() -> PathBuf {
     get_root_dir().join("assets/")
 }
+
 fn get_root_dir() -> PathBuf {
     application_root_dir().expect("Root directory not found!")
 }
@@ -44,4 +50,8 @@ fn get_user_data_dir() -> PathBuf {
 
 pub fn get_user_cache_file() -> PathBuf {
     get_user_data_dir().join("cache.ron")
+}
+
+pub fn get_user_settings_dir() -> PathBuf {
+    create_if_missing(get_user_data_dir().join("settings/"))
 }

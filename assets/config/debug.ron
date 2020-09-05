@@ -4,7 +4,6 @@
         0., 0.05, 0.1, 0.5, 1., 1.5, 2.,
     ],
     time_scale: 1.0,
-    player_speed: 10.0,
     seconds_per_rewind_frame: 0.05,
     skip_straight_to_editor: false,
     display_debug_frames: false,

@@ -12,8 +12,6 @@ pub struct DebugConfig {
     /// behaving normally, higher values mean time is sped up and
     /// 0.0 means time is frozen.
     pub time_scale: f32,
-    /// The max speed of the player in meters per second.
-    pub player_speed: f32,
     /// Number of seconds to leave between frames when rewinding time.
     pub seconds_per_rewind_frame: f32,
     /// Enable this when debugging, to save time when rapidly iterating.
