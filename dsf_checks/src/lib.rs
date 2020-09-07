@@ -10,6 +10,8 @@
 //! This crate can also eventually be leveraged to create automated tests that prove that a certain
 //! puzzle is solvable.
 
+// TODO: Change this crate to a bin.
+
 #[macro_use]
 extern crate log;
 
