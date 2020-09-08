@@ -1,4 +1,4 @@
-use crate::resources::{AudioConfig, UiHandles, UiType};
+use crate::resources::{AudioSettings, UiHandles, UiType};
 use crate::states::window_event_handler;
 use amethyst::core::ecs::{Read, World, WriteStorage};
 use amethyst::ui::UiText;
@@ -47,7 +47,7 @@ impl SettingsState {
     fn set_labels(&self, world: &mut World) {
         if let Some(label_entity) = self.label_music_volume {
             world.exec(
-                |(mut ui_text, audio_config): (WriteStorage<UiText>, Read<AudioConfig>)| {
+                |(mut ui_text, audio_config): (WriteStorage<UiText>, Read<AudioSettings>)| {
                     if let Some(mut text_component) = ui_text.get_mut(label_entity) {
                         text_component.text =
                             format!("Music volume: {:}", audio_config.format_music_volume());
@@ -57,7 +57,7 @@ impl SettingsState {
         }
         if let Some(label_entity) = self.label_sfx_volume {
             world.exec(
-                |(mut ui_text, audio_config): (WriteStorage<UiText>, Read<AudioConfig>)| {
+                |(mut ui_text, audio_config): (WriteStorage<UiText>, Read<AudioSettings>)| {
                     if let Some(mut text_component) = ui_text.get_mut(label_entity) {
                         text_component.text = format!(
                             "Sound effects volume: {:}",
@@ -72,20 +72,22 @@ impl SettingsState {
     fn handle_btn_click(&mut self, target: Entity, world: &mut World) {
         if Some(target) == self.btn_increase_music_volume {
             world
-                .write_resource::<AudioConfig>()
+                .write_resource::<AudioSettings>()
                 .add_to_music_volume(0.1);
             self.set_labels(world);
         } else if Some(target) == self.btn_decrease_music_volume {
             world
-                .write_resource::<AudioConfig>()
+                .write_resource::<AudioSettings>()
                 .add_to_music_volume(-0.1);
             self.set_labels(world);
         } else if Some(target) == self.btn_increase_sfx_volume {
-            world.write_resource::<AudioConfig>().add_to_sfx_volume(0.1);
+            world
+                .write_resource::<AudioSettings>()
+                .add_to_sfx_volume(0.1);
             self.set_labels(world);
         } else if Some(target) == self.btn_decrease_sfx_volume {
             world
-                .write_resource::<AudioConfig>()
+                .write_resource::<AudioSettings>()
                 .add_to_sfx_volume(-0.1);
             self.set_labels(world);
         }

@@ -25,7 +25,7 @@ pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
 
 pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
     let mut win_condition = WinCondition::default();
-    let display_debug_frames = world.read_resource::<DebugConfig>().display_debug_frames;
+    let display_debug_frames = world.read_resource::<DebugSettings>().display_debug_frames;
     let tile_defs = load_tile_definitions()?;
     let level = Level::load(level_file)?;
     add_background(world, &level.pos, &level.dimens);

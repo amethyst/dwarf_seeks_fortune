@@ -87,12 +87,12 @@ impl<'a, 'b> PlayState {
 
     fn handle_action(&mut self, action: &str, world: &mut World) -> SimpleTrans {
         if action == "speedUp" {
-            let (old_scale, new_scale) = (*world.fetch_mut::<DebugConfig>()).increase_speed();
+            let (old_scale, new_scale) = (*world.fetch_mut::<DebugSettings>()).increase_speed();
             info!("Speeding up time, from x{:?} to x{:?}. This feature exists for debugging purposes only.", old_scale, new_scale);
             self.update_time_scale(world, new_scale);
             Trans::None
         } else if action == "slowDown" {
-            let (old_scale, new_scale) = (*world.fetch_mut::<DebugConfig>()).decrease_speed();
+            let (old_scale, new_scale) = (*world.fetch_mut::<DebugSettings>()).decrease_speed();
             info!("Slowing down time, from x{:?} to x{:?}. This feature exists for debugging purposes only.", old_scale, new_scale);
             self.update_time_scale(world, new_scale);
             Trans::None

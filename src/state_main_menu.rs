@@ -5,7 +5,7 @@ use amethyst::{
     GameData, SimpleState, SimpleTrans, StateData, StateEvent, Trans,
 };
 
-use dsf_core::resources::{DebugConfig, UiHandles, UiType};
+use dsf_core::resources::{DebugSettings, UiHandles, UiType};
 use dsf_core::states::{window_event_handler, LevelSelectState, SettingsState};
 use dsf_editor::states::EditorState;
 
@@ -95,10 +95,10 @@ impl SimpleState for MainMenuState {
 
     fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
         let skip_straight_to_editor =
-            (*data.world.read_resource::<DebugConfig>()).skip_straight_to_editor;
+            (*data.world.read_resource::<DebugSettings>()).skip_straight_to_editor;
         if skip_straight_to_editor {
             info!("Bypassing main menu, skipping straight to editor.");
-            (*data.world.write_resource::<DebugConfig>()).skip_straight_to_editor = false;
+            (*data.world.write_resource::<DebugSettings>()).skip_straight_to_editor = false;
             Trans::Push(Box::new(EditorState::new(data.world)))
         } else {
             Trans::None

@@ -17,7 +17,7 @@ impl<'s> System<'s> for RewindControlSystem {
         Write<'s, History>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
-        Read<'s, DebugConfig>,
+        Read<'s, DebugSettings>,
     );
 
     fn run(

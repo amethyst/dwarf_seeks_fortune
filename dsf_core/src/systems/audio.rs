@@ -1,4 +1,4 @@
-use crate::resources::{Assets, AudioConfig, SoundType};
+use crate::resources::{Assets, AudioSettings, SoundType};
 use amethyst::assets::AssetStorage;
 use amethyst::audio::output::Output;
 use amethyst::audio::Source;
@@ -32,7 +32,7 @@ pub struct PlaySfxSystem {
 impl<'s> System<'s> for PlaySfxSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-        Read<'s, AudioConfig>,
+        Read<'s, AudioSettings>,
         Read<'s, EventChannel<SoundEvent>>,
         Read<'s, Assets>,
         Read<'s, AssetStorage<Source>>,
