@@ -1,4 +1,4 @@
-// Serialised version of a LoadingConfig struct.
+// Deserialises to a LoadingConfig struct.
 (
     uis: [
         (Editor, "ui/editor.ron"),
@@ -12,7 +12,6 @@
     ],
     animations: [
         (NotFound, "prefab/anim_not_found.ron"),
-        (Mob, "prefab/anim_mob.ron"),
         (Miner, "prefab/anim_miner.ron"),
     ],
     stills: [

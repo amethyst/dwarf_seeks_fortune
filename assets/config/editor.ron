@@ -1,4 +1,4 @@
-// Serialised version of an EditorConfig struct.
+// Deserialises to a EditorConfig struct.
 (
     cursor_move_high_cooldown : 0.3,
     cursor_move_low_cooldown : 0.05,

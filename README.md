@@ -22,7 +22,7 @@ You're a dwarf, digging through the ancient ruins of your ancestors. Each level 
 - Clone the repository
 
 ```bash
-git clone https://github.com/Jazarro/dwarf_seeks_fortune.git
+git clone https://github.com/amethyst/dwarf_seeks_fortune.git
 cd dwarf_seeks_fortune
 ```
 

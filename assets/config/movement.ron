@@ -1,4 +1,4 @@
-// Serialised version of a MovementConfig struct.
+// Deserialises to a MovementConfig struct.
 (
     player_speed: 10.0,
     jump_allowance: 0.1,

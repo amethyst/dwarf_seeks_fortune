@@ -92,7 +92,6 @@ pub enum SpriteType {
     /// This is the fallback sprite to use if the desired sprite cannot be found.
     NotFound,
     Ladder,
-    Background,
     Frame,
     Blocks,
     Tools,
@@ -111,7 +110,6 @@ impl Default for SpriteType {
 pub enum AnimType {
     /// The fallback animated asset to use if the desired asset could not be found.
     NotFound,
-    Mob,
     Miner,
 }
 
@@ -120,14 +118,12 @@ pub enum AnimType {
 pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
     match asset {
         AssetType::Still(sprite_type, _) => match sprite_type {
-            SpriteType::Background => Pos::new(2449, 1632),
             SpriteType::Frame => Pos::new(50, 50),
             SpriteType::Ladder => Pos::new(128, 64),
             SpriteType::Door => Pos::new(256, 256),
             _ => Pos::new(128, 128),
         },
         AssetType::Animated(anim_type) => match anim_type {
-            AnimType::Mob => Pos::new(32, 32),
             _ => Pos::new(128, 128),
         },
     }

@@ -1,7 +1,6 @@
 mod adventure;
 mod assets;
 mod config;
-mod debug_lines;
 mod event_readers;
 mod gui;
 mod history;
@@ -13,7 +12,6 @@ mod win;
 pub use self::adventure::*;
 pub use self::assets::*;
 pub use self::config::*;
-pub use self::debug_lines::*;
 pub use self::event_readers::*;
 pub use self::gui::*;
 pub use self::history::*;

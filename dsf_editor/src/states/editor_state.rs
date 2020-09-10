@@ -23,7 +23,7 @@ use amethyst::input::StringBindings;
 
 use dsf_core::entities::*;
 use dsf_core::levels::*;
-use dsf_core::resources::{setup_debug_lines, EventReaders, UiHandles, UiType};
+use dsf_core::resources::{EventReaders, UiHandles, UiType};
 use dsf_core::states::{window_event_handler, PlayState};
 
 pub struct EditorState {
