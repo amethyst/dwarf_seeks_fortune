@@ -8,6 +8,7 @@
             mandatory: true,
             asset: Animated(Miner),
             archetype: Player,
+            sturdiness: Invulnerable,
         ),
         "Block1":(
             depth: Blocks,
@@ -20,7 +21,7 @@
                 collides_bottom: true,
             ),
             asset: Still(Blocks, 0),
-            archetype: Block(Breakable),
+            sturdiness: Breakable,
         ),
         "Block2":(
             depth: Blocks,
@@ -33,7 +34,7 @@
                 collides_bottom: true,
             ),
             asset: Still(Blocks, 1),
-            archetype: Block(Breakable),
+            sturdiness: Breakable,
         ),
         "Ladder":(
             depth: Blocks,
@@ -47,7 +48,7 @@
                 collides_bottom: false,
             ),
             asset: Still(Ladder, 0),
-            archetype: Block(Invulnerable),
+            sturdiness: Invulnerable,
         ),
         "Key":(
             depth: FloatingBlocks,
@@ -61,6 +62,7 @@
             ),
             asset: Still(Blocks, 3),
             archetype: Key,
+            sturdiness: Invulnerable,
         ),
         "ToolPickaxe":(
             depth: FloatingBlocks,
@@ -74,6 +76,7 @@
             ),
             asset: Still(Tools, 0),
             archetype: Tool(BreakBlocksBelow(2)),
+            sturdiness: Invulnerable,
         ),
         "ToolHammer":(
             depth: FloatingBlocks,
@@ -87,6 +90,7 @@
             ),
             asset: Still(Tools, 2),
             archetype: Tool(BreakBlocksHorizontally(2)),
+            sturdiness: Invulnerable,
         ),
         "Door":(
             depth: Blocks,
@@ -100,6 +104,7 @@
             ),
             asset: Still(Door, 0),
             archetype: Door,
+            sturdiness: Invulnerable,
         ),
     }
 )

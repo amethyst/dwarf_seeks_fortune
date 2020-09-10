@@ -67,7 +67,9 @@ pub struct TileDefinition {
     pub asset: Option<AssetType>,
     /// Use this if there are any special components or child-entities that should be attached to
     /// this tile.
-    pub archetype: Archetype,
+    pub archetype: Option<Archetype>,
+    /// If and under what circumstances this block can be destroyed.
+    pub sturdiness: Sturdiness,
 }
 
 impl TileDefinition {
@@ -82,7 +84,8 @@ impl TileDefinition {
             climbable: false,
             collision: None,
             asset: Some(AssetType::Still(SpriteType::NotFound, 0)),
-            archetype: Archetype::NotFound,
+            archetype: None,
+            sturdiness: Sturdiness::Invulnerable,
         }
     }
 
@@ -115,7 +118,7 @@ impl TileDefinition {
     }
 
     pub fn is_breakable(&self) -> bool {
-        Archetype::Block(Sturdiness::Breakable) == self.archetype
+        self.sturdiness == Sturdiness::Breakable
     }
 }
 
@@ -164,25 +167,16 @@ impl DepthLayer {
 ///
 /// Use a different archetype to attach special components or sub-entities to an entity.
 pub enum Archetype {
-    /// ordinary block. Does nothing.
-    Block(Sturdiness),
-    /// Spawn a player here.
+    /// This tile is the spawn location for the player character.
+    /// A special Player component must be attached to this entity.
+    /// For debug purposes, some child entities may be attached to the player.
     Player,
     /// Level key. The objective is to collect them all. Each level should contain at least one.
     Key,
     /// After collecting all keys, finish level by reaching this door.
     Door,
-    /// Spawns mobs from this location.
-    MobSpawner,
-    /// A fallback archetype used when an archetype lookup failed.
-    NotFound,
+    /// An item that can be picked up and equipped by the player.
     Tool(ToolType),
-}
-
-impl Default for Archetype {
-    fn default() -> Self {
-        Archetype::NotFound
-    }
 }
 
 /// What it takes to break this block.
@@ -190,7 +184,9 @@ impl Default for Archetype {
 /// For example: more/less resistant to explosions, etc.
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub enum Sturdiness {
+    /// Cannot be targeted for demolition.
     Invulnerable,
+    /// Can be broken by tools.
     Breakable,
 }
 

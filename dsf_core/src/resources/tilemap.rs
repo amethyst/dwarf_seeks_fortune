@@ -12,27 +12,45 @@ pub struct TileMap {
 }
 
 impl TileMap {
-    pub fn new(level: LevelSave, tile_defs: TileDefinitions) -> Self {
+    /// Construct a TileMap for use during the PlayState.
+    /// Keeps track of some relevant tiles only: climbable, collidable, destructable tiles.
+    pub fn for_play(level: LevelSave, tile_defs: TileDefinitions) -> Self {
+        TileMap::new(level, tile_defs, true)
+    }
+
+    pub fn for_editing(level: LevelSave, tile_defs: TileDefinitions) -> Self {
+        TileMap::new(level, tile_defs, false)
+    }
+
+    fn new(level: LevelSave, tile_defs: TileDefinitions, apply_filter: bool) -> Self {
         let mut tiles = HashMap::new();
-        level.tiles.iter().for_each(|(pos, key)| {
-            let dimens = tile_defs.get(key).dimens;
-            for x in 0..dimens.x {
-                for y in 0..dimens.y {
-                    let tile = if x == 0 && y == 0 {
-                        Tile::TileDefKey(key.clone())
-                    } else {
-                        Tile::Dummy(*pos)
-                    };
-                    if let Some(replaced_value) = tiles.insert(Pos::new(pos.x + x, pos.y + y), tile) {
-                        error!("Error! At pos ({:?},{:?}), there are multiple tiles! {:?} replaces {:?}",
-                               x,
-                               y,
-                               (pos, key),
-                               replaced_value);
+        level.tiles.iter()
+            .map(|(pos, key)| {
+                (pos, key, tile_defs.get(key))
+            })
+            .filter(|(_, _, tile_def)| {
+                // Make sure we only add relevant stuff to the tile map.
+                !apply_filter || tile_def.climbable || tile_def.collision.is_some() || tile_def.is_breakable()
+            })
+            .for_each(|(pos, key, tile_def)| {
+                let dimens = tile_def.dimens;
+                for x in 0..dimens.x {
+                    for y in 0..dimens.y {
+                        let tile = if x == 0 && y == 0 {
+                            Tile::TileDefKey(key.clone())
+                        } else {
+                            Tile::Dummy(*pos)
+                        };
+                        if let Some(replaced_value) = tiles.insert(Pos::new(pos.x + x, pos.y + y), tile) {
+                            error!("Error! At pos ({:?},{:?}), there are multiple tiles! {:?} replaces {:?}",
+                                   x,
+                                   y,
+                                   (pos, key),
+                                   replaced_value);
+                        }
                     }
                 }
-            }
-        });
+            });
         TileMap {
             pos: level.pos,
             dimens: level.dimens,
@@ -40,6 +58,7 @@ impl TileMap {
             tile_defs,
         }
     }
+
     pub fn get_tile(&self, pos: &Pos) -> Option<&TileDefinition> {
         self.tiles
             .get(pos)
@@ -52,10 +71,12 @@ impl TileMap {
                     }
                 },
                 Tile::TileDefKey(key) => Some(key),
+                _ => None,
             })
             .flatten()
             .map(|tile_def_key| self.tile_defs.get(tile_def_key))
     }
+
     pub fn remove_tile(&mut self, pos: &Pos) {
         self.tiles.remove(pos);
     }
@@ -70,4 +91,10 @@ pub enum Tile {
     Dummy(Pos),
     /// A tile. Contains a tile definition key.
     TileDefKey(String),
+    /// Normally, if there is no mapping for a position, that position counts as occupied by
+    /// an air block. Therefore, Tile::AirBlock is not used during normal game play.
+    ///
+    /// However, if you specifically want to override an existing block with an air block,
+    /// you can use this. Currently, this only happens in the level editor.
+    AirBlock,
 }

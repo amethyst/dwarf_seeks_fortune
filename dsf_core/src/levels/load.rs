@@ -55,17 +55,17 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
         }
         builder = builder.with(Block { pos: *pos });
         match tile_def.archetype {
-            Archetype::Player => {
+            Some(Archetype::Player) => {
                 let _ = build_player(builder, pos, tile_def);
                 if display_debug_frames {
                     build_frames(world, tile_def);
                 }
             }
-            Archetype::Key => {
+            Some(Archetype::Key) => {
                 win_condition.add_key(pos);
                 builder.with(Key::new(*pos)).build();
             }
-            Archetype::Tool(tool_type) => {
+            Some(Archetype::Tool(tool_type)) => {
                 if let Some(AssetType::Still(sprite, sprite_nr)) = tile_def.asset {
                     builder
                         .with(Tool::new(tool_type, sprite, sprite_nr))
@@ -77,7 +77,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
                     );
                 }
             }
-            Archetype::Door => {
+            Some(Archetype::Door) => {
                 builder.with(ExitDoor).build();
             }
             _ => {
@@ -87,7 +87,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     });
     add_key_displays_to_door(world, &win_condition);
     world.insert(win_condition);
-    world.insert(TileMap::new(level, tile_defs));
+    world.insert(TileMap::for_play(level, tile_defs));
     world.insert(History::default());
     Ok(())
 }
