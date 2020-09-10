@@ -57,20 +57,19 @@ impl<'a, 'b> EditorState {
     }
 
     /// Perform setup that should be executed both upon starting and upon resuming the State.
+    /// TODO: don't reset editor_data upon on_resume.
     fn setup(&self, world: &mut World) {
         UiHandles::add_ui(&UiType::Fps, world);
         // UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
         create_camera(world);
-        let mut editor_data = DeprecatedEditorData::default();
-        if let Ok(level_edit) = load_auto_save() {
-            add_background(world, &level_edit.pos, &level_edit.dimens);
-            editor_data.level = level_edit;
-        }
+        let mut editor_data = EditorData::default();
         let tile_defs = load_tile_definitions().expect("Tile definitions failed to load!");
         editor_data.brush.set_palette(&tile_defs);
+        let level_edit = LevelEdit::new(load_auto_save(), tile_defs);
+        add_background(world, &level_edit.tile_map.pos, &level_edit.tile_map.dimens);
         world.insert(editor_data);
-        world.insert(tile_defs);
+        world.insert(level_edit);
     }
 }
 

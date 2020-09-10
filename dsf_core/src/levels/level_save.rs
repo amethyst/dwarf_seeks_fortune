@@ -5,7 +5,7 @@ use std::collections::{BTreeMap, HashMap};
 /// Describes a complete level. This is the format that the level is stored in.
 /// Contains a map of positions, mapped to tile definitions.
 /// This struct can be loaded from a level file and used to start a game.
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct LevelSave {
@@ -27,4 +27,15 @@ where
 {
     let ordered: BTreeMap<_, _> = value.iter().collect();
     ordered.serialize(serializer)
+}
+
+/// This default implementation is primarily used when creating a new level the level editor.
+impl Default for LevelSave {
+    fn default() -> Self {
+        LevelSave {
+            pos: Pos::new(-20, -10),
+            dimens: Pos::new(40, 20),
+            tiles: HashMap::default(),
+        }
+    }
 }

@@ -21,7 +21,7 @@ impl<'s> System<'s> for SelectionSystem {
         WriteStorage<'s, Cursor>,
         WriteStorage<'s, SelectionTag>,
         Read<'s, InputHandler<StringBindings>>,
-        Write<'s, DeprecatedEditorData>,
+        Write<'s, EditorData>,
     );
 
     fn run(

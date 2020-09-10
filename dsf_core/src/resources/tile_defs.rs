@@ -8,7 +8,7 @@ use std::collections::HashMap;
 /// tile or entity that can be encountered in a level. Level files only contain string references to
 /// tile definitions. This protects level files from becoming outdated when tile definitions are
 /// updated.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileDefinitions {

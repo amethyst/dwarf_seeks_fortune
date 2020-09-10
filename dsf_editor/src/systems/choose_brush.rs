@@ -1,5 +1,5 @@
 use crate::components::{Cursor, CursorPreviewParentTag, CursorPreviewTag, SelectionTag};
-use crate::resources::DeprecatedEditorData;
+use crate::resources::EditorData;
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Entities, Entity, Join, LazyUpdate, Read, ReadStorage, System, Write};
 use amethyst::core::{math::Vector3, Parent, Transform};
@@ -23,7 +23,7 @@ impl<'s> System<'s> for ChooseBrushSystem {
         Write<'s, EventReaders>,
         Read<'s, EventChannel<InputEvent<StringBindings>>>,
         Read<'s, LazyUpdate>,
-        Write<'s, DeprecatedEditorData>,
+        Write<'s, EditorData>,
     );
 
     fn run(

@@ -1,9 +1,9 @@
-use crate::resources::{DeprecatedEditorData, TileEdit};
+use crate::resources::{EditorData, LevelEdit};
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Read, System, Write};
 use amethyst::input::{InputEvent, StringBindings, VirtualKeyCode};
 use dsf_core::components::Pos;
-use dsf_core::resources::{EventReaders, TileDefinition, TileDefinitions};
+use dsf_core::resources::{EventReaders, Tile, TileDefinition, TileDefinitions};
 
 pub struct PlaceTilesSystem;
 
@@ -14,10 +14,14 @@ impl<'s> System<'s> for PlaceTilesSystem {
         Write<'s, EventReaders>,
         Read<'s, EventChannel<InputEvent<StringBindings>>>,
         Read<'s, TileDefinitions>,
-        Write<'s, DeprecatedEditorData>,
+        Read<'s, EditorData>,
+        Write<'s, LevelEdit>,
     );
 
-    fn run(&mut self, (mut readers, event_channel, tile_defs, mut editor_data): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut readers, event_channel, tile_defs, editor_data, mut level_edit): Self::SystemData,
+    ) {
         let reader_id = readers
             .get_reader_id("place_tiles_system")
             .expect("ReaderId was not registered for system PlaceTilesSystem.");
@@ -28,13 +32,13 @@ impl<'s> System<'s> for PlaceTilesSystem {
                     scancode: _,
                 } => {
                     let (key, tile_def) = get_brush(&editor_data, &tile_defs);
-                    set_tiles(&mut editor_data, key, tile_def);
+                    set_tiles(&editor_data, &mut level_edit, key, tile_def);
                 }
                 InputEvent::KeyReleased {
                     key_code: VirtualKeyCode::Delete,
                     scancode: _,
                 } => {
-                    set_tiles(&mut editor_data, None, None);
+                    set_tiles(&editor_data, &mut level_edit, None, None);
                 }
                 _ => (),
             }
@@ -43,7 +47,8 @@ impl<'s> System<'s> for PlaceTilesSystem {
 }
 
 fn set_tiles(
-    editor_data: &mut DeprecatedEditorData,
+    editor_data: &EditorData,
+    level_edit: &mut LevelEdit,
     key: Option<String>,
     tile_def: Option<TileDefinition>,
 ) {
@@ -59,16 +64,17 @@ fn set_tiles(
         for y in
             (lower_bounds.y..(lower_bounds.y + selection_dimens.y)).step_by(brush_dimens.y as usize)
         {
-            (*editor_data)
-                .level
-                .put_tile(Pos::new(x, y), key.clone().map(TileEdit::new));
+            (*level_edit).put_tile(
+                false,
+                Pos::new(x, y),
+                key.clone().map(Tile::TileDefKey),
+            );
         }
     }
-    (*editor_data).level.dirty_everything()
 }
 
 fn get_brush(
-    editor_data: &DeprecatedEditorData,
+    editor_data: &EditorData,
     tile_defs: &TileDefinitions,
 ) -> (Option<String>, Option<TileDefinition>) {
     let key = editor_data.brush.get_key().clone();

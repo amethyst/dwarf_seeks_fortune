@@ -3,12 +3,13 @@ use crate::levels::*;
 use crate::resources::{TileDefinition, TileDefinitions};
 use std::collections::HashMap;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TileMap {
+    // TODO: refactor these into a WorldBounds struct?
     pub pos: Pos,
     pub dimens: Pos,
-    tiles: HashMap<Pos, Tile>,
-    tile_defs: TileDefinitions,
+    pub tiles: HashMap<Pos, Tile>,
+    pub tile_defs: TileDefinitions,
 }
 
 impl TileMap {
@@ -77,12 +78,24 @@ impl TileMap {
             .map(|tile_def_key| self.tile_defs.get(tile_def_key))
     }
 
-    pub fn remove_tile(&mut self, pos: &Pos) {
-        self.tiles.remove(pos);
+    pub fn is_tile_def_key(&self, pos: &Pos) -> bool {
+        if let Some(Tile::TileDefKey(_)) = self.tiles.get(pos) {
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn remove_tile(&mut self, pos: &Pos) -> bool {
+        self.tiles.remove(pos).is_some()
+    }
+
+    pub fn put_tile(&mut self, pos: Pos, tile_def_key: String) {
+        self.tiles.insert(pos, Tile::TileDefKey(tile_def_key));
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Tile {
     /// A dummy tile, points towards its anchor point, where the real tile is stored.
     /// Dummy tiles are used when a tile is bigger than 1 by 1. The bottom-left position within the
