@@ -21,7 +21,7 @@ impl<'s> System<'s> for CursorSystem {
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
         Read<'s, EditorConfig>,
-        Write<'s, EditorData>,
+        Write<'s, DeprecatedEditorData>,
     );
 
     // TODO: Some code duplication here.

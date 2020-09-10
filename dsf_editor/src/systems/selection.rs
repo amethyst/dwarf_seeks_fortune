@@ -8,8 +8,7 @@ use amethyst::{
 use crate::components::*;
 use crate::resources::*;
 
-use dsf_core::levels::DepthLayer;
-
+use dsf_core::resources::DepthLayer;
 use std::cmp::min;
 
 /// Responsible for managing the selection.
@@ -22,7 +21,7 @@ impl<'s> System<'s> for SelectionSystem {
         WriteStorage<'s, Cursor>,
         WriteStorage<'s, SelectionTag>,
         Read<'s, InputHandler<StringBindings>>,
-        Write<'s, EditorData>,
+        Write<'s, DeprecatedEditorData>,
     );
 
     fn run(

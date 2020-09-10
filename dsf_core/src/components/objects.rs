@@ -1,6 +1,5 @@
 use crate::components::Pos;
-use crate::levels::ToolType;
-use crate::resources::SpriteType;
+use crate::resources::{SpriteType, ToolType};
 use amethyst::core::ecs::{HashMapStorage, NullStorage, VecStorage};
 use amethyst::{
     assets::PrefabData,

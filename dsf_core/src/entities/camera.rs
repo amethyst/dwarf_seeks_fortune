@@ -1,5 +1,5 @@
 use crate::components::*;
-use crate::levels::DepthLayer;
+use crate::resources::DepthLayer;
 use amethyst::{
     core::{math::Vector3, transform::Transform, Parent},
     ecs::Entity,

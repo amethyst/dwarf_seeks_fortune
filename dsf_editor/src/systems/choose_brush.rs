@@ -1,5 +1,5 @@
 use crate::components::{Cursor, CursorPreviewParentTag, CursorPreviewTag, SelectionTag};
-use crate::resources::EditorData;
+use crate::resources::DeprecatedEditorData;
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Entities, Entity, Join, LazyUpdate, Read, ReadStorage, System, Write};
 use amethyst::core::{math::Vector3, Parent, Transform};
@@ -9,10 +9,10 @@ use amethyst::renderer::palette::Srgba;
 use amethyst::renderer::resources::Tint;
 use amethyst::renderer::{SpriteRender, Transparent};
 use dsf_core::components::Pos;
-use dsf_core::levels::{
-    load_anim_asset, load_still_asset, load_transform, DepthLayer, TileDefinitions,
+use dsf_core::levels::{load_anim_asset, load_still_asset, load_transform};
+use dsf_core::resources::{
+    get_asset_dimensions, AssetType, Assets, DepthLayer, EventReaders, SpriteType, TileDefinitions,
 };
-use dsf_core::resources::{get_asset_dimensions, AssetType, Assets, EventReaders, SpriteType};
 
 pub struct ChooseBrushSystem;
 
@@ -23,7 +23,7 @@ impl<'s> System<'s> for ChooseBrushSystem {
         Write<'s, EventReaders>,
         Read<'s, EventChannel<InputEvent<StringBindings>>>,
         Read<'s, LazyUpdate>,
-        Write<'s, EditorData>,
+        Write<'s, DeprecatedEditorData>,
     );
 
     fn run(

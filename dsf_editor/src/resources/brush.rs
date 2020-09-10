@@ -1,4 +1,4 @@
-use dsf_core::levels::*;
+use dsf_core::resources::TileDefinitions;
 
 #[derive(Debug, Default)]
 pub struct Brush {

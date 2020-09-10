@@ -6,7 +6,7 @@ use amethyst::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::levels::ToolType;
+use crate::resources::ToolType;
 use amethyst::core::ecs::HashMapStorage;
 
 /// The entity with this component is the player.

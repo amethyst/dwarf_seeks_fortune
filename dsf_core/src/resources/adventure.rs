@@ -7,8 +7,8 @@ use amethyst::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::components::*;
-use crate::levels::{load_asset_from_world, load_transform, DepthLayer, Level};
-use crate::resources::{AssetType, SpriteType, UserCache};
+use crate::levels::{load_asset_from_world, load_transform, LevelSave};
+use crate::resources::{AssetType, DepthLayer, SpriteType, UserCache};
 use crate::utility::files::{get_adventures_dir, get_levels_dir};
 use amethyst::config::ConfigError;
 use amethyst::renderer::palette::Srgba;
@@ -72,7 +72,7 @@ pub fn create_default_adventure() {
         .iter()
         .map(|level_name| {
             let level_file = get_levels_dir().join(level_name);
-            (level_name, Level::load(level_file))
+            (level_name, LevelSave::load(level_file))
         })
         .filter(|(level_name, result)| {
             result

@@ -62,7 +62,7 @@ impl<'a, 'b> EditorState {
         // UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
         create_camera(world);
-        let mut editor_data = EditorData::default();
+        let mut editor_data = DeprecatedEditorData::default();
         if let Ok(level_edit) = load_auto_save() {
             add_background(world, &level_edit.pos, &level_edit.dimens);
             editor_data.level = level_edit;

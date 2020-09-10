@@ -6,8 +6,8 @@ use amethyst::{
 };
 
 use dsf_core::components::Background;
-use dsf_core::levels::{load_anim_asset, load_still_asset, load_transform, TileDefinitions};
-use dsf_core::resources::Assets;
+use dsf_core::levels::{load_anim_asset, load_still_asset, load_transform};
+use dsf_core::resources::{Assets, TileDefinitions};
 use dsf_precompile::MyPrefabData;
 
 use crate::components::*;
@@ -27,7 +27,7 @@ impl<'s> System<'s> for TilePaintSystem {
         WriteStorage<'s, PaintedTile>,
         Read<'s, TileDefinitions>,
         Read<'s, Assets>,
-        Write<'s, EditorData>,
+        Write<'s, DeprecatedEditorData>,
         Entities<'s>,
     );
 

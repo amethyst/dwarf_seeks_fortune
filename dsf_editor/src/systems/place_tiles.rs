@@ -1,10 +1,9 @@
-use crate::resources::{EditorData, TileEdit};
+use crate::resources::{DeprecatedEditorData, TileEdit};
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Read, System, Write};
 use amethyst::input::{InputEvent, StringBindings, VirtualKeyCode};
 use dsf_core::components::Pos;
-use dsf_core::levels::{TileDefinition, TileDefinitions};
-use dsf_core::resources::EventReaders;
+use dsf_core::resources::{EventReaders, TileDefinition, TileDefinitions};
 
 pub struct PlaceTilesSystem;
 
@@ -15,7 +14,7 @@ impl<'s> System<'s> for PlaceTilesSystem {
         Write<'s, EventReaders>,
         Read<'s, EventChannel<InputEvent<StringBindings>>>,
         Read<'s, TileDefinitions>,
-        Write<'s, EditorData>,
+        Write<'s, DeprecatedEditorData>,
     );
 
     fn run(&mut self, (mut readers, event_channel, tile_defs, mut editor_data): Self::SystemData) {
@@ -43,7 +42,11 @@ impl<'s> System<'s> for PlaceTilesSystem {
     }
 }
 
-fn set_tiles(editor_data: &mut EditorData, key: Option<String>, tile_def: Option<TileDefinition>) {
+fn set_tiles(
+    editor_data: &mut DeprecatedEditorData,
+    key: Option<String>,
+    tile_def: Option<TileDefinition>,
+) {
     let brush_dimens = tile_def
         .as_ref()
         .map(|def| def.dimens)
@@ -61,10 +64,11 @@ fn set_tiles(editor_data: &mut EditorData, key: Option<String>, tile_def: Option
                 .put_tile(Pos::new(x, y), key.clone().map(TileEdit::new));
         }
     }
+    (*editor_data).level.dirty_everything()
 }
 
 fn get_brush(
-    editor_data: &EditorData,
+    editor_data: &DeprecatedEditorData,
     tile_defs: &TileDefinitions,
 ) -> (Option<String>, Option<TileDefinition>) {
     let key = editor_data.brush.get_key().clone();

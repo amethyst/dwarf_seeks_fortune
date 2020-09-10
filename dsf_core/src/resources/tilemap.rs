@@ -1,5 +1,6 @@
 use crate::components::*;
 use crate::levels::*;
+use crate::resources::{TileDefinition, TileDefinitions};
 use std::collections::HashMap;
 
 #[derive(Debug, Default)]
@@ -11,7 +12,7 @@ pub struct TileMap {
 }
 
 impl TileMap {
-    pub fn new(level: Level, tile_defs: TileDefinitions) -> Self {
+    pub fn new(level: LevelSave, tile_defs: TileDefinitions) -> Self {
         let mut tiles = HashMap::new();
         level.tiles.iter().for_each(|(pos, key)| {
             let dimens = tile_defs.get(key).dimens;

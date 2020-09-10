@@ -12,7 +12,7 @@ use dsf_precompile::MyPrefabData;
 
 use crate::components::*;
 
-use crate::levels::{Archetype, DepthLayer, Level, TileDefinition, TileDefinitions};
+use crate::levels::LevelSave;
 use crate::resources::*;
 
 use crate::utility::files::get_world_dir;
@@ -27,7 +27,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     let mut win_condition = WinCondition::default();
     let display_debug_frames = world.read_resource::<DebugSettings>().display_debug_frames;
     let tile_defs = load_tile_definitions()?;
-    let level = Level::load(level_file)?;
+    let level = LevelSave::load(level_file)?;
     add_background(world, &level.pos, &level.dimens);
     level.tiles.iter().for_each(|(pos, tile_def_key)| {
         let tile_def = tile_defs.get(tile_def_key);
