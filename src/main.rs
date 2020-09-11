@@ -49,6 +49,13 @@ fn main() -> amethyst::Result<()> {
             "camera_control_system",
             &["camera_system"],
         )
+        .with(
+            // Temporarily include this system here, because it uses an event reader and must
+            // therefore keep reading on every frame.
+            dsf_editor::systems::RefreshPreviewsSystem::default(),
+            "refresh_preview_system",
+            &[],
+        )
         .with_system_desc(
             DjSystemDesc::new(|music: &mut Music| music.music.next()),
             "dj",

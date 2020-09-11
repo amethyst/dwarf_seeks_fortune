@@ -21,6 +21,7 @@ use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::input::StringBindings;
 
+use crate::systems::RefreshPreviewsSystem;
 use dsf_core::entities::*;
 use dsf_core::levels::*;
 use dsf_core::resources::{EventReaders, UiHandles, UiType};
@@ -44,7 +45,7 @@ impl<'a, 'b> EditorState {
                     "configure_editor_system",
                     &[],
                 )
-                .with(systems::CursorPreviewSystem, "cursor_preview_system", &[])
+                .with(systems::AnimatePreviewsSystem, "cursor_preview_system", &[])
                 .with(systems::CursorSystem, "cursor_system", &[])
                 .with(
                     systems::SelectionSystem,

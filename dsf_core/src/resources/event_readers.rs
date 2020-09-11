@@ -16,6 +16,7 @@ use std::collections::HashMap;
 /// bunch up.
 #[derive(Debug, Default)]
 pub struct EventReaders {
+    // TODO: Only works for one type of events. Either make generic or find different solution?
     reader_ids: HashMap<String, ReaderId<InputEvent<StringBindings>>>,
 }
 

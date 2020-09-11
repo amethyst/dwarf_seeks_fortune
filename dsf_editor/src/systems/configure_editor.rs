@@ -1,5 +1,6 @@
 use crate::components::{Cursor, CursorPreviewParentTag, CursorPreviewTag, SelectionTag};
 use crate::resources::{EditorData, LevelEdit};
+use crate::systems::RefreshPreviewsEvent;
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Entities, Entity, Join, LazyUpdate, Read, ReadStorage, System, Write};
 use amethyst::core::{math::Vector3, Parent, Time, Transform};
@@ -29,31 +30,32 @@ pub struct ConfigureEditorSystem;
 impl<'s> System<'s> for ConfigureEditorSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        Write<'s, EventChannel<RefreshPreviewsEvent>>,
         Read<'s, InputHandler<StringBindings>>,
         Write<'s, SignalEdgeDetector>,
         Write<'s, EditorData>,
         Read<'s, LevelEdit>,
     );
 
-    fn run(&mut self, (input, mut sed, mut editor_data, _level_edit): Self::SystemData) {
-        // TODO: add cursor ghosts.
+    fn run(
+        &mut self,
+        (mut channel, input, mut sed, mut editor_data, _level_edit): Self::SystemData,
+    ) {
         if let SignalEdge::Rising = sed.edge("select_previous_brush", &input) {
             let _new_key = editor_data.brush.select_previous();
-            // lazy.exec(|world| {
-            //     add_cursor_preview_tag(world, new_key);
-            // });
+            channel.single_write(RefreshPreviewsEvent);
         }
         if let SignalEdge::Rising = sed.edge("select_next_brush", &input) {
             let _new_key = editor_data.brush.select_next();
-            // lazy.exec(|world| {
-            //     add_cursor_preview_tag(world, new_key);
-            // });
+            channel.single_write(RefreshPreviewsEvent);
         }
         if let SignalEdge::Rising = sed.edge("toggle_copy_air", &input) {
             editor_data.copy_air ^= true;
+            channel.single_write(RefreshPreviewsEvent);
         }
         if let SignalEdge::Rising = sed.edge("toggle_force_place", &input) {
             editor_data.force_place ^= true;
+            channel.single_write(RefreshPreviewsEvent);
         }
     }
 }

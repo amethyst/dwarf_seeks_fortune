@@ -11,9 +11,9 @@ use amethyst::core::num::FloatConst;
 
 /// Responsible for animating the cursor preview (IE the ghost of the block on the brush
 /// that is displayed at the cursor position).
-pub struct CursorPreviewSystem;
+pub struct AnimatePreviewsSystem;
 
-impl<'s> System<'s> for CursorPreviewSystem {
+impl<'s> System<'s> for AnimatePreviewsSystem {
     type SystemData = (
         ReadStorage<'s, CursorPreviewTag>,
         WriteStorage<'s, Transform>,
