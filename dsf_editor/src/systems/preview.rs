@@ -2,8 +2,6 @@ use crate::components::CursorPreviewTag;
 use amethyst::core::ecs::{Join, ReadStorage, System, WriteStorage};
 use amethyst::core::Transform;
 
-/// Responsible for animating the cursor preview (IE the ghost of the block on the brush
-/// that is displayed at the cursor position).
 pub struct CreatePreviewsSystem;
 
 impl<'s> System<'s> for CreatePreviewsSystem {

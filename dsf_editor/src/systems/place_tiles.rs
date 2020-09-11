@@ -64,11 +64,7 @@ fn set_tiles(
         for y in
             (lower_bounds.y..(lower_bounds.y + selection_dimens.y)).step_by(brush_dimens.y as usize)
         {
-            (*level_edit).put_tile(
-                false,
-                Pos::new(x, y),
-                key.clone().map(Tile::TileDefKey),
-            );
+            (*level_edit).put_tile(false, Pos::new(x, y), key.clone().map(Tile::TileDefKey));
         }
     }
 }

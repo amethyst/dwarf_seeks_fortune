@@ -39,7 +39,11 @@ impl<'a, 'b> EditorState {
             dispatcher: DispatcherBuilder::new()
                 .with(systems::PlaceTilesSystem, "place_tile_system", &[])
                 .with_barrier()
-                .with(systems::ChooseBrushSystem, "choose_brush_system", &[])
+                .with(
+                    systems::ConfigureEditorSystem,
+                    "configure_editor_system",
+                    &[],
+                )
                 .with(systems::CursorPreviewSystem, "cursor_preview_system", &[])
                 .with(systems::CursorSystem, "cursor_system", &[])
                 .with(

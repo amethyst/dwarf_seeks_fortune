@@ -1,3 +1,4 @@
+// TODO: seperate input configurations depending on context. IE: gameplay, editor, menu, etc.
 (
   axes: {
     "move_y": Emulated(pos: Key(W), neg: Key(S)),
@@ -13,5 +14,9 @@
       "slowDown": [[Key(Subtract)]],
       "shift": [[Key(LShift)]],
       "jump": [[Key(Space)]],
+      "select_previous_brush": [[Key(LBracket)]],
+      "select_next_brush": [[Key(RBracket)]],
+      "toggle_copy_air": [[Key(G)]],
+      "toggle_force_place": [[Key(F)]],
   },
 )
