@@ -259,3 +259,40 @@ pub fn load_anim_asset(
         AssetType::Still(..) => None,
     }
 }
+
+pub fn attach_graphics(
+    world: &mut World,
+    entity: Entity,
+    asset: &AssetType,
+    dimens: &Pos,
+) -> Entity {
+    let still_asset = if let AssetType::Still(sprite, sprite_nr) = *asset {
+        Some(load_asset_from_world(&sprite, sprite_nr, world))
+    } else {
+        None
+    };
+
+    let mut builder = world.create_entity();
+    if let Some(still_asset) = still_asset {
+        builder = builder.with(still_asset);
+    }
+    // if let Some(anim_asset) = anim_asset {
+    //     builder = builder.with(anim_asset);
+    // }
+    builder
+        .with(Transparent) // TODO: only attach this when needed.
+        .with(Parent { entity })
+        .with(transform_scale(dimens, asset))
+        .build()
+}
+
+fn transform_scale(dimens: &Pos, asset: &AssetType) -> Transform {
+    let asset_dimensions = get_asset_dimensions(&asset);
+    let mut transform = Transform::default();
+    transform.set_scale(Vector3::new(
+        dimens.x as f32 / asset_dimensions.x as f32,
+        dimens.y as f32 / asset_dimensions.y as f32,
+        1.0,
+    ));
+    transform
+}

@@ -21,10 +21,16 @@ use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::input::StringBindings;
 
+use crate::components::{Cursor, SelectionTag};
 use crate::systems::RefreshPreviewsSystem;
+use amethyst::core::Transform;
+use amethyst::renderer::Transparent;
+use dsf_core::components::Pos;
 use dsf_core::entities::*;
 use dsf_core::levels::*;
-use dsf_core::resources::{EventReaders, UiHandles, UiType};
+use dsf_core::resources::{
+    AssetType, Assets, DepthLayer, EventReaders, SpriteType, UiHandles, UiType,
+};
 use dsf_core::states::{window_event_handler, PlayState};
 
 pub struct EditorState {
@@ -64,6 +70,7 @@ impl<'a, 'b> EditorState {
     /// Perform setup that should be executed both upon starting and upon resuming the State.
     /// TODO: don't reset editor_data upon on_resume.
     fn setup(&self, world: &mut World) {
+        init_cursor(world);
         UiHandles::add_ui(&UiType::Fps, world);
         // UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
@@ -181,4 +188,37 @@ impl SimpleState for EditorState {
             );
         }
     }
+}
+
+/// TODO: Temporary function, clean up later.
+/// Adds a selection and a cursor entity.
+fn init_cursor(world: &mut World) {
+    let sprite_handle = world
+        .read_resource::<Assets>()
+        .get_still(&SpriteType::Selection);
+    let mut selection_transform = Transform::default();
+    selection_transform.set_translation_z((&DepthLayer::UiElements).z());
+    world
+        .create_entity()
+        .with(SpriteRender {
+            sprite_sheet: sprite_handle.clone(),
+            sprite_number: 1,
+        })
+        .with(Transparent)
+        .with(selection_transform)
+        .with(SelectionTag)
+        .build();
+    let mut cursor_transform = Transform::default();
+    cursor_transform.set_translation_xyz(0.5, 0.5, DepthLayer::UiElements.z());
+    let cursor_entity = world
+        .create_entity()
+        .with(cursor_transform)
+        .with(Cursor::default())
+        .build();
+    attach_graphics(
+        world,
+        cursor_entity,
+        &AssetType::Still(SpriteType::Selection, 0),
+        &Pos::new(1, 1),
+    );
 }

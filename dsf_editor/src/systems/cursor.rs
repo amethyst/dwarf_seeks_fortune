@@ -1,4 +1,5 @@
 use amethyst::{
+    core::math::Vector3,
     core::timing::Time,
     core::transform::Transform,
     ecs::prelude::{Join, Read, System, Write, WriteStorage},
@@ -10,7 +11,7 @@ use crate::resources::*;
 
 use dsf_core::components::Direction2D;
 
-/// Responsible for moving the cursor across the screen.
+/// Responsible for moving the cursor across the screen and managing its blinking animation.
 pub struct CursorSystem;
 
 impl<'s> System<'s> for CursorSystem {
@@ -37,31 +38,59 @@ impl<'s> System<'s> for CursorSystem {
                 // Start movement now. Move once, then set cooldown to High.
                 editor_data.selection.end.x += input_x as i32;
                 editor_data.selection.end.y += input_y as i32;
-                transform.set_translation_xyz(
-                    editor_data.selection.end.x as f32,
-                    editor_data.selection.end.y as f32,
-                    0.0,
-                );
-                cursor.cooldown = config.cursor_move_high_cooldown;
+                transform.set_translation_x(editor_data.selection.end.x as f32 + 0.5);
+                transform.set_translation_y(editor_data.selection.end.y as f32 + 0.5);
+                reset_blink(cursor, &config);
+                cursor.movement_cooldown = config.cursor_move_high_cooldown;
             } else if cursor.last_direction.is_opposite(&new_direction) {
                 // Reset movement. Set cooldown to high.
-                cursor.cooldown = config.cursor_move_high_cooldown;
+                cursor.movement_cooldown = config.cursor_move_high_cooldown;
             } else if !new_direction.is_neutral() {
                 // continue movement. Tick down cooldown.
                 // If cooldown is due, move once and reset cooldown to Low.
-                cursor.cooldown -= time.delta_seconds();
-                if cursor.cooldown.is_sign_negative() {
-                    cursor.cooldown = config.cursor_move_low_cooldown;
+                cursor.movement_cooldown -= time.delta_seconds();
+                if cursor.movement_cooldown.is_sign_negative() {
+                    cursor.movement_cooldown = config.cursor_move_low_cooldown;
                     editor_data.selection.end.x += input_x as i32;
                     editor_data.selection.end.y += input_y as i32;
-                    transform.set_translation_xyz(
-                        editor_data.selection.end.x as f32,
-                        editor_data.selection.end.y as f32,
-                        0.0,
-                    );
+                    transform.set_translation_x(editor_data.selection.end.x as f32 + 0.5);
+                    transform.set_translation_y(editor_data.selection.end.y as f32 + 0.5);
+                    reset_blink(cursor, &config);
                 }
             }
             cursor.last_direction = new_direction;
+            perform_blinking_animation(cursor, transform, &time, &config);
         }
     }
+}
+
+/// Resets the blinking cooldown, which ensures that the cursor stays visible.
+/// Use when the cursor moves, so it is never invisible while the user is actively using it.
+fn reset_blink(cursor: &mut Cursor, config: &EditorConfig) {
+    if cursor.is_visible {
+        cursor.blink_cooldown = config.cursor_blink_on_time;
+    } else {
+        cursor.blink_cooldown = 0.0;
+    }
+}
+
+/// Tick down the blinking cooldown and take care of the the blinking animation if the cooldown is
+/// ready.
+fn perform_blinking_animation(
+    cursor: &mut Cursor,
+    transform: &mut Transform,
+    time: &Time,
+    config: &EditorConfig,
+) {
+    if cursor.blink_cooldown.is_sign_negative() {
+        cursor.is_visible ^= true;
+        cursor.blink_cooldown = if cursor.is_visible {
+            config.cursor_blink_on_time
+        } else {
+            config.cursor_blink_off_time
+        };
+        let scale_factor = if cursor.is_visible { 1.0 } else { 0.0 };
+        transform.set_scale(Vector3::new(scale_factor, scale_factor, 1.0));
+    }
+    cursor.blink_cooldown -= time.delta_seconds();
 }
