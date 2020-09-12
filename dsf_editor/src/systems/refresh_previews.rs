@@ -1,4 +1,4 @@
-use amethyst::core::ecs::{Join, Read, ReadStorage, ReaderId, System, WriteStorage};
+use amethyst::core::ecs::{Read, ReadStorage, ReaderId, System, WriteStorage};
 use amethyst::core::Transform;
 
 use crate::components::CursorPreviewTag;

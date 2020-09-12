@@ -18,5 +18,7 @@
       "select_next_brush": [[Key(RBracket)]],
       "toggle_copy_air": [[Key(G)]],
       "toggle_force_place": [[Key(F)]],
+      "place_blocks": [[Key(Return)]],
+      "delete_blocks": [[Key(Delete)]],
   },
 )

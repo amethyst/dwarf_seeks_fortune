@@ -1,20 +1,9 @@
-use crate::components::{Cursor, CursorPreviewParentTag, CursorPreviewTag, SelectionTag};
-use crate::resources::{EditorData, LevelEdit};
+use crate::resources::EditorData;
 use crate::systems::RefreshPreviewsEvent;
 use amethyst::core::ecs::shrev::EventChannel;
-use amethyst::core::ecs::{Entities, Entity, Join, LazyUpdate, Read, ReadStorage, System, Write};
-use amethyst::core::{math::Vector3, Parent, Time, Transform};
-use amethyst::input::{InputEvent, InputHandler, StringBindings, VirtualKeyCode};
-use amethyst::prelude::{Builder, World, WorldExt};
-use amethyst::renderer::palette::Srgba;
-use amethyst::renderer::resources::Tint;
-use amethyst::renderer::{SpriteRender, Transparent};
-use dsf_core::components::Pos;
-use dsf_core::levels::{load_anim_asset, load_still_asset, load_transform};
-use dsf_core::resources::{
-    get_asset_dimensions, AssetType, Assets, DepthLayer, EventReaders, SignalEdge,
-    SignalEdgeDetector, SpriteType, TileDefinitions,
-};
+use amethyst::core::ecs::{Read, System, Write};
+use amethyst::input::{InputHandler, StringBindings};
+use dsf_core::resources::{SignalEdge, SignalEdgeDetector};
 
 /// Responsible for changing transient configurations for the editor. These settings stay alive
 /// as long as the EditorState lives.
@@ -34,13 +23,9 @@ impl<'s> System<'s> for ConfigureEditorSystem {
         Read<'s, InputHandler<StringBindings>>,
         Write<'s, SignalEdgeDetector>,
         Write<'s, EditorData>,
-        Read<'s, LevelEdit>,
     );
 
-    fn run(
-        &mut self,
-        (mut channel, input, mut sed, mut editor_data, _level_edit): Self::SystemData,
-    ) {
+    fn run(&mut self, (mut channel, input, mut sed, mut editor_data): Self::SystemData) {
         if let SignalEdge::Rising = sed.edge("select_previous_brush", &input) {
             let _new_key = editor_data.brush.select_previous();
             channel.single_write(RefreshPreviewsEvent);

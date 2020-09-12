@@ -1,47 +1,28 @@
 use crate::resources::{EditorData, LevelEdit};
-use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Read, System, Write};
-use amethyst::input::{InputEvent, StringBindings, VirtualKeyCode};
+use amethyst::input::{InputHandler, StringBindings};
 use dsf_core::components::Pos;
-use dsf_core::resources::{EventReaders, Tile, TileDefinition, TileDefinitions};
+use dsf_core::resources::{SignalEdge, SignalEdgeDetector, Tile, TileDefinition, TileDefinitions};
 
+/// Responsible for placing and removing tiles based on player input.
 pub struct PlaceTilesSystem;
 
-/// TODO: Delay in channel is unacceptable here. Replace channel with direct input check.
 impl<'s> System<'s> for PlaceTilesSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-        Write<'s, EventReaders>,
-        Read<'s, EventChannel<InputEvent<StringBindings>>>,
-        Read<'s, TileDefinitions>,
+        Write<'s, SignalEdgeDetector>,
+        Read<'s, InputHandler<StringBindings>>,
         Read<'s, EditorData>,
         Write<'s, LevelEdit>,
     );
 
-    fn run(
-        &mut self,
-        (mut readers, event_channel, tile_defs, editor_data, mut level_edit): Self::SystemData,
-    ) {
-        let reader_id = readers
-            .get_reader_id("place_tiles_system")
-            .expect("ReaderId was not registered for system PlaceTilesSystem.");
-        for event in event_channel.read(reader_id) {
-            match event {
-                InputEvent::KeyReleased {
-                    key_code: VirtualKeyCode::Return,
-                    scancode: _,
-                } => {
-                    let (key, tile_def) = get_brush(&editor_data, &tile_defs);
-                    set_tiles(&editor_data, &mut level_edit, key, tile_def);
-                }
-                InputEvent::KeyReleased {
-                    key_code: VirtualKeyCode::Delete,
-                    scancode: _,
-                } => {
-                    set_tiles(&editor_data, &mut level_edit, None, None);
-                }
-                _ => (),
-            }
+    fn run(&mut self, (mut sed, input, editor_data, mut level_edit): Self::SystemData) {
+        if let SignalEdge::Rising = sed.edge("place_blocks", &input) {
+            let (key, tile_def) = get_brush(&editor_data, &level_edit.tile_map.tile_defs);
+            set_tiles(&editor_data, &mut level_edit, key, tile_def);
+        }
+        if let SignalEdge::Rising = sed.edge("delete_blocks", &input) {
+            set_tiles(&editor_data, &mut level_edit, None, None);
         }
     }
 }

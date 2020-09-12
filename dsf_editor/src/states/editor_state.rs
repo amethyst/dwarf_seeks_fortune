@@ -22,7 +22,6 @@ use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::input::StringBindings;
 
 use crate::components::{Cursor, SelectionTag};
-use crate::systems::RefreshPreviewsSystem;
 use amethyst::core::Transform;
 use amethyst::renderer::Transparent;
 use dsf_core::components::Pos;
