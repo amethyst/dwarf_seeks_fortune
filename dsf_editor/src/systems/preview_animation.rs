@@ -9,13 +9,13 @@ use crate::components::*;
 
 use amethyst::core::num::FloatConst;
 
-/// Responsible for animating the cursor preview (IE the ghost of the block on the brush
-/// that is displayed at the cursor position).
+/// Responsible for animating the cursor previews (IE the ghostly outlines of the blocks that
+/// would get placed if the user would press 'place' at that time).
 pub struct AnimatePreviewsSystem;
 
 impl<'s> System<'s> for AnimatePreviewsSystem {
     type SystemData = (
-        ReadStorage<'s, CursorPreviewTag>,
+        ReadStorage<'s, PreviewGhostTag>,
         WriteStorage<'s, Transform>,
         Read<'s, Time>,
     );

@@ -1,6 +1,8 @@
 use crate::resources::{EditorData, LevelEdit};
+use crate::systems::RefreshPreviewsEvent;
 use amethyst::core::ecs::{Read, System, Write};
 use amethyst::input::{InputHandler, StringBindings};
+use amethyst::shrev::EventChannel;
 use dsf_core::components::Pos;
 use dsf_core::resources::{SignalEdge, SignalEdgeDetector, Tile, TileDefinition, TileDefinitions};
 
@@ -10,19 +12,25 @@ pub struct PlaceTilesSystem;
 impl<'s> System<'s> for PlaceTilesSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        Write<'s, EventChannel<RefreshPreviewsEvent>>,
         Write<'s, SignalEdgeDetector>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, EditorData>,
         Write<'s, LevelEdit>,
     );
 
-    fn run(&mut self, (mut sed, input, editor_data, mut level_edit): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut channel, mut sed, input, editor_data, mut level_edit): Self::SystemData,
+    ) {
         if let SignalEdge::Rising = sed.edge("place_blocks", &input) {
             let (key, tile_def) = get_brush(&editor_data, &level_edit.tile_map.tile_defs);
             set_tiles(&editor_data, &mut level_edit, key, tile_def);
+            channel.single_write(RefreshPreviewsEvent);
         }
         if let SignalEdge::Rising = sed.edge("delete_blocks", &input) {
             set_tiles(&editor_data, &mut level_edit, None, None);
+            channel.single_write(RefreshPreviewsEvent);
         }
     }
 }

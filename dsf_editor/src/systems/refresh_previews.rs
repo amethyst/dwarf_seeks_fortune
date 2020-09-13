@@ -1,10 +1,17 @@
-use amethyst::core::ecs::{Read, ReadStorage, ReaderId, System, WriteStorage};
-use amethyst::core::Transform;
+use amethyst::core::ecs::{
+    Entities, Join, LazyUpdate, Read, ReadStorage, ReaderId, System, WriteStorage,
+};
 
-use crate::components::CursorPreviewTag;
+use crate::components::{PaintedTile, PreviewGhostTag};
+use crate::resources::{Blueprint, EditorData, LevelEdit};
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::shred::SystemData;
-use amethyst::prelude::World;
+use amethyst::core::Transform;
+use amethyst::prelude::{Builder, World, WorldExt};
+use amethyst::renderer::palette::Srgba;
+use amethyst::renderer::resources::Tint;
+use dsf_core::levels::attach_graphics;
+use dsf_core::resources::{DepthLayer, Tile};
 
 /// Send this through the event bus in order to trigger a complete refresh of the previews.
 #[derive(Debug, Clone)]
@@ -21,11 +28,19 @@ pub struct RefreshPreviewsSystem {
 impl<'s> System<'s> for RefreshPreviewsSystem {
     type SystemData = (
         Read<'s, EventChannel<RefreshPreviewsEvent>>,
-        ReadStorage<'s, CursorPreviewTag>,
-        WriteStorage<'s, Transform>,
+        Read<'s, EditorData>,
+        Read<'s, LevelEdit>,
+        WriteStorage<'s, Tint>,
+        ReadStorage<'s, PaintedTile>,
+        ReadStorage<'s, PreviewGhostTag>,
+        Read<'s, LazyUpdate>,
+        Entities<'s>,
     );
 
-    fn run(&mut self, (channel, tags, mut transforms): Self::SystemData) {
+    fn run(
+        &mut self,
+        (channel, editor_data, level_edit, mut tints, painted_tiles, previews, lazy, entities): Self::SystemData,
+    ) {
         let reader_id = self.reader_id.as_mut().expect(
             "`RefreshPreviewsSystem::setup` was not called before `RefreshPreviewsSystem::run`",
         );
@@ -35,9 +50,65 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
         let at_least_one_event = channel.read(reader_id).fold(false, |_, _| true);
         if at_least_one_event {
             // TODO:
+            //  - Generate blueprint.
             //  - Set all of the tints.
             //  - Delete all of the ghosts.
             //  - Add the ghosts.
+
+            let blueprint = Blueprint::from_placing_tiles(&editor_data, &level_edit);
+            let lower_bounds = editor_data.selection.lower_bounds();
+            for (tint, painted_tile) in (&mut tints, &painted_tiles).join() {
+                tint.0 = if let Some(tile_def) = level_edit.tile_map.get_tile(&painted_tile.pos) {
+                    if blueprint.overlaps(painted_tile.pos - lower_bounds, tile_def.dimens) {
+                        Srgba::new(1., 0., 0., 1.0)
+                    } else {
+                        Srgba::new(1., 1., 1., 1.0)
+                    }
+                } else {
+                    Srgba::new(1., 1., 1., 1.0)
+                };
+            }
+            // First delete all existing previews:
+            for (entity, _) in (&entities, &previews).join() {
+                entities.delete(entity).expect("Failed to delete preview.");
+            }
+            // Then create new previews based on the current Blueprint:
+            lazy.exec_mut(move |world| {
+                blueprint.tiles.iter().for_each(|(blueprint_pos, tile)| {
+                    if let Tile::TileDefKey(key) = tile {
+                        let asset = world
+                            .read_resource::<LevelEdit>()
+                            .tile_map
+                            .tile_defs
+                            .get(key)
+                            .asset;
+                        let dimens = world
+                            .read_resource::<LevelEdit>()
+                            .tile_map
+                            .tile_defs
+                            .get(key)
+                            .dimens;
+                        let mut transform = Transform::default();
+                        transform.set_translation_xyz(
+                            (lower_bounds.x + blueprint_pos.x) as f32 + dimens.x as f32 * 0.5,
+                            (lower_bounds.y + blueprint_pos.y) as f32 + dimens.y as f32 * 0.5,
+                            DepthLayer::UiElements.z(),
+                        );
+                        let preview = world
+                            .create_entity()
+                            .with(PreviewGhostTag)
+                            .with(transform)
+                            .build();
+                        attach_graphics(
+                            world,
+                            preview,
+                            &asset.unwrap(),
+                            &dimens,
+                            Some(Tint(Srgba::new(0.5, 0.5, 0.5, 0.7))),
+                        );
+                    }
+                });
+            });
         }
     }
 

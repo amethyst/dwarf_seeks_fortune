@@ -13,6 +13,8 @@ use dsf_precompile::MyPrefabData;
 use crate::components::*;
 use crate::resources::*;
 use amethyst::core::ecs::Write;
+use amethyst::renderer::palette::Srgba;
+use amethyst::renderer::resources::Tint;
 
 /// Clears all dirty tiles, then adds all dirty tiles back in.
 /// At the end of this system's execution, no tiles should be left dirty.
@@ -26,6 +28,7 @@ impl<'s> System<'s> for TilePaintSystem {
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Handle<Prefab<MyPrefabData>>>,
         WriteStorage<'s, PaintedTile>,
+        WriteStorage<'s, Tint>,
         Read<'s, Assets>,
         Write<'s, LevelEdit>,
         Entities<'s>,
@@ -39,6 +42,7 @@ impl<'s> System<'s> for TilePaintSystem {
             mut sprite_renders,
             mut anims,
             mut painted_tiles,
+            mut tints,
             assets,
             mut level_edit,
             entities,
@@ -90,6 +94,7 @@ impl<'s> System<'s> for TilePaintSystem {
                     builder = builder.with(transform, &mut transforms);
                 }
                 builder
+                    .with(Tint(Srgba::new(1., 1., 1., 1.)), &mut tints)
                     .with(PaintedTile::new(pos), &mut painted_tiles)
                     .build();
             });

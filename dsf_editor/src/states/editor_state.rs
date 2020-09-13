@@ -219,5 +219,6 @@ fn init_cursor(world: &mut World) {
         cursor_entity,
         &AssetType::Still(SpriteType::Selection, 0),
         &Pos::new(1, 1),
+        None,
     );
 }

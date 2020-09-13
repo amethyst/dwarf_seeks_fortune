@@ -7,24 +7,20 @@ use amethyst::{
 use dsf_core::components::Direction2D;
 use serde::{Deserialize, Serialize};
 
+/// Entities with this component are the ghostly outlines of tiles before they are placed.
+/// For example, if the user has equipped the exit door tile on their brush, a ghostly outline
+/// of the exit door will appear where it will be placed.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
-pub struct CursorPreviewParentTag;
+pub struct PreviewGhostTag;
 
-impl Component for CursorPreviewParentTag {
+impl Component for PreviewGhostTag {
     type Storage = NullStorage<Self>;
 }
 
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
-#[prefab(Component)]
-#[serde(deny_unknown_fields)]
-pub struct CursorPreviewTag;
-
-impl Component for CursorPreviewTag {
-    type Storage = NullStorage<Self>;
-}
-
+/// This component identifies an entity as the cursor. There should be no more than one of these
+/// at any given time. There is a separate component for the selection area.
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]

@@ -16,6 +16,7 @@ use crate::levels::LevelSave;
 use crate::resources::*;
 
 use crate::utility::files::get_world_dir;
+use amethyst::renderer::resources::Tint;
 use std::path::PathBuf;
 
 pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
@@ -265,6 +266,7 @@ pub fn attach_graphics(
     entity: Entity,
     asset: &AssetType,
     dimens: &Pos,
+    tint: Option<Tint>,
 ) -> Entity {
     let still_asset = if let AssetType::Still(sprite, sprite_nr) = *asset {
         Some(load_asset_from_world(&sprite, sprite_nr, world))
@@ -279,6 +281,9 @@ pub fn attach_graphics(
     // if let Some(anim_asset) = anim_asset {
     //     builder = builder.with(anim_asset);
     // }
+    if let Some(tint) = tint {
+        builder = builder.with(tint);
+    }
     builder
         .with(Transparent) // TODO: only attach this when needed.
         .with(Parent { entity })

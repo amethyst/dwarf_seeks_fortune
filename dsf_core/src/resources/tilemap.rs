@@ -1,6 +1,7 @@
 use crate::components::*;
 use crate::levels::*;
 use crate::resources::{TileDefinition, TileDefinitions};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug, Default, Clone)]
@@ -95,7 +96,7 @@ impl TileMap {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum Tile {
     /// A dummy tile, points towards its anchor point, where the real tile is stored.
     /// Dummy tiles are used when a tile is bigger than 1 by 1. The bottom-left position within the
@@ -110,4 +111,15 @@ pub enum Tile {
     /// However, if you specifically want to override an existing block with an air block,
     /// you can use this. Currently, this only happens in the level editor.
     AirBlock,
+}
+
+impl Tile {
+    /// Returns true iff the enum is an actual tile, rather than an air block or a dummy reference.
+    pub fn is_tile_def(&self) -> bool {
+        if let Tile::TileDefKey(_) = self {
+            true
+        } else {
+            false
+        }
+    }
 }

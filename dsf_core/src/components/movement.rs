@@ -7,6 +7,7 @@ use amethyst::{
     error::Error,
 };
 use serde::{Deserialize, Serialize};
+use std::ops::Sub;
 
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq)]
 #[prefab(Component)]
@@ -136,6 +137,14 @@ impl Pos {
 
     pub fn append_xy(&self, x: i32, y: i32) -> Self {
         Pos::new(self.x + x, self.y + y)
+    }
+}
+
+impl Sub for Pos {
+    type Output = Pos;
+
+    fn sub(self, other: Pos) -> Pos {
+        Pos::new(self.x - other.x, self.y - other.y)
     }
 }
 

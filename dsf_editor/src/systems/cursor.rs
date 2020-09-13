@@ -9,6 +9,8 @@ use amethyst::{
 use crate::components::*;
 use crate::resources::*;
 
+use crate::systems::RefreshPreviewsEvent;
+use amethyst::shrev::EventChannel;
 use dsf_core::components::Direction2D;
 
 /// Responsible for moving the cursor across the screen and managing its blinking animation.
@@ -17,6 +19,7 @@ pub struct CursorSystem;
 impl<'s> System<'s> for CursorSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
+        Write<'s, EventChannel<RefreshPreviewsEvent>>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Cursor>,
         Read<'s, InputHandler<StringBindings>>,
@@ -28,20 +31,21 @@ impl<'s> System<'s> for CursorSystem {
     // TODO: Some code duplication here.
     fn run(
         &mut self,
-        (mut transforms, mut cursors, input, time, config, mut editor_data): Self::SystemData,
+        (mut channel, mut transforms, mut cursors, input, time, config, mut editor_data): Self::SystemData,
     ) {
         for (cursor, transform) in (&mut cursors, &mut transforms).join() {
             let input_x = input.axis_value("move_x").unwrap_or(0.0);
             let input_y = input.axis_value("move_y").unwrap_or(0.0);
             let new_direction = Direction2D::new(input_x, input_y);
             if cursor.last_direction.is_neutral() && !new_direction.is_neutral() {
-                // Start movement now. Move once, then set cooldown to High.
+                // Start movement now. Move once and set cooldown to High.
+                cursor.movement_cooldown = config.cursor_move_high_cooldown;
                 editor_data.selection.end.x += input_x as i32;
                 editor_data.selection.end.y += input_y as i32;
                 transform.set_translation_x(editor_data.selection.end.x as f32 + 0.5);
                 transform.set_translation_y(editor_data.selection.end.y as f32 + 0.5);
                 reset_blink(cursor, &config);
-                cursor.movement_cooldown = config.cursor_move_high_cooldown;
+                channel.single_write(RefreshPreviewsEvent);
             } else if cursor.last_direction.is_opposite(&new_direction) {
                 // Reset movement. Set cooldown to high.
                 cursor.movement_cooldown = config.cursor_move_high_cooldown;
@@ -56,6 +60,7 @@ impl<'s> System<'s> for CursorSystem {
                     transform.set_translation_x(editor_data.selection.end.x as f32 + 0.5);
                     transform.set_translation_y(editor_data.selection.end.y as f32 + 0.5);
                     reset_blink(cursor, &config);
+                    channel.single_write(RefreshPreviewsEvent);
                 }
             }
             cursor.last_direction = new_direction;
