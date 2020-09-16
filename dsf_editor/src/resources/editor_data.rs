@@ -1,11 +1,13 @@
-use crate::resources::{Brush, Selection};
-use dsf_core::components::Pos;
-use dsf_core::levels::LevelSave;
-use dsf_core::resources::{Tile, TileDefinitions, TileMap};
 use std::collections::{HashMap, HashSet};
 
+use dsf_core::components::Pos;
+use dsf_core::levels::LevelSave;
+use dsf_core::resources::{Tile, TileDefinition, TileDefinitions, TileMap};
+
+use crate::resources::{Brush, Selection};
+
 /// Persists through play testing. Is only reset when the EditorState goes through on_create.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct EditorData {
     /// Contains information on which tile is currently selected to be placed. Also contains the
     /// palette: all possible tiles that the editor could use.
@@ -21,6 +23,17 @@ pub struct EditorData {
     pub force_place: bool,
 }
 
+impl Default for EditorData {
+    fn default() -> Self {
+        EditorData {
+            brush: Brush::default(),
+            selection: Selection::default(),
+            copy_air: false,
+            force_place: true,
+        }
+    }
+}
+
 #[derive(Debug, Default, Clone)]
 pub struct LevelEdit {
     pub tile_map: TileMap,
@@ -29,6 +42,11 @@ pub struct LevelEdit {
     pub dirty: HashSet<Pos>,
 }
 
+/// Implements the standard converter from LevelEdit to LevelSave. In other words: convert a level
+/// from a format that the editor uses, to the format that levels are stored in on disk.
+///
+/// Note that only TileDefKey entries are saved, Dummy entries are discarded, because they can be
+/// derived from the primary entries and only exist for faster lookup.
 impl From<LevelEdit> for LevelSave {
     fn from(mut item: LevelEdit) -> Self {
         let mut map = HashMap::new();
@@ -73,13 +91,27 @@ impl LevelEdit {
     }
 
     fn remove_tile(&mut self, pos: Pos) {
-        if self.tile_map.remove_tile(&pos) {
-            self.dirty.insert(pos);
+        if let Some(removed_pos) = self.tile_map.remove_tile(&pos) {
+            self.dirty.insert(removed_pos);
         }
     }
 
-    fn add_tile(&mut self, pos: Pos, key: String, _force_place: bool) {
-        self.tile_map.put_tile(pos, key);
+    fn add_tile(&mut self, pos: Pos, key: String, force_place: bool) {
+        let dimensions = self.get_tile_def(&key).dimens;
+        if force_place {
+            (0..dimensions.x).for_each(|x| {
+                (0..dimensions.y).for_each(|y| {
+                    self.remove_tile(pos.append_xy(x, y));
+                })
+            })
+        }
+        // TODO: check if we are allowed to place there. World bounds and existing tiles.
+        self.tile_map.put_tile(pos, key, &dimensions);
+
         self.dirty.insert(pos);
+    }
+
+    pub fn get_tile_def(&self, key: &str) -> &TileDefinition {
+        self.tile_map.tile_defs.get(key)
     }
 }

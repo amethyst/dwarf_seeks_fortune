@@ -34,7 +34,7 @@ impl<'a> TileDefinitions {
                 error!("Failed to find tile definition {:?}, using fallback.", key);
                 Some(&self.fallback)
             })
-            .expect("Should never panic, because we use a fallback!")
+            .unwrap_or_else(|| unreachable!("Is unreachable because we use a fallback!"))
     }
 }
 

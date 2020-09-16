@@ -49,12 +49,6 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
         // (very important, otherwise the surplus events stay in the channel until next frame).
         let at_least_one_event = channel.read(reader_id).fold(false, |_, _| true);
         if at_least_one_event {
-            // TODO:
-            //  - Generate blueprint.
-            //  - Set all of the tints.
-            //  - Delete all of the ghosts.
-            //  - Add the ghosts.
-
             let blueprint = Blueprint::from_placing_tiles(&editor_data, &level_edit);
             let lower_bounds = editor_data.selection.lower_bounds();
             for (tint, painted_tile) in (&mut tints, &painted_tiles).join() {

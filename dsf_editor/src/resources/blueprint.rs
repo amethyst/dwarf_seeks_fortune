@@ -21,6 +21,13 @@ impl Blueprint {
         }
     }
 
+    /// Create a new instance of Blueprint, based on the current selection and the tile on the
+    /// brush. The blueprint will consist of rows and columns of whatever tile is on the brush,
+    /// starting at the lower-left corner of the selection.
+    ///
+    /// When creating the Blueprint, existing tiles are ignored. It is therefore not guaranteed
+    /// that all tiles in the blueprint will be placed; if force-place is not enabled and there are
+    /// tiles in the way, that will prevent the whole blueprint being placed.
     pub fn from_placing_tiles(editor_data: &EditorData, level_edit: &LevelEdit) -> Self {
         let key = editor_data.brush.get_key().as_ref();
         let tile_def = key.map(|key| level_edit.tile_map.tile_defs.get(key));

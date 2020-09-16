@@ -86,13 +86,44 @@ impl TileMap {
             false
         }
     }
-
-    pub fn remove_tile(&mut self, pos: &Pos) -> bool {
-        self.tiles.remove(pos).is_some()
+    
+    /// Removes the tile at the given location. Also removes any Dummy tiles associated with the
+    /// tile that is being removed.
+    /// It is allowed to give the location of one of the dummy tiles, this function will remove
+    /// the tile that the dummy is pointing at.
+    ///
+    /// If a tile was removed, returns Some() containing the actual position of the removed tile.
+    /// This position is not necessarily the same as the given pos, because that pos might point
+    /// at a dummy.
+    ///
+    /// If no tiles were removed, then this returns None.
+    pub fn remove_tile(&mut self, pos: &Pos) -> Option<Pos> {
+        let actual_pos = match self.tiles.get(pos) {
+            Some(Tile::TileDefKey(_)) => Some(*pos),
+            Some(Tile::Dummy(anchor_pos)) => Some(*anchor_pos),
+            _ => None,
+        };
+        if let Some(actual_pos) = actual_pos {
+            let tile_def = self.get_tile(&actual_pos).unwrap_or_else(|| unreachable!());
+            let dimens = tile_def.dimens;
+            (0..dimens.x).for_each(|x| {
+                (0..dimens.y).for_each(|y| {
+                    self.tiles.remove(&actual_pos.append_xy(x, y));
+                });
+            });
+        }
+        actual_pos
     }
 
-    pub fn put_tile(&mut self, pos: Pos, tile_def_key: String) {
+    pub fn put_tile(&mut self, pos: Pos, tile_def_key: String, dimensions: &Pos) {
         self.tiles.insert(pos, Tile::TileDefKey(tile_def_key));
+        (0..dimensions.x).for_each(|x| {
+            (0..dimensions.y).for_each(|y| {
+                if x != 0 || y != 0 {
+                    self.tiles.insert(pos.append_xy(x, y), Tile::Dummy(pos));
+                }
+            })
+        })
     }
 }
 
@@ -104,6 +135,7 @@ pub enum Tile {
     /// towards that bottom-left position.
     Dummy(Pos),
     /// A tile. Contains a tile definition key.
+    /// TODO: Should we perhaps include the dimensions here? Consider.
     TileDefKey(String),
     /// Normally, if there is no mapping for a position, that position counts as occupied by
     /// an air block. Therefore, Tile::AirBlock is not used during normal game play.
