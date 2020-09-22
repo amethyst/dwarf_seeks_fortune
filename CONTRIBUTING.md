@@ -10,7 +10,7 @@ One simple way anyone can contribute to the game is making new levels. Each leve
 You can always add new puzzle elements. There are some ideas in in [the brainstorm doc](docs/brainstorm.md) but you can also invent your own. The cool thing about adding a new type of tile is that it doesn't affect any levels that don't include that tile. This allows adding pretty crazy stuff without breaking any puzzles or affecting the overall balancing of the game.
 
 ### Code Style
-Please use `cargo fmt` before sending in your pull request. This step is mandatory, the CI checks will fail otherwise. Please also try to resolve compiler and clippy warnings as much as possible. As I tinker with the CI configuration, these will probably also become mandatory at some point.
+Please try to resolve all `clippy` and compiler warnings and run `cargo fmt` before sending in your pull request, the CI checks will fail otherwise.
 
 ## Art
 ### Graphics
