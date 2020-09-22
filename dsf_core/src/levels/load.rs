@@ -161,7 +161,6 @@ fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
                 world
                     .create_entity()
                     .with(Parent {
-                        //TODO:FIXME: don't make this a parent, leads to problems.
                         entity: door_entity,
                     })
                     .with(transform)

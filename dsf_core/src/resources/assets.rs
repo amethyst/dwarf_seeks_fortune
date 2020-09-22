@@ -115,6 +115,7 @@ pub enum AnimType {
 
 /// Matches a still or animated asset to its dimensions in pixels. Required to calculate the
 /// correct scale factor for the entity to make it fit within its in-world bounds.
+#[allow(clippy::match_single_binding)]
 pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
     match asset {
         AssetType::Still(sprite_type, _) => match sprite_type {

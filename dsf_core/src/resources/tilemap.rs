@@ -86,7 +86,7 @@ impl TileMap {
             false
         }
     }
-    
+
     /// Removes the tile at the given location. Also removes any Dummy tiles associated with the
     /// tile that is being removed.
     /// It is allowed to give the location of one of the dummy tiles, this function will remove

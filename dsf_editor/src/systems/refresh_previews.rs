@@ -26,6 +26,7 @@ pub struct RefreshPreviewsSystem {
 }
 
 impl<'s> System<'s> for RefreshPreviewsSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         Read<'s, EventChannel<RefreshPreviewsEvent>>,
         Read<'s, EditorData>,

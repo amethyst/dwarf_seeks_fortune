@@ -7,7 +7,7 @@ use amethyst::{
     error::Error,
 };
 use serde::{Deserialize, Serialize};
-use std::ops::{Sub, Add};
+use std::ops::{Add, Sub};
 
 #[derive(Clone, Copy, Component, Debug, Default, Deserialize, Serialize, PrefabData, PartialEq)]
 #[prefab(Component)]

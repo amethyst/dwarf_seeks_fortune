@@ -200,7 +200,7 @@ fn init_cursor(world: &mut World) {
     world
         .create_entity()
         .with(SpriteRender {
-            sprite_sheet: sprite_handle.clone(),
+            sprite_sheet: sprite_handle,
             sprite_number: 1,
         })
         .with(Transparent)

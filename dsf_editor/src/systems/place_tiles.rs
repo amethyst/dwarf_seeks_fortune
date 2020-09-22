@@ -28,7 +28,11 @@ impl<'s> System<'s> for PlaceTilesSystem {
             let blueprint = Blueprint::from_placing_tiles(&editor_data, &level_edit);
             let lower_bounds = editor_data.selection.lower_bounds();
             blueprint.tiles.iter().for_each(|(relative_pos, tile)| {
-                level_edit.put_tile(editor_data.force_place, lower_bounds + *relative_pos, Some(tile.clone()));
+                level_edit.put_tile(
+                    editor_data.force_place,
+                    lower_bounds + *relative_pos,
+                    Some(tile.clone()),
+                );
             });
             channel.single_write(RefreshPreviewsEvent);
         }
