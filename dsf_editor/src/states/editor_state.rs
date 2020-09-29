@@ -22,6 +22,7 @@ use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::input::StringBindings;
 
 use crate::components::{Cursor, SelectionTag};
+use crate::systems::EditorUiUpdateSystem;
 use amethyst::core::Transform;
 use amethyst::renderer::Transparent;
 use dsf_core::components::Pos;
@@ -45,6 +46,7 @@ impl<'a, 'b> EditorState {
             dispatcher: DispatcherBuilder::new()
                 .with(systems::PlaceTilesSystem, "place_tile_system", &[])
                 .with_barrier()
+                .with(EditorUiUpdateSystem, "editor_ui_update_system", &[])
                 .with(
                     systems::ConfigureEditorSystem,
                     "configure_editor_system",
@@ -71,7 +73,7 @@ impl<'a, 'b> EditorState {
     fn setup(&self, world: &mut World) {
         init_cursor(world);
         UiHandles::add_ui(&UiType::Fps, world);
-        // UiHandles::add_ui(&UiType::Editor, world);
+        UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
         create_camera(world);
         let mut editor_data = EditorData::default();

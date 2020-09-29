@@ -10,27 +10,38 @@ Container(
     ),
     background: SolidColor(0.70, 0.66, 0.53, 1.0),
     children: [
-        Button(
+        Image(
             transform: (
-                id: "load",
-                x: 32.0,
+                id: "toggle_force_place",
+                x: 96.0,
                 y: -32.0,
-                width: 64.0,
-                height: 64.0,
+                width: 64.,
+                height: 64.,
                 anchor: TopLeft,
-                mouse_reactive: true,
             ),
-            button: (
-                text: "Load",
-                font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
-                font_size: 36.0,
-                normal_image: SolidColor(0.4, 0.4, 0.4, 1.),
-                hover_image: SolidColor(0.5, 0.5, 0.5, 1.),
-                press_image: SolidColor(0.2, 0.2, 0.2, 1.),
-                normal_text_color: (0.2, 0.2, 0.2, 1.0),
-                hover_text_color: (0.7, 0.7, 0.7, 1.0),
-                press_text_color: (1.0, 1.0, 1.0, 1.0),
-            )
+            image: Texture(File("textures/editor_ui_icons.png", ("IMAGE", ()))),
+        ),
+        Image(
+            transform: (
+                id: "toggle_copy_air",
+                x: 160.0,
+                y: -32.0,
+                width: 64.,
+                height: 64.,
+                anchor: TopLeft,
+            ),
+            image: Texture(File("textures/editor_ui_icons.png", ("IMAGE", ()))),
+        ),
+        Image(
+            transform: (
+                id: "brush_preview",
+                x: 224.0,
+                y: -32.0,
+                width: 64.,
+                height: 64.,
+                anchor: TopLeft,
+            ),
+            image: Texture(File("textures/editor_ui_icons.png", ("IMAGE", ()))),
         ),
     ]
 )

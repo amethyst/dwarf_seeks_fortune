@@ -247,6 +247,13 @@ pub fn load_asset_from_world(
     }
 }
 
+pub fn load_sprite_render(sprite: &SpriteType, sprite_nr: usize, assets: &Assets) -> SpriteRender {
+    SpriteRender {
+        sprite_sheet: assets.get_still(sprite),
+        sprite_number: sprite_nr,
+    }
+}
+
 pub fn load_anim_asset(
     tile: &TileDefinition,
     assets: &Assets,

@@ -55,6 +55,11 @@
             "textures/level_select.png",
             "prefab/still_level_select.ron",
         ),
+        (
+            EditorUiIcons,
+            "textures/editor_ui_icons.png",
+            "prefab/still_editor_ui_icons.ron",
+        ),
     ],
     sound_effects: [
         (Mining, "audio/mining.wav"),
