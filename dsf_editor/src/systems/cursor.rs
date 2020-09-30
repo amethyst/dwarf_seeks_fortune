@@ -42,8 +42,6 @@ impl<'s> System<'s> for CursorSystem {
                 cursor.movement_cooldown = config.cursor_move_high_cooldown;
                 editor_data.selection.end.x += input_x as i32;
                 editor_data.selection.end.y += input_y as i32;
-                transform.set_translation_x(editor_data.selection.end.x as f32 + 0.5);
-                transform.set_translation_y(editor_data.selection.end.y as f32 + 0.5);
                 reset_blink(cursor, &config);
                 channel.single_write(RefreshPreviewsEvent);
             } else if cursor.last_direction.is_opposite(&new_direction) {
@@ -57,14 +55,14 @@ impl<'s> System<'s> for CursorSystem {
                     cursor.movement_cooldown = config.cursor_move_low_cooldown;
                     editor_data.selection.end.x += input_x as i32;
                     editor_data.selection.end.y += input_y as i32;
-                    transform.set_translation_x(editor_data.selection.end.x as f32 + 0.5);
-                    transform.set_translation_y(editor_data.selection.end.y as f32 + 0.5);
                     reset_blink(cursor, &config);
                     channel.single_write(RefreshPreviewsEvent);
                 }
             }
             cursor.last_direction = new_direction;
             perform_blinking_animation(cursor, transform, &time, &config);
+            transform.set_translation_x(editor_data.selection.end.x as f32 + 0.5);
+            transform.set_translation_y(editor_data.selection.end.y as f32 + 0.5);
         }
     }
 }

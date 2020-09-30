@@ -4,8 +4,8 @@ use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Read, System, Write, WriteStorage};
 use amethyst::input::{InputHandler, StringBindings};
 use amethyst::ui::{UiFinder, UiImage};
-use dsf_core::levels::{load_sprite_render, load_still_asset};
-use dsf_core::resources::{Assets, SignalEdge, SignalEdgeDetector, SpriteType};
+use dsf_core::levels::load_sprite_render;
+use dsf_core::resources::{AssetType, Assets, SignalEdge, SignalEdgeDetector, SpriteType};
 
 /// Responsible for changing transient configurations for the editor. These settings stay alive
 /// as long as the EditorState lives.
@@ -86,7 +86,13 @@ impl<'s> System<'s> for EditorUiUpdateSystem {
                 .get_key()
                 .as_ref()
                 .map(|selected_key| level_edit.get_tile_def(selected_key))
-                .map(|tile_def| load_still_asset(tile_def, &assets))
+                .map(|tile_def| {
+                    if let AssetType::Still(sprite, sprite_nr) = tile_def.get_preview() {
+                        Some(load_sprite_render(&sprite, sprite_nr, &assets))
+                    } else {
+                        None
+                    }
+                })
                 .flatten()
             {
                 *brush_preview = UiImage::Sprite(sprite_render);

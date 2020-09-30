@@ -73,16 +73,9 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
                     if let Tile::TileDefKey(key) = tile {
                         let asset = world
                             .read_resource::<LevelEdit>()
-                            .tile_map
-                            .tile_defs
-                            .get(key)
-                            .asset;
-                        let dimens = world
-                            .read_resource::<LevelEdit>()
-                            .tile_map
-                            .tile_defs
-                            .get(key)
-                            .dimens;
+                            .get_tile_def(key)
+                            .get_preview();
+                        let dimens = world.read_resource::<LevelEdit>().get_tile_def(key).dimens;
                         let mut transform = Transform::default();
                         transform.set_translation_xyz(
                             (lower_bounds.x + blueprint_pos.x) as f32 + dimens.x as f32 * 0.5,
@@ -97,7 +90,7 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
                         attach_graphics(
                             world,
                             preview,
-                            &asset.unwrap(),
+                            &asset,
                             &dimens,
                             Some(Tint(Srgba::new(0.5, 0.5, 0.5, 0.7))),
                         );

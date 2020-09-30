@@ -22,7 +22,7 @@ use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::input::StringBindings;
 
 use crate::components::{Cursor, SelectionTag};
-use crate::systems::EditorUiUpdateSystem;
+use crate::systems::{EditorUiUpdateSystem, RefreshPreviewsEvent};
 use amethyst::core::Transform;
 use amethyst::renderer::Transparent;
 use dsf_core::components::Pos;
@@ -69,19 +69,19 @@ impl<'a, 'b> EditorState {
     }
 
     /// Perform setup that should be executed both upon starting and upon resuming the State.
-    /// TODO: don't reset editor_data upon on_resume.
     fn setup(&self, world: &mut World) {
         init_cursor(world);
         UiHandles::add_ui(&UiType::Fps, world);
         UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
         create_camera(world);
-        let mut editor_data = EditorData::default();
         let tile_defs = load_tile_definitions().expect("Tile definitions failed to load!");
-        editor_data.brush.set_palette(&tile_defs);
+        world
+            .write_resource::<EditorData>()
+            .brush
+            .set_palette(&tile_defs);
         let level_edit = LevelEdit::new(load_auto_save(), tile_defs);
         add_background(world, &level_edit.tile_map.pos, &level_edit.tile_map.dimens);
-        world.insert(editor_data);
         world.insert(level_edit);
     }
 }
@@ -95,6 +95,7 @@ impl SimpleState for EditorState {
             .add_reader("choose_brush_system".to_string(), data.world);
         data.world.insert(readers);
         self.dispatcher.setup(data.world);
+        data.world.insert(EditorData::default());
         self.setup(data.world);
     }
 
@@ -223,4 +224,7 @@ fn init_cursor(world: &mut World) {
         &Pos::new(1, 1),
         None,
     );
+    world.exec(|mut channel: Write<EventChannel<RefreshPreviewsEvent>>| {
+        channel.single_write(RefreshPreviewsEvent);
+    });
 }

@@ -87,6 +87,12 @@ pub enum AssetType {
     Animated(AnimType),
 }
 
+impl Default for AssetType {
+    fn default() -> Self {
+        AssetType::Still(SpriteType::default(), 0)
+    }
+}
+
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum SpriteType {
     /// This is the fallback sprite to use if the desired sprite cannot be found.
@@ -99,6 +105,7 @@ pub enum SpriteType {
     Selection,
     LevelSelect,
     EditorUiIcons,
+    Miner,
 }
 
 impl Default for SpriteType {

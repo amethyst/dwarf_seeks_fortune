@@ -60,6 +60,11 @@
             "textures/editor_ui_icons.png",
             "prefab/still_editor_ui_icons.ron",
         ),
+        (
+            Miner,
+            "textures/miner_walk.png",
+            "prefab/still_miner.ron",
+        ),
     ],
     sound_effects: [
         (Mining, "audio/mining.wav"),

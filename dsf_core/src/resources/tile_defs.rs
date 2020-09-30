@@ -65,6 +65,10 @@ pub struct TileDefinition {
     pub collision: Option<CollisionDefinition>,
     /// The graphical asset to use for this tile. Is optional, because not all tiles have an asset.
     pub asset: Option<AssetType>,
+    /// If the asset is an animation or doesn't exist at all, this must be Some(AssetType::Still()).
+    /// Is mainly used in the editor. This is there to guarantee that we can have still-image
+    /// representations of any tile, so it can be displayed in the editor GUI.
+    pub preview_asset: Option<AssetType>,
     /// Use this if there are any special components or child-entities that should be attached to
     /// this tile.
     pub archetype: Option<Archetype>,
@@ -84,6 +88,7 @@ impl TileDefinition {
             climbable: false,
             collision: None,
             asset: Some(AssetType::Still(SpriteType::NotFound, 0)),
+            preview_asset: None,
             archetype: None,
             sturdiness: Sturdiness::Invulnerable,
         }
@@ -119,6 +124,12 @@ impl TileDefinition {
 
     pub fn is_breakable(&self) -> bool {
         self.sturdiness == Sturdiness::Breakable
+    }
+
+    /// This returns the preview asset if it exists and the standard asset otherwise.
+    /// Mainly used by the editor.
+    pub fn get_preview(&self) -> AssetType {
+        self.preview_asset.or(self.asset).unwrap_or_default()
     }
 }
 
