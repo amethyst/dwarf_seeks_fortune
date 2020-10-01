@@ -20,5 +20,9 @@
       "toggle_force_place": [[Key(F)]],
       "place_blocks": [[Key(Return)]],
       "delete_blocks": [[Key(Delete)]],
+      "y_to_start":[[Key(PageDown)]],
+      "y_to_end":[[Key(PageUp)]],
+      "x_to_start":[[Key(Home)]],
+      "x_to_end":[[Key(End)]],
   },
 )

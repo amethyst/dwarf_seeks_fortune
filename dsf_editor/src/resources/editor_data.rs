@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use dsf_core::components::Pos;
 use dsf_core::levels::LevelSave;
-use dsf_core::resources::{Tile, TileDefinition, TileDefinitions, TileMap};
+use dsf_core::resources::{Tile, TileDefinition, TileDefinitions, TileMap, WorldBounds};
 
 use crate::resources::{Brush, Selection};
 
@@ -112,5 +112,9 @@ impl LevelEdit {
 
     pub fn get_tile_def(&self, key: &str) -> &TileDefinition {
         self.tile_map.tile_defs.get(key)
+    }
+
+    pub fn bounds(&self) -> &WorldBounds {
+        &self.tile_map.world_bounds
     }
 }

@@ -46,4 +46,28 @@ impl WorldBounds {
     pub fn upper_y(&self) -> i32 {
         self.pos.y + self.dimens.y
     }
+
+    pub fn clamp(&self, pos: &Pos) -> Pos {
+        Pos::new(self.clamp_x(pos.x), self.clamp_y(pos.y))
+    }
+
+    fn clamp_x(&self, x: i32) -> i32 {
+        if x < self.x() {
+            self.x()
+        } else if x >= self.upper_x() {
+            self.upper_x() - 1
+        } else {
+            x
+        }
+    }
+
+    fn clamp_y(&self, y: i32) -> i32 {
+        if y < self.y() {
+            self.y()
+        } else if y >= self.upper_y() {
+            self.upper_y() - 1
+        } else {
+            y
+        }
+    }
 }
