@@ -1,11 +1,13 @@
 (
-    pos: (
-        x: -26,
-        y: -16,
-    ),
-    dimens: (
-        x: 36,
-        y: 32,
+    world_bounds: (
+        pos: (
+            x: -26,
+            y: -16,
+        ),
+        dimens: (
+            x: 36,
+            y: 32,
+        ),
     ),
     tiles: {
         (

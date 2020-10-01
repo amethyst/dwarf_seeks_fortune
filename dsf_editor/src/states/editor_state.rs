@@ -22,7 +22,7 @@ use amethyst::core::ecs::{Dispatcher, DispatcherBuilder, Read, Write};
 use amethyst::input::StringBindings;
 
 use crate::components::{Cursor, SelectionTag};
-use crate::systems::{EditorUiUpdateSystem, RefreshPreviewsEvent};
+use crate::systems::RefreshPreviewsEvent;
 use amethyst::core::Transform;
 use amethyst::renderer::Transparent;
 use dsf_core::components::Pos;
@@ -46,7 +46,11 @@ impl<'a, 'b> EditorState {
             dispatcher: DispatcherBuilder::new()
                 .with(systems::PlaceTilesSystem, "place_tile_system", &[])
                 .with_barrier()
-                .with(EditorUiUpdateSystem, "editor_ui_update_system", &[])
+                .with(
+                    systems::EditorUiUpdateSystem,
+                    "editor_ui_update_system",
+                    &[],
+                )
                 .with(
                     systems::ConfigureEditorSystem,
                     "configure_editor_system",
@@ -81,7 +85,7 @@ impl<'a, 'b> EditorState {
             .brush
             .set_palette(&tile_defs);
         let level_edit = LevelEdit::new(load_auto_save(), tile_defs);
-        add_background(world, &level_edit.tile_map.pos, &level_edit.tile_map.dimens);
+        add_background(world, &level_edit.tile_map.world_bounds);
         world.insert(level_edit);
     }
 }

@@ -29,7 +29,7 @@ pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigE
     let display_debug_frames = world.read_resource::<DebugSettings>().display_debug_frames;
     let tile_defs = load_tile_definitions()?;
     let level = LevelSave::load(level_file)?;
-    add_background(world, &level.pos, &level.dimens);
+    add_background(world, &level.world_bounds);
     level.tiles.iter().for_each(|(pos, tile_def_key)| {
         let tile_def = tile_defs.get(tile_def_key);
         let still_asset = load_still_asset(tile_def, &world.read_resource::<Assets>());
@@ -103,11 +103,11 @@ fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) ->
         .build()
 }
 
-pub fn add_background(world: &mut World, pos: &Pos, dimens: &Pos) {
+pub fn add_background(world: &mut World, world_bounds: &WorldBounds) {
     let transform = load_transform(
-        pos,
+        &world_bounds.pos,
         &DepthLayer::Background,
-        dimens,
+        &world_bounds.dimens,
         &AssetType::Still(SpriteType::Selection, 1),
     );
     let asset = load_asset_from_world(&SpriteType::Selection, 1, world);

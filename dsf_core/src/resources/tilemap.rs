@@ -1,14 +1,12 @@
 use crate::components::*;
 use crate::levels::*;
-use crate::resources::{TileDefinition, TileDefinitions};
+use crate::resources::{TileDefinition, TileDefinitions, WorldBounds};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug, Default, Clone)]
 pub struct TileMap {
-    // TODO: refactor these into a WorldBounds struct?
-    pub pos: Pos,
-    pub dimens: Pos,
+    pub world_bounds: WorldBounds,
     pub tiles: HashMap<Pos, Tile>,
     pub tile_defs: TileDefinitions,
 }
@@ -54,8 +52,7 @@ impl TileMap {
                 }
             });
         TileMap {
-            pos: level.pos,
-            dimens: level.dimens,
+            world_bounds: level.world_bounds,
             tiles,
             tile_defs,
         }

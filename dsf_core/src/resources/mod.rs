@@ -10,6 +10,7 @@ mod tile_defs;
 mod tilemap;
 mod userdata;
 mod win;
+mod world_bounds;
 
 pub use self::adventure::*;
 pub use self::assets::*;
@@ -23,3 +24,4 @@ pub use self::tile_defs::*;
 pub use self::tilemap::*;
 pub use self::userdata::*;
 pub use self::win::*;
+pub use self::world_bounds::*;

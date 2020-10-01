@@ -56,8 +56,7 @@ impl From<LevelEdit> for LevelSave {
             }
         });
         LevelSave {
-            pos: item.tile_map.pos,
-            dimens: item.tile_map.dimens,
+            world_bounds: item.tile_map.world_bounds,
             tiles: map,
         }
     }

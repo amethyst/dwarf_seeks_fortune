@@ -1,17 +1,17 @@
 use crate::components::Pos;
+use crate::resources::WorldBounds;
 use serde::{Deserialize, Serialize, Serializer};
 use std::collections::{BTreeMap, HashMap};
 
 /// Describes a complete level. This is the format that the level is stored in.
 /// Contains a map of positions, mapped to tile definitions.
 /// This struct can be loaded from a level file and used to start a game.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct LevelSave {
-    pub pos: Pos,
-    /// Width and height of the level. In this game, the world wraps at the borders.
-    pub dimens: Pos,
+    /// The level's exterior borders. In this game, the world wraps at the borders.
+    pub world_bounds: WorldBounds,
     /// Mapping of (x,y) position in the world to a TileDefinition key.
     /// These keys can be used to look up the corresponding TileDefinition.
     #[serde(serialize_with = "ordered_map")]
@@ -27,15 +27,4 @@ where
 {
     let ordered: BTreeMap<_, _> = value.iter().collect();
     ordered.serialize(serializer)
-}
-
-/// This default implementation is primarily used when creating a new level the level editor.
-impl Default for LevelSave {
-    fn default() -> Self {
-        LevelSave {
-            pos: Pos::new(-20, -10),
-            dimens: Pos::new(40, 20),
-            tiles: HashMap::default(),
-        }
-    }
 }
