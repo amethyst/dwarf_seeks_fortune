@@ -25,7 +25,7 @@ impl Default for EditorStatus {
         EditorStatus {
             brush: Brush::default(),
             selection: Selection::default(),
-            copy_air: false,
+            copy_air: true,
             force_place: true,
         }
     }

@@ -95,11 +95,7 @@ impl TileMap {
     ///
     /// If no tiles were removed, then this returns None.
     pub fn remove_tile(&mut self, pos: &Pos) -> Option<Pos> {
-        let actual_pos = match self.tiles.get(pos) {
-            Some(Tile::TileDefKey(_)) => Some(*pos),
-            Some(Tile::Dummy(anchor_pos)) => Some(*anchor_pos),
-            _ => None,
-        };
+        let actual_pos = self.get_actual_pos(pos);
         if let Some(actual_pos) = actual_pos {
             let tile_def = self.get_tile(&actual_pos).unwrap_or_else(|| unreachable!());
             let dimens = tile_def.dimens;
@@ -110,6 +106,19 @@ impl TileMap {
             });
         }
         actual_pos
+    }
+
+    /// For the given position, finds the anchor position of the tile that covers that position.
+    /// If there is no tile covering the given position, None is returned.
+    ///
+    /// Example: if there is a 2x2 tile at position (0, 0), enquiring about any of the following
+    /// four positions will return Some((0, 0)): (0, 0), (1, 0), (0, 1), (1, 1).
+    pub fn get_actual_pos(&self, pos: &Pos) -> Option<Pos> {
+        match self.tiles.get(pos) {
+            Some(Tile::TileDefKey(_)) => Some(*pos),
+            Some(Tile::Dummy(anchor_pos)) => Some(*anchor_pos),
+            _ => None,
+        }
     }
 
     pub fn put_tile(&mut self, pos: Pos, tile_def_key: String, dimensions: &Pos) {

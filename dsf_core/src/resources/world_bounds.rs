@@ -78,4 +78,15 @@ impl WorldBounds {
             y
         }
     }
+
+    /// Checks if the rectangle at the given position with the given dimensions is completely
+    /// enclosed within the world bounds.
+    /// Can be used to check if a tile can be placed in the world.
+    /// If it's (partially) out of bounds, this method will return false.
+    pub fn encloses(&self, pos: &Pos, dimensions: &Pos) -> bool {
+        self.x() <= pos.x
+            && self.y() <= pos.y
+            && self.upper_x() >= pos.x + dimensions.x
+            && self.upper_y() >= pos.y + dimensions.y
+    }
 }

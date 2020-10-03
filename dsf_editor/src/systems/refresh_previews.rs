@@ -10,8 +10,10 @@ use amethyst::core::Transform;
 use amethyst::prelude::{Builder, World, WorldExt};
 use amethyst::renderer::palette::Srgba;
 use amethyst::renderer::resources::Tint;
+use dsf_core::components::Pos;
 use dsf_core::levels::attach_graphics;
-use dsf_core::resources::{DepthLayer, Tile};
+use dsf_core::resources::DepthLayer;
+use std::collections::HashSet;
 
 /// Send this through the event bus in order to trigger a complete refresh of the previews.
 #[derive(Debug, Clone)]
@@ -49,55 +51,65 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
         // Check if at least one event was received, while still making sure to empty the iterator
         // (very important, otherwise the surplus events stay in the channel until next frame).
         let at_least_one_event = channel.read(reader_id).fold(false, |_, _| true);
-        if at_least_one_event {
-            let blueprint = Blueprint::from_placing_tiles(&status, &level_edit);
-            let lower_bounds = status.selection.lower_bounds();
-            for (tint, painted_tile) in (&mut tints, &painted_tiles).join() {
-                tint.0 = if let Some(tile_def) = level_edit.tile_map.get_tile(&painted_tile.pos) {
-                    if blueprint.overlaps(painted_tile.pos - lower_bounds, tile_def.dimens) {
-                        Srgba::new(1., 0., 0., 1.0)
-                    } else {
-                        Srgba::new(1., 1., 1., 1.0)
-                    }
-                } else {
-                    Srgba::new(1., 1., 1., 1.0)
-                };
-            }
-            // First delete all existing previews:
-            for (entity, _) in (&entities, &previews).join() {
-                entities.delete(entity).expect("Failed to delete preview.");
-            }
-            // Then create new previews based on the current Blueprint:
-            lazy.exec_mut(move |world| {
-                blueprint.tiles.iter().for_each(|(blueprint_pos, tile)| {
-                    if let Tile::TileDefKey(key) = tile {
-                        let asset = world
-                            .read_resource::<LevelEdit>()
-                            .get_tile_def(key)
-                            .get_preview();
-                        let dimens = world.read_resource::<LevelEdit>().get_tile_def(key).dimens;
-                        let mut transform = Transform::default();
-                        transform.set_translation_xyz(
-                            (lower_bounds.x + blueprint_pos.x) as f32 + dimens.x as f32 * 0.5,
-                            (lower_bounds.y + blueprint_pos.y) as f32 + dimens.y as f32 * 0.5,
-                            DepthLayer::UiElements.z(),
-                        );
-                        let preview = world
-                            .create_entity()
-                            .with(PreviewGhostTag)
-                            .with(transform)
-                            .build();
-                        attach_graphics(
-                            world,
-                            preview,
-                            &asset,
-                            &dimens,
-                            Some(Tint(Srgba::new(0.5, 0.5, 0.5, 0.7))),
-                        );
-                    }
-                });
-            });
+        if !at_least_one_event {
+            return;
         }
+        let blueprint = Blueprint::from_placing_tiles(&status, &level_edit);
+        let lower_bounds = status.selection.lower_bounds();
+        let (adds, removes): (Vec<(Pos, String, Pos)>, HashSet<Pos>) = blueprint.tiles.iter().fold(
+            (vec![], HashSet::default()),
+            |(mut adds, mut removes), (pos, tile)| {
+                let (to_be_added, to_be_deleted) = level_edit.check_place_tile(
+                    status.force_place,
+                    lower_bounds + *pos,
+                    Some(tile.clone()),
+                );
+                if let Some(to_be_added) = to_be_added {
+                    adds.push(to_be_added);
+                }
+                removes.extend(to_be_deleted);
+                (adds, removes)
+            },
+        );
+        // Tint existing tiles that are due to be removed red.
+        for (tint, painted_tile) in (&mut tints, &painted_tiles).join() {
+            tint.0 = if removes.contains(&painted_tile.pos) {
+                Srgba::new(1., 0., 0., 1.0)
+            } else {
+                Srgba::new(1., 1., 1., 1.0)
+            };
+        }
+        // First delete all existing previews:
+        for (entity, _) in (&entities, &previews).join() {
+            entities.delete(entity).expect("Failed to delete preview.");
+        }
+        // Then create new previews based on the current Blueprint:
+        lazy.exec_mut(move |world| {
+            adds.iter().for_each(|(pos, key, dimens)| {
+                let asset = world
+                    .read_resource::<LevelEdit>()
+                    .get_tile_def(key)
+                    .get_preview();
+                let mut transform = Transform::default();
+                transform.set_translation_xyz(
+                    pos.x as f32 + dimens.x as f32 * 0.5,
+                    pos.y as f32 + dimens.y as f32 * 0.5,
+                    DepthLayer::UiElements.z(),
+                );
+                let preview = world
+                    .create_entity()
+                    .with(PreviewGhostTag)
+                    .with(transform)
+                    .build();
+                attach_graphics(
+                    world,
+                    preview,
+                    &asset,
+                    &dimens,
+                    Some(Tint(Srgba::new(0.5, 0.5, 0.5, 0.7))),
+                );
+            });
+        });
     }
 
     fn setup(&mut self, world: &mut World) {

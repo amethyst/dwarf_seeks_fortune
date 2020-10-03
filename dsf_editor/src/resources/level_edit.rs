@@ -50,40 +50,75 @@ impl LevelEdit {
     }
 
     pub(crate) fn put_tile(&mut self, force_place: bool, pos: Pos, tile: Option<Tile>) {
+        let (to_be_placed, to_be_deleted) = self.check_place_tile(force_place, pos, tile);
+        println!("({:?}, {:?})", to_be_placed, to_be_deleted);
+        to_be_deleted.iter().for_each(|delete_pos| {
+            if let Some(removed_pos) = self.tile_map.remove_tile(&delete_pos) {
+                self.dirty.insert(removed_pos);
+            }
+        });
+        if let Some((pos, key, dimensions)) = to_be_placed {
+            self.tile_map.put_tile(pos, key, &dimensions);
+            self.dirty.insert(pos);
+        }
+    }
+
+    pub(crate) fn check_place_tile(
+        &self,
+        force_place: bool,
+        pos: Pos,
+        tile: Option<Tile>,
+    ) -> (Option<(Pos, String, Pos)>, HashSet<Pos>) {
         match tile {
-            Some(Tile::AirBlock) if force_place => self.remove_tile(pos),
-            Some(Tile::TileDefKey(key)) => self.add_tile(pos, key, force_place),
-            None => self.remove_tile(pos),
-            _ => (),
+            Some(Tile::AirBlock) if force_place => (
+                None,
+                self.tile_map.get_actual_pos(&pos).iter().copied().collect(),
+            ),
+            Some(Tile::TileDefKey(key)) => self.check_add_tile(pos, key, force_place),
+            None => (
+                None,
+                self.tile_map.get_actual_pos(&pos).iter().copied().collect(),
+            ),
+            _ => (None, HashSet::default()),
         }
     }
 
-    fn remove_tile(&mut self, pos: Pos) {
-        if let Some(removed_pos) = self.tile_map.remove_tile(&pos) {
-            self.dirty.insert(removed_pos);
-        }
-    }
-
-    fn add_tile(&mut self, pos: Pos, key: String, force_place: bool) {
+    fn check_add_tile(
+        &self,
+        pos: Pos,
+        key: String,
+        force_place: bool,
+    ) -> (Option<(Pos, String, Pos)>, HashSet<Pos>) {
         let dimensions = self.get_tile_def(&key).dimens;
-        if force_place {
-            (0..dimensions.x).for_each(|x| {
-                (0..dimensions.y).for_each(|y| {
-                    self.remove_tile(pos.append_xy(x, y));
+        let obstructed = !self.bounds().encloses(&pos, &dimensions)
+            || (!force_place
+                && (0..dimensions.x).any(|x| {
+                    (0..dimensions.y).any(|y| {
+                        self.tile_map
+                            .get_tile(&Pos::new(pos.x + x, pos.y + y))
+                            .is_some()
+                    })
+                }));
+        if obstructed {
+            (None, HashSet::default())
+        } else {
+            let to_be_deleted = (0..dimensions.x)
+                .flat_map(|x| (0..dimensions.y).map(move |y| (x, y)))
+                .map(|(x, y)| {
+                    self.tile_map
+                        .get_actual_pos(&Pos::new(pos.x + x, pos.y + y))
                 })
-            })
+                .flatten()
+                .collect();
+            (Some((pos, key, dimensions)), to_be_deleted)
         }
-        // TODO: check if we are allowed to place there. World bounds and existing tiles.
-        self.tile_map.put_tile(pos, key, &dimensions);
-
-        self.dirty.insert(pos);
     }
 
-    pub fn get_tile_def(&self, key: &str) -> &TileDefinition {
+    pub(crate) fn get_tile_def(&self, key: &str) -> &TileDefinition {
         self.tile_map.tile_defs.get(key)
     }
 
-    pub fn bounds(&self) -> &WorldBounds {
+    pub(crate) fn bounds(&self) -> &WorldBounds {
         &self.tile_map.world_bounds
     }
 }
