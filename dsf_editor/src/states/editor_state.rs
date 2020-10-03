@@ -75,7 +75,6 @@ impl<'a, 'b> EditorState {
     /// Perform setup that should be executed both upon starting and upon resuming the State.
     fn setup(&self, world: &mut World) {
         init_cursor(world);
-        UiHandles::add_ui(&UiType::Fps, world);
         UiHandles::add_ui(&UiType::Editor, world);
         setup_debug_lines(world);
         create_camera(world);

@@ -21,10 +21,12 @@ impl WorldBounds {
         }
     }
 
+    /// Inclusive lower bound.
     pub fn x(&self) -> i32 {
         self.pos.x
     }
 
+    /// Inclusive lower bound.
     pub fn y(&self) -> i32 {
         self.pos.y
     }
@@ -47,10 +49,14 @@ impl WorldBounds {
         self.pos.y + self.dimens.y
     }
 
+    /// Clamp the given position inside the world bounds.
+    /// The resulting position is always inside the world.
     pub fn clamp(&self, pos: &Pos) -> Pos {
         Pos::new(self.clamp_x(pos.x), self.clamp_y(pos.y))
     }
 
+    /// Clamp the given x-coordinate inside the world bounds.
+    /// The resulting coordinate is always inside the world.
     fn clamp_x(&self, x: i32) -> i32 {
         if x < self.x() {
             self.x()
@@ -61,6 +67,8 @@ impl WorldBounds {
         }
     }
 
+    /// Clamp the given y-coordinate inside the world bounds.
+    /// The resulting coordinate is always inside the world.
     fn clamp_y(&self, y: i32) -> i32 {
         if y < self.y() {
             self.y()
