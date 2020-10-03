@@ -73,17 +73,22 @@ impl<'s> System<'s> for CursorSystem {
             };
             cursor.last_direction = new_direction;
             let old_cursor_pos = status.selection.end;
+            let mut received_user_input_to_move_cursor = should_move;
             if let SignalEdge::Rising = sed.edge("x_to_start", &input) {
                 status.selection.end.x = level_edit.bounds().x();
+                received_user_input_to_move_cursor = true;
             }
             if let SignalEdge::Rising = sed.edge("x_to_end", &input) {
                 status.selection.end.x = level_edit.bounds().upper_x() - 1;
+                received_user_input_to_move_cursor = true;
             }
             if let SignalEdge::Rising = sed.edge("y_to_start", &input) {
                 status.selection.end.y = level_edit.bounds().y();
+                received_user_input_to_move_cursor = true;
             }
             if let SignalEdge::Rising = sed.edge("y_to_end", &input) {
                 status.selection.end.y = level_edit.bounds().upper_y() - 1;
+                received_user_input_to_move_cursor = true;
             }
             if should_move {
                 status.selection.end.x += input_x as i32;
@@ -91,14 +96,16 @@ impl<'s> System<'s> for CursorSystem {
             }
             status.selection.end = level_edit.bounds().clamp(&status.selection.end);
             if old_cursor_pos != status.selection.end {
-                transform.set_translation_x(status.selection.end.x as f32 + 0.5);
-                transform.set_translation_y(status.selection.end.y as f32 + 0.5);
-                reset_blink(cursor, &config);
                 channel.single_write(RefreshPreviewsEvent);
+            }
+            if received_user_input_to_move_cursor {
+                reset_blink(cursor, &config);
                 if !shift {
                     status.selection.start = status.selection.end;
                 }
             }
+            transform.set_translation_x(status.selection.end.x as f32 + 0.5);
+            transform.set_translation_y(status.selection.end.y as f32 + 0.5);
             perform_blinking_animation(cursor, transform, &time, &config);
         }
     }

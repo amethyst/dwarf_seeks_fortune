@@ -25,7 +25,7 @@ impl<'s> System<'s> for PlaceTilesSystem {
             let blueprint = Blueprint::from_placing_tiles(&status, &level_edit);
             let lower_bounds = status.selection.lower_bounds();
             blueprint.tiles.iter().for_each(|(relative_pos, tile)| {
-                level_edit.put_tile(
+                level_edit.place_tile(
                     status.force_place,
                     lower_bounds + *relative_pos,
                     Some(tile.clone()),
@@ -38,7 +38,7 @@ impl<'s> System<'s> for PlaceTilesSystem {
             let selection_dimens = status.selection.dimens();
             (0..selection_dimens.x).for_each(|x| {
                 (0..selection_dimens.y).for_each(|y| {
-                    level_edit.put_tile(true, lower_bounds.append_xy(x, y), None);
+                    level_edit.place_tile(true, lower_bounds.append_xy(x, y), None);
                 });
             });
             channel.single_write(RefreshPreviewsEvent);

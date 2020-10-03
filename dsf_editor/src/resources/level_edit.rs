@@ -3,6 +3,7 @@ use dsf_core::levels::LevelSave;
 use dsf_core::resources::{Tile, TileDefinition, TileDefinitions, TileMap, WorldBounds};
 use std::collections::{HashMap, HashSet};
 
+/// The representation of a level in the level editor.
 #[derive(Debug, Default, Clone)]
 pub struct LevelEdit {
     pub tile_map: TileMap,
@@ -49,46 +50,51 @@ impl LevelEdit {
         self.dirty.drain().collect::<Vec<Pos>>()
     }
 
-    pub(crate) fn put_tile(&mut self, force_place: bool, pos: Pos, tile: Option<Tile>) {
-        let (to_be_placed, to_be_deleted) = self.check_place_tile(force_place, pos, tile);
-        println!("({:?}, {:?})", to_be_placed, to_be_deleted);
-        to_be_deleted.iter().for_each(|delete_pos| {
+    /// Attempt to place the given tile at the given position.
+    pub(crate) fn place_tile(&mut self, force_place: bool, pos: Pos, tile: Option<Tile>) {
+        let mut dry_run = self.check_place_tile(force_place, pos, tile);
+        dry_run.to_be_removed.iter().for_each(|delete_pos| {
             if let Some(removed_pos) = self.tile_map.remove_tile(&delete_pos) {
                 self.dirty.insert(removed_pos);
             }
         });
-        if let Some((pos, key, dimensions)) = to_be_placed {
-            self.tile_map.put_tile(pos, key, &dimensions);
-            self.dirty.insert(pos);
-        }
+        dry_run
+            .to_be_added
+            .drain(..)
+            .for_each(|(pos, key, dimensions)| {
+                self.tile_map.put_tile(pos, key, &dimensions);
+                self.dirty.insert(pos);
+            });
     }
 
+    /// Does a dry-run to check what would happen if we'd place the given tile right now.
+    /// Determines which existing tiles would need to be removed and which tiles would need to be
+    /// placed.
+    /// This does not actually place or remove anything.
     pub(crate) fn check_place_tile(
         &self,
         force_place: bool,
         pos: Pos,
         tile: Option<Tile>,
-    ) -> (Option<(Pos, String, Pos)>, HashSet<Pos>) {
+    ) -> PlaceTileDryRun {
         match tile {
-            Some(Tile::AirBlock) if force_place => (
-                None,
-                self.tile_map.get_actual_pos(&pos).iter().copied().collect(),
-            ),
+            // Trying to place a new tile:
             Some(Tile::TileDefKey(key)) => self.check_add_tile(pos, key, force_place),
-            None => (
-                None,
-                self.tile_map.get_actual_pos(&pos).iter().copied().collect(),
-            ),
-            _ => (None, HashSet::default()),
+            // Air blocks are ignored unless force_place is enabled.
+            // Delete whatever is at that location:
+            Some(Tile::AirBlock) if force_place => {
+                PlaceTileDryRun::remove_single(self.tile_map.get_actual_pos(&pos))
+            }
+            // When explicitly placing an empty Option, remove whatever is at that location whether
+            // force_place is enabled or not:
+            None => PlaceTileDryRun::remove_single(self.tile_map.get_actual_pos(&pos)),
+            // In all other cases, do nothing:
+            _ => PlaceTileDryRun::default(),
         }
     }
 
-    fn check_add_tile(
-        &self,
-        pos: Pos,
-        key: String,
-        force_place: bool,
-    ) -> (Option<(Pos, String, Pos)>, HashSet<Pos>) {
+    /// Does a dry run to check what would happen if we added a new tile.
+    fn check_add_tile(&self, pos: Pos, key: String, force_place: bool) -> PlaceTileDryRun {
         let dimensions = self.get_tile_def(&key).dimens;
         let obstructed = !self.bounds().encloses(&pos, &dimensions)
             || (!force_place
@@ -100,9 +106,9 @@ impl LevelEdit {
                     })
                 }));
         if obstructed {
-            (None, HashSet::default())
+            PlaceTileDryRun::default()
         } else {
-            let to_be_deleted = (0..dimensions.x)
+            let to_be_removed = (0..dimensions.x)
                 .flat_map(|x| (0..dimensions.y).map(move |y| (x, y)))
                 .map(|(x, y)| {
                     self.tile_map
@@ -110,15 +116,47 @@ impl LevelEdit {
                 })
                 .flatten()
                 .collect();
-            (Some((pos, key, dimensions)), to_be_deleted)
+            PlaceTileDryRun {
+                to_be_added: vec![(pos, key, dimensions)],
+                to_be_removed,
+            }
         }
     }
 
-    pub(crate) fn get_tile_def(&self, key: &str) -> &TileDefinition {
-        self.tile_map.tile_defs.get(key)
+    /// Returns the TileDefinition that belongs to the given key.
+    pub(crate) fn get_tile_def(&self, tile_def_key: &str) -> &TileDefinition {
+        self.tile_map.tile_defs.get(tile_def_key)
     }
 
+    /// Returns the world bounds for this level.
     pub(crate) fn bounds(&self) -> &WorldBounds {
         &self.tile_map.world_bounds
+    }
+}
+
+/// When performing a place-tile dry-run to determine what tiles (if any) to place and what tiles
+/// (if any) to remove, this is the object it returns that encapsulates that information.
+#[derive(Debug, Default)]
+pub struct PlaceTileDryRun {
+    /// The tiles that should be placed.
+    /// Is a collection of tuples: (tile_position_in_the_world, tile_def_key, tile_dimensions)
+    pub to_be_added: Vec<(Pos, String, Pos)>,
+    /// The anchor-positions of all existing tiles that should be removed.
+    pub to_be_removed: HashSet<Pos>,
+}
+
+impl PlaceTileDryRun {
+    fn remove_single(pos_to_be_removed: Option<Pos>) -> Self {
+        PlaceTileDryRun {
+            to_be_added: vec![],
+            to_be_removed: pos_to_be_removed.iter().copied().collect(),
+        }
+    }
+
+    /// Combines two dry runs into one.
+    pub(crate) fn extend(mut self, other: PlaceTileDryRun) -> Self {
+        self.to_be_added.extend(other.to_be_added);
+        self.to_be_removed.extend(other.to_be_removed);
+        self
     }
 }
