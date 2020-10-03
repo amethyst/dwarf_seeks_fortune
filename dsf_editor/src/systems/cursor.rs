@@ -27,7 +27,7 @@ impl<'s> System<'s> for CursorSystem {
         Read<'s, Time>,
         Read<'s, EditorConfig>,
         Read<'s, LevelEdit>,
-        Write<'s, EditorData>,
+        Write<'s, EditorStatus>,
         Write<'s, SignalEdgeDetector>,
     );
 
@@ -41,7 +41,7 @@ impl<'s> System<'s> for CursorSystem {
             time,
             config,
             level_edit,
-            mut editor_data,
+            mut status,
             mut sed,
         ): Self::SystemData,
     ) {
@@ -72,31 +72,31 @@ impl<'s> System<'s> for CursorSystem {
                 false
             };
             cursor.last_direction = new_direction;
-            let old_cursor_pos = editor_data.selection.end;
+            let old_cursor_pos = status.selection.end;
             if let SignalEdge::Rising = sed.edge("x_to_start", &input) {
-                editor_data.selection.end.x = level_edit.bounds().x();
+                status.selection.end.x = level_edit.bounds().x();
             }
             if let SignalEdge::Rising = sed.edge("x_to_end", &input) {
-                editor_data.selection.end.x = level_edit.bounds().upper_x() - 1;
+                status.selection.end.x = level_edit.bounds().upper_x() - 1;
             }
             if let SignalEdge::Rising = sed.edge("y_to_start", &input) {
-                editor_data.selection.end.y = level_edit.bounds().y();
+                status.selection.end.y = level_edit.bounds().y();
             }
             if let SignalEdge::Rising = sed.edge("y_to_end", &input) {
-                editor_data.selection.end.y = level_edit.bounds().upper_y() - 1;
+                status.selection.end.y = level_edit.bounds().upper_y() - 1;
             }
             if should_move {
-                editor_data.selection.end.x += input_x as i32;
-                editor_data.selection.end.y += input_y as i32;
+                status.selection.end.x += input_x as i32;
+                status.selection.end.y += input_y as i32;
             }
-            editor_data.selection.end = level_edit.bounds().clamp(&editor_data.selection.end);
-            if old_cursor_pos != editor_data.selection.end {
-                transform.set_translation_x(editor_data.selection.end.x as f32 + 0.5);
-                transform.set_translation_y(editor_data.selection.end.y as f32 + 0.5);
+            status.selection.end = level_edit.bounds().clamp(&status.selection.end);
+            if old_cursor_pos != status.selection.end {
+                transform.set_translation_x(status.selection.end.x as f32 + 0.5);
+                transform.set_translation_y(status.selection.end.y as f32 + 0.5);
                 reset_blink(cursor, &config);
                 channel.single_write(RefreshPreviewsEvent);
                 if !shift {
-                    editor_data.selection.start = editor_data.selection.end;
+                    status.selection.start = status.selection.end;
                 }
             }
             perform_blinking_animation(cursor, transform, &time, &config);

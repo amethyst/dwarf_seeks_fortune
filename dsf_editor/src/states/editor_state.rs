@@ -80,7 +80,7 @@ impl<'a, 'b> EditorState {
         create_camera(world);
         let tile_defs = load_tile_definitions().expect("Tile definitions failed to load!");
         world
-            .write_resource::<EditorData>()
+            .write_resource::<EditorStatus>()
             .brush
             .set_palette(&tile_defs);
         let level_edit = LevelEdit::new(load_auto_save(), tile_defs);
@@ -98,7 +98,7 @@ impl SimpleState for EditorState {
             .add_reader("choose_brush_system".to_string(), data.world);
         data.world.insert(readers);
         self.dispatcher.setup(data.world);
-        data.world.insert(EditorData::default());
+        data.world.insert(EditorStatus::default());
         self.setup(data.world);
     }
 

@@ -3,7 +3,7 @@ use amethyst::core::ecs::{
 };
 
 use crate::components::{PaintedTile, PreviewGhostTag};
-use crate::resources::{Blueprint, EditorData, LevelEdit};
+use crate::resources::{Blueprint, EditorStatus, LevelEdit};
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::shred::SystemData;
 use amethyst::core::Transform;
@@ -29,7 +29,7 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
         Read<'s, EventChannel<RefreshPreviewsEvent>>,
-        Read<'s, EditorData>,
+        Read<'s, EditorStatus>,
         Read<'s, LevelEdit>,
         WriteStorage<'s, Tint>,
         ReadStorage<'s, PaintedTile>,
@@ -40,7 +40,7 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
 
     fn run(
         &mut self,
-        (channel, editor_data, level_edit, mut tints, painted_tiles, previews, lazy, entities): Self::SystemData,
+        (channel, status, level_edit, mut tints, painted_tiles, previews, lazy, entities): Self::SystemData,
     ) {
         let reader_id = self.reader_id.as_mut().expect(
             "`RefreshPreviewsSystem::setup` was not called before `RefreshPreviewsSystem::run`",
@@ -50,8 +50,8 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
         // (very important, otherwise the surplus events stay in the channel until next frame).
         let at_least_one_event = channel.read(reader_id).fold(false, |_, _| true);
         if at_least_one_event {
-            let blueprint = Blueprint::from_placing_tiles(&editor_data, &level_edit);
-            let lower_bounds = editor_data.selection.lower_bounds();
+            let blueprint = Blueprint::from_placing_tiles(&status, &level_edit);
+            let lower_bounds = status.selection.lower_bounds();
             for (tint, painted_tile) in (&mut tints, &painted_tiles).join() {
                 tint.0 = if let Some(tile_def) = level_edit.tile_map.get_tile(&painted_tile.pos) {
                     if blueprint.overlaps(painted_tile.pos - lower_bounds, tile_def.dimens) {

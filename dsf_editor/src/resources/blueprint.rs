@@ -1,4 +1,4 @@
-use crate::resources::{EditorData, LevelEdit};
+use crate::resources::{EditorStatus, LevelEdit};
 use dsf_core::components::Pos;
 use dsf_core::resources::Tile;
 use serde::{Deserialize, Serialize};
@@ -28,13 +28,13 @@ impl Blueprint {
     /// When creating the Blueprint, existing tiles are ignored. It is therefore not guaranteed
     /// that all tiles in the blueprint will be placed; if force-place is not enabled and there are
     /// tiles in the way, that will prevent the whole blueprint being placed.
-    pub fn from_placing_tiles(editor_data: &EditorData, level_edit: &LevelEdit) -> Self {
-        let key = editor_data.brush.get_key().as_ref();
+    pub fn from_placing_tiles(status: &EditorStatus, level_edit: &LevelEdit) -> Self {
+        let key = status.brush.get_key().as_ref();
         let tile_def = key.map(|key| level_edit.tile_map.tile_defs.get(key));
         let brush_dimens = tile_def
             .map(|def| def.dimens)
             .unwrap_or_else(|| Pos::new(1, 1));
-        let selection_dimens = (*editor_data).selection.dimens();
+        let selection_dimens = (*status).selection.dimens();
         let mut blueprint = Blueprint::new(selection_dimens);
         for x in (0..(selection_dimens.x)).step_by(brush_dimens.x as usize) {
             for y in (0..(selection_dimens.y)).step_by(brush_dimens.y as usize) {

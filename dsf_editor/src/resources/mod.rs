@@ -1,15 +1,13 @@
 mod blueprint;
-mod brush;
 mod config;
 mod debug_lines;
-mod editor_data;
-mod selection;
+mod level_edit;
+mod status;
 mod tile_edit;
 
 pub use self::blueprint::*;
-pub use self::brush::*;
 pub use self::config::*;
 pub use self::debug_lines::*;
-pub use self::editor_data::*;
-pub use self::selection::*;
+pub use self::level_edit::*;
+pub use self::status::*;
 pub use self::tile_edit::*;

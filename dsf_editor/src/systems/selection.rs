@@ -19,13 +19,13 @@ impl<'s> System<'s> for SelectionSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, SelectionTag>,
-        Read<'s, EditorData>,
+        Read<'s, EditorStatus>,
     );
 
-    fn run(&mut self, (mut transforms, mut selection_tags, editor_data): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut selection_tags, status): Self::SystemData) {
         for (_, transform) in (&mut selection_tags, &mut transforms).join() {
-            let width = (editor_data.selection.start.x - editor_data.selection.end.x).abs() + 1;
-            let height = (editor_data.selection.start.y - editor_data.selection.end.y).abs() + 1;
+            let width = (status.selection.start.x - status.selection.end.x).abs() + 1;
+            let height = (status.selection.start.y - status.selection.end.y).abs() + 1;
             // TODO: set scale requires knowledge about dimensions of sprite.
             // Maybe solve with child entity.
             // Or accept hardcoded nature, because sprite unlikely to change?
@@ -36,10 +36,9 @@ impl<'s> System<'s> for SelectionSystem {
             }
 
             transform.set_translation_xyz(
-                (width as f32 * 0.5)
-                    + min(editor_data.selection.start.x, editor_data.selection.end.x) as f32,
+                (width as f32 * 0.5) + min(status.selection.start.x, status.selection.end.x) as f32,
                 (height as f32 * 0.5)
-                    + min(editor_data.selection.start.y, editor_data.selection.end.y) as f32,
+                    + min(status.selection.start.y, status.selection.end.y) as f32,
                 (&DepthLayer::UiElements).z(),
             );
         }

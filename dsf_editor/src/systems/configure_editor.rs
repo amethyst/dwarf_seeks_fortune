@@ -1,4 +1,4 @@
-use crate::resources::{EditorData, LevelEdit};
+use crate::resources::{EditorStatus, LevelEdit};
 use crate::systems::RefreshPreviewsEvent;
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::ecs::{Read, System, Write, WriteStorage};
@@ -24,24 +24,24 @@ impl<'s> System<'s> for ConfigureEditorSystem {
         Write<'s, EventChannel<RefreshPreviewsEvent>>,
         Read<'s, InputHandler<StringBindings>>,
         Write<'s, SignalEdgeDetector>,
-        Write<'s, EditorData>,
+        Write<'s, EditorStatus>,
     );
 
-    fn run(&mut self, (mut channel, input, mut sed, mut editor_data): Self::SystemData) {
+    fn run(&mut self, (mut channel, input, mut sed, mut status): Self::SystemData) {
         if let SignalEdge::Rising = sed.edge("select_previous_brush", &input) {
-            let _new_key = editor_data.brush.select_previous();
+            let _new_key = status.brush.select_previous();
             channel.single_write(RefreshPreviewsEvent);
         }
         if let SignalEdge::Rising = sed.edge("select_next_brush", &input) {
-            let _new_key = editor_data.brush.select_next();
+            let _new_key = status.brush.select_next();
             channel.single_write(RefreshPreviewsEvent);
         }
         if let SignalEdge::Rising = sed.edge("toggle_copy_air", &input) {
-            editor_data.copy_air ^= true;
+            status.copy_air ^= true;
             channel.single_write(RefreshPreviewsEvent);
         }
         if let SignalEdge::Rising = sed.edge("toggle_force_place", &input) {
-            editor_data.force_place ^= true;
+            status.force_place ^= true;
             channel.single_write(RefreshPreviewsEvent);
         }
     }
@@ -55,15 +55,15 @@ impl<'s> System<'s> for EditorUiUpdateSystem {
     type SystemData = (
         WriteStorage<'s, UiImage>,
         UiFinder<'s>,
-        Read<'s, EditorData>,
+        Read<'s, EditorStatus>,
         Read<'s, LevelEdit>,
         Read<'s, Assets>,
     );
 
-    fn run(&mut self, (mut ui_image, finder, editor_data, level_edit, assets): Self::SystemData) {
+    fn run(&mut self, (mut ui_image, finder, status, level_edit, assets): Self::SystemData) {
         let toggle_copy_air = get_image("toggle_copy_air", &finder, &mut ui_image);
         if let Some(toggle_copy_air) = toggle_copy_air {
-            let sprite_nr = if editor_data.copy_air { 0 } else { 1 };
+            let sprite_nr = if status.copy_air { 0 } else { 1 };
             *toggle_copy_air = UiImage::Sprite(load_sprite_render(
                 &SpriteType::EditorUiIcons,
                 sprite_nr,
@@ -72,7 +72,7 @@ impl<'s> System<'s> for EditorUiUpdateSystem {
         }
         let toggle_force_place = get_image("toggle_force_place", &finder, &mut ui_image);
         if let Some(toggle_force_place) = toggle_force_place {
-            let sprite_nr = 2 + if editor_data.force_place { 0 } else { 1 };
+            let sprite_nr = 2 + if status.force_place { 0 } else { 1 };
             *toggle_force_place = UiImage::Sprite(load_sprite_render(
                 &SpriteType::EditorUiIcons,
                 sprite_nr,
@@ -81,7 +81,7 @@ impl<'s> System<'s> for EditorUiUpdateSystem {
         }
         let brush_preview = get_image("brush_preview", &finder, &mut ui_image);
         if let Some(brush_preview) = brush_preview {
-            if let Some(sprite_render) = editor_data
+            if let Some(sprite_render) = status
                 .brush
                 .get_key()
                 .as_ref()
