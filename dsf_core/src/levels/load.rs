@@ -113,7 +113,7 @@ pub fn add_background(world: &mut World, world_bounds: &WorldBounds) {
     let asset = load_asset_from_world(&SpriteType::Selection, 1, world);
     world
         .create_entity()
-        .with(Background)
+        .with(BackgroundTag)
         .with(transform)
         .with(asset)
         .build();

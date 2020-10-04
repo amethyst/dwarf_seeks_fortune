@@ -93,7 +93,7 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
                     transform.set_translation_xyz(
                         pos.x as f32 + dimens.x as f32 * 0.5,
                         pos.y as f32 + dimens.y as f32 * 0.5,
-                        DepthLayer::UiElements.z(),
+                        DepthLayer::FloatingBlocks.z(),
                     );
                     let preview = world
                         .create_entity()

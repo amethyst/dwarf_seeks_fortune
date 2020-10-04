@@ -56,8 +56,17 @@ impl<'a, 'b> EditorState {
                     "configure_editor_system",
                     &[],
                 )
-                .with(systems::AnimatePreviewsSystem, "cursor_preview_system", &[])
+                .with(
+                    systems::AnimatePreviewsSystem,
+                    "animate_previews_system",
+                    &[],
+                )
                 .with(systems::CursorSystem, "cursor_system", &[])
+                .with(
+                    systems::UpdateBackgroundSystem,
+                    "update_background_system",
+                    &["cursor_system"],
+                )
                 .with(
                     systems::SelectionSystem,
                     "selection_system",
@@ -202,7 +211,7 @@ fn init_cursor(world: &mut World) {
         .read_resource::<Assets>()
         .get_still(&SpriteType::Selection);
     let mut selection_transform = Transform::default();
-    selection_transform.set_translation_z((&DepthLayer::UiElements).z());
+    selection_transform.set_translation_z((&DepthLayer::Selection).z());
     world
         .create_entity()
         .with(SpriteRender {
@@ -214,7 +223,7 @@ fn init_cursor(world: &mut World) {
         .with(SelectionTag)
         .build();
     let mut cursor_transform = Transform::default();
-    cursor_transform.set_translation_xyz(0.5, 0.5, DepthLayer::UiElements.z());
+    cursor_transform.set_translation_xyz(0.5, 0.5, DepthLayer::Cursor.z());
     let cursor_entity = world
         .create_entity()
         .with(cursor_transform)

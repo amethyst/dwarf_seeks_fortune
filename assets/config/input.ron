@@ -24,5 +24,6 @@
       "y_to_end":[[Key(PageUp)]],
       "x_to_start":[[Key(Home)]],
       "x_to_end":[[Key(End)]],
+      "adjust_bounds":[[Key(LAlt)]],
   },
 )

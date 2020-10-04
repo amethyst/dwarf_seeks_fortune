@@ -14,9 +14,9 @@ pub struct DummySystem;
 
 impl<'s> System<'s> for DummySystem {
     #[allow(clippy::type_complexity)]
-    type SystemData = (ReadStorage<'s, Background>,);
+    type SystemData = ();
 
-    fn run(&mut self, (_,): Self::SystemData) {
+    fn run(&mut self, (): Self::SystemData) {
         // Do nothing.
     }
 }

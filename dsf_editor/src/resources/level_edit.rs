@@ -132,6 +132,11 @@ impl LevelEdit {
     pub(crate) fn bounds(&self) -> &WorldBounds {
         &self.tile_map.world_bounds
     }
+
+    /// Returns a mutable reference to the world bounds for this level.
+    pub(crate) fn bounds_mut(&mut self) -> &mut WorldBounds {
+        &mut self.tile_map.world_bounds
+    }
 }
 
 /// When performing a place-tile dry-run to determine what tiles (if any) to place and what tiles

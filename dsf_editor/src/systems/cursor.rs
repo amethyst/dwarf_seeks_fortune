@@ -26,7 +26,7 @@ impl<'s> System<'s> for CursorSystem {
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
         Read<'s, EditorConfig>,
-        Read<'s, LevelEdit>,
+        Write<'s, LevelEdit>,
         Write<'s, EditorStatus>,
         Write<'s, SignalEdgeDetector>,
     );
@@ -40,12 +40,13 @@ impl<'s> System<'s> for CursorSystem {
             input,
             time,
             config,
-            level_edit,
+            mut level_edit,
             mut status,
             mut sed,
         ): Self::SystemData,
     ) {
         for (cursor, transform) in (&mut cursors, &mut transforms).join() {
+            let adjust_bounds = input.action_is_down("adjust_bounds").unwrap_or(false);
             let shift = input.action_is_down("shift").unwrap_or(false);
             let input_x = input.axis_value("move_x").unwrap_or(0.0);
             let input_y = input.axis_value("move_y").unwrap_or(0.0);
@@ -91,6 +92,14 @@ impl<'s> System<'s> for CursorSystem {
                 received_user_input_to_move_cursor = true;
             }
             if should_move {
+                if adjust_bounds {
+                    level_edit
+                        .bounds_mut()
+                        .adjust_x(status.selection.end.x, input_x as i32);
+                    level_edit
+                        .bounds_mut()
+                        .adjust_y(status.selection.end.y, input_y as i32);
+                }
                 status.selection.end.x += input_x as i32;
                 status.selection.end.y += input_y as i32;
             }

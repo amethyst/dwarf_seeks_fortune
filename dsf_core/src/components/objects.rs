@@ -89,8 +89,8 @@ impl Component for ExitDoor {
 /// The blue background sprite.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
-pub struct Background;
+pub struct BackgroundTag;
 
-impl Component for Background {
+impl Component for BackgroundTag {
     type Storage = NullStorage<Self>;
 }

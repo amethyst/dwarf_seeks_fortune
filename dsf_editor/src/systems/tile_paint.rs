@@ -5,7 +5,7 @@ use amethyst::{
     renderer::sprite::SpriteRender,
 };
 
-use dsf_core::components::Background;
+use dsf_core::components::BackgroundTag;
 use dsf_core::levels::{load_anim_asset, load_still_asset, load_transform};
 use dsf_core::resources::Assets;
 use dsf_precompile::MyPrefabData;
@@ -23,7 +23,7 @@ pub struct TilePaintSystem;
 impl<'s> System<'s> for TilePaintSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-        ReadStorage<'s, Background>,
+        ReadStorage<'s, BackgroundTag>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Handle<Prefab<MyPrefabData>>>,

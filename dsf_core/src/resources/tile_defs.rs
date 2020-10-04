@@ -136,8 +136,11 @@ impl TileDefinition {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DepthLayer {
     Background,
+    DebugLines,
     // Leave room to expand background into multiple parallax layers here
     Blocks,
+    Selection,
+    Cursor,
     FloatingBlocks,
     Enemies,
     Player,
@@ -160,7 +163,10 @@ impl DepthLayer {
     pub fn z(&self) -> f32 {
         match self {
             DepthLayer::Background => 0.,
+            DepthLayer::DebugLines => 1.,
             DepthLayer::Blocks => 100.,
+            DepthLayer::Selection => 101.,
+            DepthLayer::Cursor => 102.,
             DepthLayer::FloatingBlocks => 110.,
             DepthLayer::Enemies => 120.,
             DepthLayer::Player => 130.,
