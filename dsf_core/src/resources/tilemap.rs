@@ -77,11 +77,7 @@ impl TileMap {
     }
 
     pub fn is_tile_def_key(&self, pos: &Pos) -> bool {
-        if let Some(Tile::TileDefKey(_)) = self.tiles.get(pos) {
-            true
-        } else {
-            false
-        }
+        matches!(self.tiles.get(pos), Some(Tile::TileDefKey(_)))
     }
 
     /// Removes the tile at the given location. Also removes any Dummy tiles associated with the
@@ -154,10 +150,6 @@ pub enum Tile {
 impl Tile {
     /// Returns true iff the enum is an actual tile, rather than an air block or a dummy reference.
     pub fn is_tile_def(&self) -> bool {
-        if let Tile::TileDefKey(_) = self {
-            true
-        } else {
-            false
-        }
+        matches!(self, Tile::TileDefKey(_))
     }
 }

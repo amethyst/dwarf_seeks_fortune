@@ -340,11 +340,7 @@ impl Steering {
     }
 
     pub fn is_jumping(&self) -> bool {
-        if let SteeringMode::Jumping { .. } = self.mode {
-            true
-        } else {
-            false
-        }
+        matches!(self.mode, SteeringMode::Jumping {..})
     }
 
     pub fn jump_has_peaked(&self) -> bool {
@@ -356,11 +352,7 @@ impl Steering {
     }
 
     pub fn is_falling(&self) -> bool {
-        if let SteeringMode::Falling { .. } = self.mode {
-            true
-        } else {
-            false
-        }
+        matches!(self.mode, SteeringMode::Falling {..})
     }
 
     pub fn is_climbing(&self) -> bool {
