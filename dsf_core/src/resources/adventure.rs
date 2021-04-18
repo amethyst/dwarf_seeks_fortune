@@ -1,19 +1,17 @@
+use std::collections::HashMap;
 use std::fs;
+use std::path::Path;
 
-use std::path::PathBuf;
-
+use amethyst::config::ConfigError;
 use amethyst::prelude::*;
-
+use amethyst::renderer::palette::Srgba;
+use amethyst::renderer::resources::Tint;
 use serde::{Deserialize, Serialize};
 
 use crate::components::*;
 use crate::levels::{load_asset_from_world, load_transform, LevelSave};
 use crate::resources::{AssetType, DepthLayer, SpriteType, UserCache};
 use crate::utility::files::{get_adventures_dir, get_levels_dir};
-use amethyst::config::ConfigError;
-use amethyst::renderer::palette::Srgba;
-use amethyst::renderer::resources::Tint;
-use std::collections::HashMap;
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct PositionOnMap {
@@ -131,7 +129,7 @@ fn level_files() -> Vec<String> {
         .collect()
 }
 
-pub fn load_adventure(path: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
+pub fn load_adventure(path: &Path, world: &mut World) -> Result<(), ConfigError> {
     let adventure = Adventure::load(path)?;
     for (pos, map_element) in &adventure.nodes {
         match map_element {
@@ -153,7 +151,7 @@ pub fn load_adventure(path: &PathBuf, world: &mut World) -> Result<(), ConfigErr
     Ok(())
 }
 
-fn cursor_position(path: &PathBuf, world: &mut World) -> Pos {
+fn cursor_position(path: &Path, world: &mut World) -> Pos {
     world.read_resource::<UserCache>().get_initial_cursor_pos(
         path.file_name()
             .expect("This should not happen.")

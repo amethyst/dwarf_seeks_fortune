@@ -12,7 +12,7 @@ pub fn setup_debug_lines(world: &mut World) {
 
     // Adds all the horizontal lines, spaced 2 meters apart.
     // No line is drawn at y=0, the x-axis will be added later in a different colour.
-    for y in (0..(100 as u16)).step_by(2).skip(1).map(f32::from) {
+    for y in (0..(100_u16)).step_by(2).skip(1).map(f32::from) {
         debug_lines_component.add_line(
             [-100., y, z_coordinate].into(),
             [100., y, z_coordinate].into(),
@@ -27,7 +27,7 @@ pub fn setup_debug_lines(world: &mut World) {
 
     // Adds all the vertical lines, spaced 2 meters apart.
     // No line is drawn at x=0, the y-axis will be added later in a different colour.
-    for x in (0..(100 as u16)).step_by(2).skip(1).map(f32::from) {
+    for x in (0..(100_u16)).step_by(2).skip(1).map(f32::from) {
         debug_lines_component.add_line(
             [x, -100., z_coordinate].into(),
             [x, 100., z_coordinate].into(),

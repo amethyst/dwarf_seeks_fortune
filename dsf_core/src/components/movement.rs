@@ -332,15 +332,14 @@ impl Steering {
     }
 
     pub fn is_mid_air(&self) -> bool {
-        match self.mode {
-            SteeringMode::Falling { .. } => true,
-            SteeringMode::Jumping { .. } => true,
-            _ => false,
-        }
+        matches!(
+            self.mode,
+            SteeringMode::Falling { .. } | SteeringMode::Jumping { .. }
+        )
     }
 
     pub fn is_jumping(&self) -> bool {
-        matches!(self.mode, SteeringMode::Jumping {..})
+        matches!(self.mode, SteeringMode::Jumping { .. })
     }
 
     pub fn jump_has_peaked(&self) -> bool {
@@ -352,7 +351,7 @@ impl Steering {
     }
 
     pub fn is_falling(&self) -> bool {
-        matches!(self.mode, SteeringMode::Falling {..})
+        matches!(self.mode, SteeringMode::Falling { .. })
     }
 
     pub fn is_climbing(&self) -> bool {

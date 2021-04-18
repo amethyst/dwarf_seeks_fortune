@@ -1,5 +1,7 @@
-use amethyst::prelude::WorldExt;
+use std::path::Path;
 
+use amethyst::prelude::WorldExt;
+use amethyst::renderer::resources::Tint;
 use amethyst::{
     assets::{Handle, Prefab},
     config::ConfigError,
@@ -8,23 +10,20 @@ use amethyst::{
     prelude::*,
     renderer::{sprite::SpriteRender, Transparent},
 };
+
 use dsf_precompile::MyPrefabData;
 
 use crate::components::*;
-
 use crate::levels::LevelSave;
 use crate::resources::*;
-
 use crate::utility::files::get_world_dir;
-use amethyst::renderer::resources::Tint;
-use std::path::PathBuf;
 
 pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
     let file = get_world_dir().join("tile_references.ron");
     TileDefinitions::load(file)
 }
 
-pub fn load_level(level_file: &PathBuf, world: &mut World) -> Result<(), ConfigError> {
+pub fn load_level(level_file: &Path, world: &mut World) -> Result<(), ConfigError> {
     let mut win_condition = WinCondition::default();
     let display_debug_frames = world.read_resource::<DebugSettings>().display_debug_frames;
     let tile_defs = load_tile_definitions()?;

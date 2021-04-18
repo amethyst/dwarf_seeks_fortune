@@ -1,7 +1,9 @@
-use crate::utility::files::{get_default_settings_dir, get_user_settings_dir};
+use std::path::Path;
+
 use amethyst::prelude::Config;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+
+use crate::utility::files::{get_default_settings_dir, get_user_settings_dir};
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(default)]
@@ -98,7 +100,7 @@ pub fn load_audio_settings() -> AudioSettings {
     }
 }
 
-fn load_audio_user_settings(file_path: &PathBuf) -> AudioSettings {
+fn load_audio_user_settings(file_path: &Path) -> AudioSettings {
     AudioSettings::load(&file_path).unwrap_or_else(|error| {
         error!(
             "Failed to load the user-specific audio settings file from {:?}! Falling back to default settings file. Error: {:?}",

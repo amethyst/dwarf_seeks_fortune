@@ -1,7 +1,7 @@
 use crate::utility::files::{get_default_settings_dir, get_user_settings_dir};
 use amethyst::prelude::Config;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::Path;
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
@@ -79,7 +79,7 @@ pub fn load_debug_settings() -> DebugSettings {
     }
 }
 
-fn load_debug_user_settings(file_path: &PathBuf) -> DebugSettings {
+fn load_debug_user_settings(file_path: &Path) -> DebugSettings {
     DebugSettings::load(&file_path).unwrap_or_else(|error| {
         error!(
             "Failed to load the user-specific debug settings file from {:?}! Falling back to default settings file. Error: {:?}",
