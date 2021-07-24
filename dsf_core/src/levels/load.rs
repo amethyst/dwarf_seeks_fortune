@@ -33,16 +33,10 @@ pub fn load_level(level_file: &Path, world: &mut World) -> Result<(), ConfigErro
         let tile_def = tile_defs.get(tile_def_key);
         let still_asset = load_still_asset(tile_def, &world.read_resource::<Assets>());
         let anim_asset = load_anim_asset(tile_def, &world.read_resource::<Assets>());
-        let transform = if let Some(asset) = &tile_def.asset {
-            Some(load_transform(
-                &pos,
-                &tile_def.depth,
-                &tile_def.dimens,
-                asset,
-            ))
-        } else {
-            None
-        };
+        let transform = tile_def
+            .asset
+            .as_ref()
+            .map(|asset| load_transform(&pos, &tile_def.depth, &tile_def.dimens, asset));
         let mut builder = world.create_entity();
         if let Some(still_asset) = still_asset {
             builder = builder.with(still_asset);
