@@ -19,7 +19,7 @@ const DOOR_HEIGHT: f32 = 4.;
 
 /// Checks if the player intersects any keys.
 /// If so, the key will collected by the player and will be removed from the game.
-#[derive(Default)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct KeyCollectionSystem;
 
 impl<'s> System<'s> for KeyCollectionSystem {
@@ -88,7 +88,7 @@ impl<'s> System<'s> for KeyCollectionSystem {
 
 /// Checks if the player has finished the level.
 /// The player finishes the level when they collect all keys and then reach the exit door.
-#[derive(Default)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct WinSystem;
 
 impl<'s> System<'s> for WinSystem {

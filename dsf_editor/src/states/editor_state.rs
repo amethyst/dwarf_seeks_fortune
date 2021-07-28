@@ -99,7 +99,7 @@ impl<'a, 'b> EditorState {
 }
 
 impl SimpleState for EditorState {
-    fn on_start(&mut self, data: StateData<GameData>) {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("EditorState on_start");
         self.is_active = true;
         let readers = EventReaders::default()
@@ -111,26 +111,30 @@ impl SimpleState for EditorState {
         self.setup(data.world);
     }
 
-    fn on_stop(&mut self, data: StateData<GameData>) {
+    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("EditorState on_stop");
         data.world.insert(EventReaders::default());
         self.is_active = false;
         data.world.delete_all();
     }
 
-    fn on_pause(&mut self, data: StateData<GameData>) {
+    fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("EditorState on_pause");
         self.is_active = false;
         data.world.delete_all();
     }
 
-    fn on_resume(&mut self, data: StateData<GameData>) {
+    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("EditorState on_resume");
         self.is_active = true;
         self.setup(data.world);
     }
 
-    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
+    fn handle_event(
+        &mut self,
+        data: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         match event {
             // Events related to the window and inputs.
@@ -157,15 +161,15 @@ impl SimpleState for EditorState {
         }
     }
 
-    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
-        self.dispatcher.dispatch(&data.world);
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        self.dispatcher.dispatch(data.world);
         // Execute a pass similar to a system
         data.world.exec(
             #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
-                Entities,
-                ReadStorage<AnimationSet<AnimationId, SpriteRender>>,
-                WriteStorage<AnimationControlSet<AnimationId, SpriteRender>>,
+                Entities<'_>,
+                ReadStorage<'_, AnimationSet<AnimationId, SpriteRender>>,
+                WriteStorage<'_, AnimationControlSet<AnimationId, SpriteRender>>,
             )| {
                 // For each entity that has AnimationSet
                 for (entity, animation_set) in (&entities, &animation_sets).join() {
@@ -174,7 +178,7 @@ impl SimpleState for EditorState {
                     // Adds the `Fly` animation to AnimationControlSet and loops infinitely
                     control_set.add_animation(
                         AnimationId::Fly,
-                        &animation_set.get(&AnimationId::Fly).unwrap(),
+                        animation_set.get(&AnimationId::Fly).unwrap(),
                         EndControl::Loop(None),
                         1.0,
                         AnimationCommand::Start,
@@ -194,8 +198,8 @@ impl SimpleState for EditorState {
         if !self.is_active {
             data.world.exec(
                 |(mut readers, channel): (
-                    Write<EventReaders>,
-                    Read<EventChannel<InputEvent<StringBindings>>>,
+                    Write<'_, EventReaders>,
+                    Read<'_, EventChannel<InputEvent<StringBindings>>>,
                 )| {
                     readers.drain_event_channel(channel);
                 },
@@ -236,7 +240,9 @@ fn init_cursor(world: &mut World) {
         &Pos::new(1, 1),
         None,
     );
-    world.exec(|mut channel: Write<EventChannel<RefreshPreviewsEvent>>| {
-        channel.single_write(RefreshPreviewsEvent);
-    });
+    world.exec(
+        |mut channel: Write<'_, EventChannel<RefreshPreviewsEvent>>| {
+            channel.single_write(RefreshPreviewsEvent);
+        },
+    );
 }

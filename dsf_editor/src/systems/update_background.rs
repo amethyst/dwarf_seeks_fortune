@@ -12,6 +12,7 @@ use dsf_core::components::BackgroundTag;
 
 /// Responsible for updating the size and location of the background sprite whenever the
 /// world bounds change.
+#[derive(Copy, Clone, Debug)]
 pub struct UpdateBackgroundSystem;
 
 impl<'s> System<'s> for UpdateBackgroundSystem {

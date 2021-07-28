@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::utility::files::{get_default_settings_dir, get_user_settings_dir};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct AudioSettings {

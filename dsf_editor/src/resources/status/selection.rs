@@ -2,7 +2,7 @@ use std::cmp::min;
 
 use dsf_core::components::Pos;
 
-#[derive(Debug, Default)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Selection {
     /// Inclusive bound.
     pub start: Pos,

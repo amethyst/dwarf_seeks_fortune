@@ -16,7 +16,7 @@ const INCREASE_SFX_VOLUME_BUTTON_ID: &str = "btn_increase_sfx_volume";
 const DECREASE_SFX_VOLUME_BUTTON_ID: &str = "btn_decrease_sfx_volume";
 const SFX_VOLUME_LABEL_ID: &str = "label_sfx_volume";
 
-#[derive(Default)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct SettingsState {
     ui: Option<Entity>,
     btn_increase_music_volume: Option<Entity>,
@@ -28,11 +28,11 @@ pub struct SettingsState {
 }
 
 impl SettingsState {
-    fn init_ui(&mut self, data: StateData<GameData>) {
+    fn init_ui(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         UiHandles::add_ui(&UiType::Fps, data.world);
         self.ui = UiHandles::add_ui(&UiType::Settings, data.world);
         // invoke a world update to finish creating our ui entities
-        data.data.update(&data.world);
+        data.data.update(data.world);
         // look up our buttons
         data.world.exec(|ui_finder: UiFinder<'_>| {
             self.btn_increase_music_volume = ui_finder.find(INCREASE_MUSIC_VOLUME_BUTTON_ID);
@@ -47,7 +47,10 @@ impl SettingsState {
     fn set_labels(&self, world: &mut World) {
         if let Some(label_entity) = self.label_music_volume {
             world.exec(
-                |(mut ui_text, audio_config): (WriteStorage<UiText>, Read<AudioSettings>)| {
+                |(mut ui_text, audio_config): (
+                    WriteStorage<'_, UiText>,
+                    Read<'_, AudioSettings>,
+                )| {
                     if let Some(mut text_component) = ui_text.get_mut(label_entity) {
                         text_component.text =
                             format!("Music volume: {:}", audio_config.format_music_volume());
@@ -57,7 +60,10 @@ impl SettingsState {
         }
         if let Some(label_entity) = self.label_sfx_volume {
             world.exec(
-                |(mut ui_text, audio_config): (WriteStorage<UiText>, Read<AudioSettings>)| {
+                |(mut ui_text, audio_config): (
+                    WriteStorage<'_, UiText>,
+                    Read<'_, AudioSettings>,
+                )| {
                     if let Some(mut text_component) = ui_text.get_mut(label_entity) {
                         text_component.text = format!(
                             "Sound effects volume: {:}",
@@ -95,7 +101,7 @@ impl SettingsState {
 }
 
 impl SimpleState for SettingsState {
-    fn on_start(&mut self, data: StateData<GameData>) {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("SettingsState on_start");
         self.init_ui(data);
     }
@@ -105,7 +111,7 @@ impl SimpleState for SettingsState {
         data.world.delete_all();
     }
 
-    fn on_pause(&mut self, data: StateData<GameData>) {
+    fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("SettingsState on_pause");
         data.world.delete_all();
         self.btn_increase_music_volume = None;
@@ -116,12 +122,16 @@ impl SimpleState for SettingsState {
         self.label_sfx_volume = None;
     }
 
-    fn on_resume(&mut self, data: StateData<GameData>) {
+    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("SettingsState on_resume");
         self.init_ui(data);
     }
 
-    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
+    fn handle_event(
+        &mut self,
+        data: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         match event {
             StateEvent::Window(event) => {

@@ -37,7 +37,10 @@ impl EventReaders {
     }
 
     /// The State should call this method every frame if it is not active.
-    pub fn drain_event_channel(&mut self, channel: Read<EventChannel<InputEvent<StringBindings>>>) {
+    pub fn drain_event_channel(
+        &mut self,
+        channel: Read<'_, EventChannel<InputEvent<StringBindings>>>,
+    ) {
         self.reader_ids.values_mut().for_each(|mut reader_id| {
             channel.read(&mut reader_id).for_each(|_| ());
         });

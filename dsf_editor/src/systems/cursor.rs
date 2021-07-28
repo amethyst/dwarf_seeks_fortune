@@ -15,6 +15,7 @@ use crate::resources::*;
 use crate::systems::RefreshPreviewsEvent;
 
 /// Responsible for moving the cursor across the screen and managing its blinking animation.
+#[derive(Copy, Clone, Debug)]
 pub struct CursorSystem;
 
 impl<'s> System<'s> for CursorSystem {

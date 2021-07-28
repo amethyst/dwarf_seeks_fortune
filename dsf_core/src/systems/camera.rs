@@ -12,6 +12,7 @@ use amethyst::{
 
 /// This system handles player input to control certain aspects of the camera.
 /// Specifically: camera panning, camera zoom.
+#[derive(Copy, Clone, Debug)]
 pub struct CameraControlSystem;
 
 impl<'s> System<'s> for CameraControlSystem {
@@ -55,6 +56,7 @@ impl<'s> System<'s> for CameraControlSystem {
 }
 
 /// This system updates the camera frame position to center on the player's position.
+#[derive(Copy, Clone, Debug)]
 pub struct CameraSystem;
 
 impl<'s> System<'s> for CameraSystem {

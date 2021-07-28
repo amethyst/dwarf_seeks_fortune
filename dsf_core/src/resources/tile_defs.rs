@@ -43,7 +43,7 @@ impl<'a> TileDefinitions {
 /// asset not necessarily the same as the asset in editor. (Mob spawn)
 /// this tile map resource that is created, doesn't need to contain ALL tiles.
 ///
-#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct TileDefinition {
@@ -133,7 +133,7 @@ impl TileDefinition {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize)]
 pub enum DepthLayer {
     Background,
     DebugLines,
@@ -177,7 +177,7 @@ impl DepthLayer {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 /// If there are any special rules that apply to this tile, the archetype signals this.
 /// For example: a tile with the Archetype Player will be targeted by player input, etc.
@@ -199,7 +199,7 @@ pub enum Archetype {
 /// What it takes to break this block.
 /// This enum has two varieties now (breakable or not breakable) but further nuances could be added later.
 /// For example: more/less resistant to explosions, etc.
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
 pub enum Sturdiness {
     /// Cannot be targeted for demolition.
     Invulnerable,
@@ -236,7 +236,7 @@ impl Default for ToolType {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CollisionDefinition {
     /// Player can stand on these tiles. Examples include regular blocks and ladders.

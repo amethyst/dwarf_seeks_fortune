@@ -7,6 +7,7 @@ use amethyst::core::Transform;
 ///
 /// IE: if character falls out the bottom, they appear at top. If character goes off to the left,
 /// they wrap around to the right.
+#[derive(Copy, Clone, Debug)]
 pub struct LevelWrappingSystem;
 
 impl<'s> System<'s> for LevelWrappingSystem {

@@ -11,6 +11,7 @@ use amethyst::core::num::FloatConst;
 
 /// Responsible for animating the cursor previews (IE the ghostly outlines of the blocks that
 /// would get placed if the user would press 'place' at that time).
+#[derive(Copy, Clone, Debug)]
 pub struct AnimatePreviewsSystem;
 
 impl<'s> System<'s> for AnimatePreviewsSystem {

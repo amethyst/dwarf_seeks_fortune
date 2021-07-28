@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 /// - If a dimension is one, you couldn't expand one border without contracting the other border.
 const MIN_DIMENSION: i32 = 2;
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Copy, Clone)]
 pub struct WorldBounds {
     pub pos: Pos,
     pub dimens: Pos,

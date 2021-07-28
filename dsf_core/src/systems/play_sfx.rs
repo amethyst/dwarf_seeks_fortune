@@ -10,7 +10,7 @@ use amethyst::prelude::World;
 
 /// Elsewhere in the application, you can broadcast SoundEvents. The PlaySfxSystem below listens
 /// for such events and actually plays the sound effect that was requested.
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct SoundEvent {
     sound_type: SoundType,
 }
@@ -24,7 +24,7 @@ impl SoundEvent {
 /// This system is responsible for playing non-location-dependent sound effects.
 /// To play any sound effect, just broadcast a SoundEvent in the corresponding event channel.
 /// This system will take care of the rest.
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct PlaySfxSystem {
     reader_id: Option<ReaderId<SoundEvent>>,
 }

@@ -1,4 +1,12 @@
 #![forbid(unsafe_code)]
+#![deny(
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    unused,
+    nonstandard_style,
+    future_incompatible,
+    missing_copy_implementations
+)]
 
 //! This crate is not really used right now. The plan is to be able to run automated tests
 //! with AIs playing the role of the player to prove that the player will or will not be able to

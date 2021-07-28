@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]
 pub struct EditorConfig {

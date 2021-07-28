@@ -13,6 +13,7 @@ use crate::resources::*;
 use amethyst::core::ecs::ReadStorage;
 
 /// Responsible for managing the selection.
+#[derive(Copy, Clone, Debug)]
 pub struct SelectionSystem;
 
 impl<'s> System<'s> for SelectionSystem {

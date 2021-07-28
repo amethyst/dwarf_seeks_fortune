@@ -33,7 +33,7 @@ impl History {
     }
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Frame {
     pub player_position: Pos,
 }
@@ -46,7 +46,7 @@ impl Frame {
 
 /// Used to toggle systems on and off. Some systems can only run if the game is running normally.
 /// Some systems can only run if the game is rewinding.
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum CurrentState {
     Running,
     Rewinding,
@@ -59,7 +59,7 @@ impl Default for CurrentState {
 }
 
 /// Helper resource for the rewinding mechanism.
-#[derive(Debug, Default)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Rewind {
     /// The time in seconds until a new Frame can be popped off the History.
     pub cooldown: f32,

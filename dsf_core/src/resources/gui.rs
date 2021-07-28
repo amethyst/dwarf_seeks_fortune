@@ -37,7 +37,7 @@ impl UiHandles {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub enum UiType {
     /// Small debug FPS meter.
     Fps,

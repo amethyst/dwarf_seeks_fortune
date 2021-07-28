@@ -8,6 +8,7 @@ pub struct SignalEdgeDetector {
     map: HashMap<String, bool>,
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum SignalEdge {
     /// No signal edge. The signal was low the previous time you checked and it is still low now.
     /// For example: the key is in its idle state and is NOT being pressed right now.
