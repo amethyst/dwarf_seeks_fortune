@@ -73,16 +73,12 @@ impl<'s> System<'s> for TilePaintSystem {
             .for_each(|(pos, tile_def)| {
                 let still_asset = load_still_asset(tile_def, &assets);
                 let anim_asset = load_anim_asset(tile_def, &assets);
-                let transform = if let Some(asset) = &tile_def.asset {
-                    Some(load_transform(
+                let transform = tile_def.asset.as_ref().map(|asset| load_transform(
                         &pos,
                         &tile_def.depth,
                         &tile_def.dimens,
                         asset,
-                    ))
-                } else {
-                    None
-                };
+                    ));
                 let mut builder = entities.build_entity();
                 if let Some(still_asset) = still_asset {
                     builder = builder.with(still_asset, &mut sprite_renders);

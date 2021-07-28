@@ -124,8 +124,7 @@ fn level_files() -> Vec<String> {
                 None
             }
         })
-        .filter(|option| option.is_some())
-        .map(|option| option.unwrap())
+        .flatten()
         .collect()
 }
 

@@ -72,7 +72,7 @@ impl Assets {
                 None
             })
             .map(|sounds_of_that_type| {
-                let random_index = rand::thread_rng().gen_range(0, sounds_of_that_type.len());
+                let random_index = rand::thread_rng().gen_range(0..sounds_of_that_type.len());
                 (*sounds_of_that_type.get(random_index).expect("Should not panic.")).clone()
             })
     }
