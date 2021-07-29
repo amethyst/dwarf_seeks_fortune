@@ -21,7 +21,7 @@ const TOOL_HEIGHT: f32 = 2.;
 
 /// Checks if the player intersects any tools.
 /// If so, the tool will equipped by the player and will be removed from the game.
-#[derive(Default)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct PickupSystem;
 
 impl<'s> System<'s> for PickupSystem {
@@ -90,7 +90,7 @@ impl<'s> System<'s> for PickupSystem {
     }
 }
 
-#[derive(Default)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct UseToolSystem;
 
 impl<'s> System<'s> for UseToolSystem {

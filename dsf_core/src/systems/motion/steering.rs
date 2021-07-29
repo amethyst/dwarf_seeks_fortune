@@ -5,7 +5,7 @@ use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::{Time, Transform};
 use amethyst::ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorage};
 
-#[derive(Default)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct SteeringSystem;
 
 impl<'s> System<'s> for SteeringSystem {
@@ -48,7 +48,7 @@ impl<'s> System<'s> for SteeringSystem {
             }
 
             // The following if-else construction checks if the steering mode should be changed.
-            let has_ground_beneath_feet = is_grounded(&steering, &tile_map);
+            let has_ground_beneath_feet = is_grounded(steering, &tile_map);
             if steering.is_falling()
                 && anchored_y <= steering.pos.y as f32
                 && has_ground_beneath_feet
@@ -93,9 +93,9 @@ impl<'s> System<'s> for SteeringSystem {
                 && aligned_with_grid(steering.destination.y as f32, anchored_y, intent.climb)
                 && !intent.walk_invalidated
                 && ((intent.walk.is_positive()
-                    && !is_against_wall_right(&steering, steering.pos.y as f32, &tile_map))
+                    && !is_against_wall_right(steering, steering.pos.y as f32, &tile_map))
                     || (intent.walk.is_negative()
-                        && !is_against_wall_left(&steering, steering.pos.y as f32, &tile_map)))
+                        && !is_against_wall_left(steering, steering.pos.y as f32, &tile_map)))
             {
                 steering.mode = SteeringMode::Grounded;
             }
@@ -107,14 +107,14 @@ impl<'s> System<'s> for SteeringSystem {
                         steering.facing = Direction2D::from(intent.walk, Direction1D::Neutral);
                         let offset_from_destination = steering.destination.x as f32 - anchored_x;
                         if offset_from_destination < f32::EPSILON && intent.walk.is_positive() {
-                            if !is_against_wall_right(&steering, steering.pos.y as f32, &tile_map) {
+                            if !is_against_wall_right(steering, steering.pos.y as f32, &tile_map) {
                                 steering.destination.x = steering.pos.x + 1;
                                 sound_channel.single_write(SoundEvent::new(SoundType::Step));
                             }
                         } else if offset_from_destination > -f32::EPSILON
                             && intent.walk.is_negative()
                         {
-                            if !is_against_wall_left(&steering, steering.pos.y as f32, &tile_map) {
+                            if !is_against_wall_left(steering, steering.pos.y as f32, &tile_map) {
                                 steering.destination.x = steering.pos.x - 1;
                                 sound_channel.single_write(SoundEvent::new(SoundType::Step));
                             }
@@ -301,14 +301,14 @@ fn is_underneath_ceiling(steering: &Steering, tile_map: &TileMap) -> bool {
 }
 
 fn is_against_wall_left(steering: &Steering, anchored_y: f32, tile_map: &TileMap) -> bool {
-    is_against_wall(&steering, anchored_y, &tile_map, -1, 0)
+    is_against_wall(steering, anchored_y, tile_map, -1, 0)
 }
 
 fn is_against_wall_right(steering: &Steering, anchored_y: f32, tile_map: &TileMap) -> bool {
     is_against_wall(
-        &steering,
+        steering,
         anchored_y,
-        &tile_map,
+        tile_map,
         steering.dimens.x,
         steering.dimens.x - 1,
     )
@@ -344,7 +344,7 @@ fn is_against_wall(
 }
 
 fn can_climb_up(steering: &Steering, tile_map: &TileMap) -> bool {
-    can_climb(steering, tile_map, (0, 1)) && !is_underneath_ceiling(steering, &tile_map)
+    can_climb(steering, tile_map, (0, 1)) && !is_underneath_ceiling(steering, tile_map)
 }
 
 fn can_climb_down(steering: &Steering, tile_map: &TileMap) -> bool {

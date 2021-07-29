@@ -10,6 +10,7 @@ use amethyst::shrev::EventChannel;
 use amethyst::ui::{UiFinder, UiText};
 
 /// Responsible for moving the map cursor in the adventure and level selection.
+#[derive(Copy, Clone, Debug)]
 pub struct MapCursorSystem;
 
 impl<'s> System<'s> for MapCursorSystem {
@@ -100,6 +101,7 @@ fn move_cursor(
 
 /// Updates the UI label on the adventure and level select screen. The label must always display the
 /// name of the currently selected node.
+#[derive(Copy, Clone, Debug)]
 pub struct LevelSelectUiUpdateSystem;
 
 impl<'s> System<'s> for LevelSelectUiUpdateSystem {

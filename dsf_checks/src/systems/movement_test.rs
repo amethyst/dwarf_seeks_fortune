@@ -5,7 +5,7 @@ use amethyst::core::ecs::Entities;
 use amethyst::ecs::prelude::{ReadStorage, System};
 
 /// This shows how to handle UI events.
-#[derive(Default)]
+#[derive(Copy, Clone, Default)]
 pub struct TestSetupSystem;
 
 impl<'s> System<'s> for TestSetupSystem {

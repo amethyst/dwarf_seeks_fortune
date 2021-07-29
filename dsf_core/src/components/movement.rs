@@ -161,7 +161,7 @@ impl Add for Pos {
 ///
 /// Any non-particle entity that has movement should have steering.
 /// Examples of entities with steering include the Player, enemies and projectiles.
-#[derive(Clone, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[derive(Copy, Clone, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
 pub struct Steering {
@@ -188,7 +188,7 @@ impl Component for Steering {
 /// Specifies how the entity intents to move. For the player, this is mostly informed by the
 /// keyboard input. For enemies, this will be set by the AI. For all entities with Steering,
 /// the SteeringSystem then actually moves the entity based on this intent.
-#[derive(Clone, Debug, Default, Deserialize, Serialize, PrefabData)]
+#[derive(Copy, Clone, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
 pub struct SteeringIntent {
@@ -224,7 +224,7 @@ impl Component for SteeringIntent {
 }
 
 /// SteeringMode influences max speeds, ability to jump, ability to move, etc.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub enum SteeringMode {
     /// Standard mode. There is flat ground beneath the entity and the entity can either move
     /// horizontally or initiate a jump.
@@ -363,7 +363,7 @@ impl Steering {
     ///
     /// The discrete position is the bottom-left corner of the entity, a translation is the
     /// center point of the entity.
-    pub fn to_centered_coords(&self, pos: Pos) -> (f32, f32) {
+    pub fn to_centered_coords(self, pos: Pos) -> (f32, f32) {
         (
             pos.x as f32 + 0.5 * self.dimens.x as f32,
             pos.y as f32 + 0.5 * self.dimens.y as f32,
@@ -374,7 +374,7 @@ impl Steering {
     /// anchored coordinates, describing the bottom-left corner of the entity.
     ///
     /// Note that this does NOT return a discrete position: output is not rounded or floored.
-    pub fn to_anchor_coords(&self, transform: &Transform) -> (f32, f32) {
+    pub fn to_anchor_coords(self, transform: &Transform) -> (f32, f32) {
         (
             transform.translation().x - 0.5 * self.dimens.x as f32,
             transform.translation().y - 0.5 * self.dimens.y as f32,

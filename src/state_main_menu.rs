@@ -28,11 +28,11 @@ impl MainMenuState {
         MainMenuState::default()
     }
 
-    fn init_ui(&mut self, data: StateData<GameData>) {
+    fn init_ui(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         UiHandles::add_ui(&UiType::Fps, data.world);
         self.ui = UiHandles::add_ui(&UiType::MainMenu, data.world);
         // invoke a world update to finish creating our ui entities
-        data.data.update(&data.world);
+        data.data.update(data.world);
         // look up our buttons
         data.world.exec(|ui_finder: UiFinder<'_>| {
             self.play_button = ui_finder.find(PLAY_BUTTON_ID);
@@ -44,12 +44,12 @@ impl MainMenuState {
 }
 
 impl SimpleState for MainMenuState {
-    fn on_start(&mut self, data: StateData<GameData>) {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("MainMenuState on_start");
         self.init_ui(data);
     }
 
-    fn on_pause(&mut self, data: StateData<GameData>) {
+    fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("MainMenuState on_pause");
         data.world.delete_all();
         self.play_button = None;
@@ -58,12 +58,16 @@ impl SimpleState for MainMenuState {
         self.exit_button = None;
     }
 
-    fn on_resume(&mut self, data: StateData<GameData>) {
+    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("MainMenuState on_resume");
         self.init_ui(data);
     }
 
-    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
+    fn handle_event(
+        &mut self,
+        data: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         match event {
             StateEvent::Window(event) => {
@@ -93,7 +97,7 @@ impl SimpleState for MainMenuState {
         }
     }
 
-    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         let skip_straight_to_editor =
             (*data.world.read_resource::<DebugSettings>()).skip_straight_to_editor;
         if skip_straight_to_editor {

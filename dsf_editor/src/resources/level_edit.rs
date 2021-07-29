@@ -54,7 +54,7 @@ impl LevelEdit {
     pub(crate) fn place_tile(&mut self, force_place: bool, pos: Pos, tile: Option<Tile>) {
         let mut dry_run = self.check_place_tile(force_place, pos, tile);
         dry_run.to_be_removed.iter().for_each(|delete_pos| {
-            if let Some(removed_pos) = self.tile_map.remove_tile(&delete_pos) {
+            if let Some(removed_pos) = self.tile_map.remove_tile(delete_pos) {
                 self.dirty.insert(removed_pos);
             }
         });

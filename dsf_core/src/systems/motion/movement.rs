@@ -11,6 +11,7 @@ use amethyst::{
 
 /// For every entity with a velocity and a transform, updates the transform according to the
 /// velocity.
+#[derive(Copy, Clone, Debug)]
 pub struct VelocitySystem;
 
 impl<'s> System<'s> for VelocitySystem {
@@ -31,6 +32,7 @@ impl<'s> System<'s> for VelocitySystem {
 }
 
 /// Sets velocity for all entities with steering.
+#[derive(Copy, Clone, Debug)]
 pub struct MovementSystem;
 
 impl<'s> System<'s> for MovementSystem {

@@ -13,7 +13,7 @@ use crate::levels::{load_asset_from_world, load_transform, LevelSave};
 use crate::resources::{AssetType, DepthLayer, SpriteType, UserCache};
 use crate::utility::files::{get_adventures_dir, get_levels_dir};
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize, Default)]
 pub struct PositionOnMap {
     pub pos: Pos,
 }
@@ -56,7 +56,7 @@ pub enum NodeDetails {
     Level(String),
 }
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize, Default)]
 pub struct Road {
     pub start_id: u16,
     pub end_id: u16,
@@ -162,7 +162,7 @@ fn cursor_position(path: &Path, world: &mut World) -> Pos {
 fn load_cursor(world: &mut World, pos: &Pos) {
     let sprite_render = load_asset_from_world(&SpriteType::LevelSelect, 3, world);
     let transform = load_transform(
-        &pos,
+        pos,
         &DepthLayer::Player,
         &Pos::new(1, 1),
         &AssetType::Still(SpriteType::LevelSelect, 3),

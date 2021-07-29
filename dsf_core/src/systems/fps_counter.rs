@@ -5,7 +5,7 @@ use amethyst::{
     utils::fps_counter::FpsCounter,
 };
 
-#[derive(Default)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct FpsCounterUiSystem {
     maybe_fps_entity: Option<Entity>,
 }

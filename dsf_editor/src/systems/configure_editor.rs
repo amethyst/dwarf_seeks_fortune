@@ -16,6 +16,7 @@ use dsf_core::resources::{AssetType, Assets, SignalEdge, SignalEdgeDetector, Spr
 /// - Toggling the copy-air flag.
 /// - Toggling the force-place flag.
 ///
+#[derive(Copy, Clone, Debug)]
 pub struct ConfigureEditorSystem;
 
 impl<'s> System<'s> for ConfigureEditorSystem {
@@ -48,6 +49,7 @@ impl<'s> System<'s> for ConfigureEditorSystem {
 }
 
 /// Updates the UI images for the copy-air and force-place flags and for the active brush.
+#[derive(Copy, Clone, Debug)]
 pub struct EditorUiUpdateSystem;
 
 impl<'s> System<'s> for EditorUiUpdateSystem {
@@ -105,8 +107,8 @@ impl<'s> System<'s> for EditorUiUpdateSystem {
 
 fn get_image<'a>(
     key: &str,
-    finder: &UiFinder,
-    ui_image: &'a mut WriteStorage<UiImage>,
+    finder: &UiFinder<'_>,
+    ui_image: &'a mut WriteStorage<'_, UiImage>,
 ) -> Option<&'a mut UiImage> {
     let toggle_entity = finder.find(key);
     if let Some(toggle_entity) = toggle_entity {

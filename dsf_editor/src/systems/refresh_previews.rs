@@ -14,13 +14,13 @@ use dsf_core::levels::attach_graphics;
 use dsf_core::resources::DepthLayer;
 
 /// Send this through the event bus in order to trigger a complete refresh of the previews.
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct RefreshPreviewsEvent;
 
 /// Responsible for refreshing the preview when it receives the signal to do so through its event
 /// bus. This will add a red tint to all existing tiles that are due to be removed. It will also
 /// add ghost images for all the tiles that are due to be added.
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct RefreshPreviewsSystem {
     reader_id: Option<ReaderId<RefreshPreviewsEvent>>,
 }
@@ -104,7 +104,7 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
                         world,
                         preview,
                         &asset,
-                        &dimens,
+                        dimens,
                         Some(Tint(Srgba::new(0.5, 0.5, 0.5, 0.7))),
                     );
                 });

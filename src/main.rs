@@ -1,4 +1,13 @@
 #![forbid(unsafe_code)]
+#![deny(
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    unused,
+    nonstandard_style,
+    future_incompatible,
+    missing_copy_implementations,
+    missing_debug_implementations
+)]
 
 #[macro_use]
 extern crate log;

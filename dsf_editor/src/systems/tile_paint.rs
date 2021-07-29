@@ -18,6 +18,7 @@ use amethyst::renderer::resources::Tint;
 
 /// Clears all dirty tiles, then adds all dirty tiles back in.
 /// At the end of this system's execution, no tiles should be left dirty.
+#[derive(Copy, Clone, Debug)]
 pub struct TilePaintSystem;
 
 impl<'s> System<'s> for TilePaintSystem {
@@ -64,7 +65,7 @@ impl<'s> System<'s> for TilePaintSystem {
             .drain_dirty()
             .drain(..)
             // Do not create entities for dummy tiles:
-            .filter(|pos| level_edit.tile_map.is_tile_def_key(&pos))
+            .filter(|pos| level_edit.tile_map.is_tile_def_key(pos))
             .map(|dirty_pos| {
                 let tile_def = level_edit.tile_map.get_tile(&dirty_pos)
                     .expect("Cannot panic, we previously checked that there is a proper tile in this location.");

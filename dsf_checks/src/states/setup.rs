@@ -11,7 +11,7 @@ pub fn setup_test(test: MovementTest, world: &mut World) {
 
 fn clear_previous_test(world: &mut World) {
     world.exec(
-        |(entities, tags): (Entities, ReadStorage<MovementTestScopeTag>)| {
+        |(entities, tags): (Entities<'_>, ReadStorage<'_, MovementTestScopeTag>)| {
             for (entity, _) in (&entities, &tags).join() {
                 entities
                     .delete(entity)

@@ -18,6 +18,7 @@ use amethyst::{
     utils::fps_counter::FpsCounterBundle,
 };
 
+#[derive(Debug)]
 pub struct PrecompiledRenderBundle {
     pub display_config_path: PathBuf,
 }
@@ -46,6 +47,7 @@ impl<'a, 'b> SystemBundle<'a, 'b> for PrecompiledRenderBundle {
     }
 }
 
+#[derive(Debug)]
 pub struct PrecompiledDefaultsBundle {
     pub bindings_config_path: PathBuf,
 }

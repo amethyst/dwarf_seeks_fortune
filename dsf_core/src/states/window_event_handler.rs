@@ -45,12 +45,12 @@ fn resize_camera(world: &mut World) {
     world.exec(
         #[allow(clippy::type_complexity)]
         |data: (
-            Entities,
-            WriteStorage<Camera>,
-            WriteStorage<Transform>,
-            WriteStorage<Parent>,
-            ReadStorage<CameraFrame>,
-            ReadExpect<ScreenDimensions>,
+            Entities<'_>,
+            WriteStorage<'_, Camera>,
+            WriteStorage<'_, Transform>,
+            WriteStorage<'_, Parent>,
+            ReadStorage<'_, CameraFrame>,
+            ReadExpect<'_, ScreenDimensions>,
         )| {
             let (entities, mut cameras, mut transforms, mut parents, camera_frames, screen_dimens) =
                 data;

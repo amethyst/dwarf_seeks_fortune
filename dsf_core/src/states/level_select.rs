@@ -54,7 +54,7 @@ impl<'a, 'b> LevelSelectState {
     /// - If the user selected an adventure, that adventure will be opened in a nested LevelSelect state.
     fn select_node(world: &mut World) -> SimpleTrans {
         world.exec(
-            |(adventure, pos_on_map): (Read<Adventure>, Read<PositionOnMap>)| {
+            |(adventure, pos_on_map): (Read<'_, Adventure>, Read<'_, PositionOnMap>)| {
                 let selected_node = adventure.nodes.get(&pos_on_map.pos);
                 match selected_node {
                     Some(MapElement::Node(AdventureNode {
@@ -82,7 +82,7 @@ impl<'a, 'b> LevelSelectState {
     fn perform_shutdown(&self, world: &mut World) {
         world.delete_all();
         world.exec(
-            |(pos_on_map, mut user_cache): (Read<PositionOnMap>, Write<UserCache>)| {
+            |(pos_on_map, mut user_cache): (Read<'_, PositionOnMap>, Write<'_, UserCache>)| {
                 user_cache.save_adventure_map_pos(
                     self.adventure_file
                         .file_name()
@@ -98,13 +98,13 @@ impl<'a, 'b> LevelSelectState {
 }
 
 impl SimpleState for LevelSelectState {
-    fn on_start(&mut self, data: StateData<GameData>) {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("LevelSelectState on_start");
         self.dispatcher.setup(data.world);
         self.perform_setup(data.world);
     }
 
-    fn on_stop(&mut self, data: StateData<GameData>) {
+    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("LevelSelectState on_stop");
         self.perform_shutdown(data.world);
     }
@@ -119,7 +119,11 @@ impl SimpleState for LevelSelectState {
         self.perform_setup(data.world);
     }
 
-    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
+    fn handle_event(
+        &mut self,
+        data: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         match event {
             // Events related to the window and inputs.
@@ -145,7 +149,7 @@ impl SimpleState for LevelSelectState {
     }
 
     fn fixed_update(&mut self, data: StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
-        self.dispatcher.dispatch(&data.world);
+        self.dispatcher.dispatch(data.world);
         Trans::None
     }
 }

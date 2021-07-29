@@ -33,7 +33,7 @@ pub struct LoadingState {
 }
 
 impl SimpleState for LoadingState {
-    fn on_start(&mut self, data: StateData<GameData>) {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         load_configs(data.world);
         self.load_ui = Some(data.world.exec(|mut creator: UiCreator<'_>| {
             creator.create("ui/loading.ron", &mut self.progress)
@@ -136,7 +136,7 @@ impl SimpleState for LoadingState {
         data.world.insert(music_resource);
     }
 
-    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         match self.progress.complete() {
             Completion::Failed => {
                 error!("Failed loading assets");

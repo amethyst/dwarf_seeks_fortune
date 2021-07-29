@@ -36,7 +36,7 @@ pub fn load_level(level_file: &Path, world: &mut World) -> Result<(), ConfigErro
         let transform = tile_def
             .asset
             .as_ref()
-            .map(|asset| load_transform(&pos, &tile_def.depth, &tile_def.dimens, asset));
+            .map(|asset| load_transform(pos, &tile_def.depth, &tile_def.dimens, asset));
         let mut builder = world.create_entity();
         if let Some(still_asset) = still_asset {
             builder = builder.with(still_asset);
@@ -86,7 +86,7 @@ pub fn load_level(level_file: &Path, world: &mut World) -> Result<(), ConfigErro
     Ok(())
 }
 
-fn build_player(builder: EntityBuilder, pos: &Pos, tile_def: &TileDefinition) -> Entity {
+fn build_player(builder: EntityBuilder<'_>, pos: &Pos, tile_def: &TileDefinition) -> Entity {
     builder
         .with(Transparent)
         .with(Velocity::default())
@@ -113,12 +113,14 @@ pub fn add_background(world: &mut World, world_bounds: &WorldBounds) {
 }
 
 fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
-    let door_entity = world.exec(|(doors, entities): (ReadStorage<ExitDoor>, Entities)| {
-        (&doors, &entities)
-            .join()
-            .map(|(_, entity)| (entity))
-            .next()
-    });
+    let door_entity = world.exec(
+        |(doors, entities): (ReadStorage<'_, ExitDoor>, Entities<'_>)| {
+            (&doors, &entities)
+                .join()
+                .map(|(_, entity)| (entity))
+                .next()
+        },
+    );
     if let Some(door_entity) = door_entity {
         win_condition
             .keys
@@ -200,7 +202,7 @@ fn build_frames(world: &mut World, tile_def: &TileDefinition) {
 }
 
 pub fn load_transform(pos: &Pos, depth: &DepthLayer, dimens: &Pos, asset: &AssetType) -> Transform {
-    let asset_dimensions = get_asset_dimensions(&asset);
+    let asset_dimensions = get_asset_dimensions(asset);
     let mut transform = Transform::default();
     transform.set_translation_xyz(
         pos.x as f32 + dimens.x as f32 * 0.5,
@@ -219,7 +221,7 @@ pub fn load_still_asset(tile: &TileDefinition, assets: &Assets) -> Option<Sprite
     match &tile.asset? {
         AssetType::Animated(..) => None,
         AssetType::Still(spritesheet, sprite_nr) => {
-            let handle = assets.get_still(&spritesheet);
+            let handle = assets.get_still(spritesheet);
             Some(SpriteRender {
                 sprite_sheet: handle,
                 sprite_number: *sprite_nr,
@@ -253,7 +255,7 @@ pub fn load_anim_asset(
 ) -> Option<Handle<Prefab<MyPrefabData>>> {
     match &tile.asset? {
         AssetType::Animated(anim) => {
-            let handle = assets.get_animated(&anim);
+            let handle = assets.get_animated(anim);
             Some(handle)
         }
         AssetType::Still(..) => None,
@@ -291,7 +293,7 @@ pub fn attach_graphics(
 }
 
 fn transform_scale(dimens: &Pos, asset: &AssetType) -> Transform {
-    let asset_dimensions = get_asset_dimensions(&asset);
+    let asset_dimensions = get_asset_dimensions(asset);
     let mut transform = Transform::default();
     transform.set_scale(Vector3::new(
         dimens.x as f32 / asset_dimensions.x as f32,

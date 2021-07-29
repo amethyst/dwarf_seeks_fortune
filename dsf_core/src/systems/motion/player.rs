@@ -5,7 +5,7 @@ use amethyst::core::Time;
 use amethyst::input::{InputHandler, StringBindings};
 
 /// Sets the player intention to move.
-#[derive(Default)]
+#[derive(Copy, Clone, Default, Debug)]
 pub struct PlayerSystem;
 
 impl<'s> System<'s> for PlayerSystem {

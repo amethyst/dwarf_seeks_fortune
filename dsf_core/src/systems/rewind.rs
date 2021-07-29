@@ -7,6 +7,7 @@ use amethyst::{
     input::{InputHandler, StringBindings},
 };
 
+#[derive(Copy, Clone, Debug)]
 pub struct RewindControlSystem;
 
 impl<'s> System<'s> for RewindControlSystem {
@@ -46,6 +47,7 @@ impl<'s> System<'s> for RewindControlSystem {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
 pub struct RewindSystem;
 
 impl<'s> System<'s> for RewindSystem {

@@ -42,7 +42,7 @@ impl Default for MovementTestState {
 }
 
 impl SimpleState for MovementTestState {
-    fn on_start(&mut self, data: StateData<GameData>) {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("MovementTestState on_start");
         self.dispatcher.setup(data.world);
         UiHandles::add_ui(&UiType::Fps, data.world);
@@ -50,12 +50,16 @@ impl SimpleState for MovementTestState {
         data.world.insert(History::default());
     }
 
-    fn on_stop(&mut self, data: StateData<GameData>) {
+    fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("MovementTestState on_stop");
         data.world.delete_all();
     }
 
-    fn handle_event(&mut self, data: StateData<GameData>, event: StateEvent) -> SimpleTrans {
+    fn handle_event(
+        &mut self,
+        data: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
         window_event_handler::handle(&event, data.world);
         match event {
             // Events related to the window and inputs.
@@ -93,15 +97,15 @@ impl SimpleState for MovementTestState {
         }
     }
 
-    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         self.dispatcher.dispatch(&data.world);
         // Execute a pass similar to a system
         data.world.exec(
             #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
-                Entities,
-                ReadStorage<AnimationSet<AnimationId, SpriteRender>>,
-                WriteStorage<AnimationControlSet<AnimationId, SpriteRender>>,
+                Entities<'_>,
+                ReadStorage<'_, AnimationSet<AnimationId, SpriteRender>>,
+                WriteStorage<'_, AnimationControlSet<AnimationId, SpriteRender>>,
             )| {
                 // For each entity that has AnimationSet
                 for (entity, animation_set) in (&entities, &animation_sets).join() {

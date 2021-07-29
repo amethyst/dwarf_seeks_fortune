@@ -18,6 +18,7 @@ impl Component for MovementTestScopeTag {
 }
 
 /// Various sorts of tests that can be executed.
+#[derive(Copy, Clone, Debug)]
 pub enum MovementTest {
     /// This test will prove that the player can ALWAYS make a jump across a 2-wide gap.
     Jump2Wide,

@@ -8,6 +8,7 @@ use crate::resources::{Blueprint, EditorStatus, LevelEdit};
 use crate::systems::RefreshPreviewsEvent;
 
 /// Responsible for placing and removing tiles based on player input.
+#[derive(Copy, Clone, Debug)]
 pub struct PlaceTilesSystem;
 
 impl<'s> System<'s> for PlaceTilesSystem {

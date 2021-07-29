@@ -11,6 +11,7 @@ use crate::components::*;
 /// Add the component to this system temporarily, and the game will stop crashing.
 ///
 /// ... It's not pretty, I know.
+#[derive(Copy, Clone, Debug)]
 pub struct DummySystem;
 
 impl<'s> System<'s> for DummySystem {
@@ -22,6 +23,7 @@ impl<'s> System<'s> for DummySystem {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
 pub struct DebugSystem;
 
 impl<'s> System<'s> for DebugSystem {
