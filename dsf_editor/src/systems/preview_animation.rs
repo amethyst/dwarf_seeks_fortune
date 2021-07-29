@@ -5,7 +5,7 @@ use amethyst::{
     ecs::prelude::{Join, Read, ReadStorage, System, WriteStorage},
 };
 
-use crate::components::*;
+use crate::components::PreviewGhostTag;
 
 use amethyst::core::num::FloatConst;
 

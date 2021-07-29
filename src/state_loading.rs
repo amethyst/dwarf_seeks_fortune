@@ -24,7 +24,7 @@ use dsf_editor::resources::EditorConfig;
 /// This state is briefly active when the game is first started up. It loads all assets used in the
 /// entire game and then switches to the main menu state.
 ///
-/// If you want to add a new asset that should be loaded, please go to LoadingConfig and add it
+/// If you want to add a new asset that should be loaded, please go to `LoadingConfig` and add it
 /// there.
 #[derive(Default)]
 pub struct LoadingState {
@@ -154,8 +154,8 @@ impl SimpleState for LoadingState {
     }
 }
 
-/// Load the LoadingConfig from file. The LoadingConfig contains information on what assets must be
-/// loaded by this LoadingState.
+/// Load the `LoadingConfig` from file. The `LoadingConfig` contains information on what assets must be
+/// loaded by this `LoadingState`.
 fn load_loading_config() -> LoadingConfig {
     LoadingConfig::load(&get_config_dir().join("loading.ron")).unwrap_or_else(|error| {
         error!(

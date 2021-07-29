@@ -1,6 +1,6 @@
 use amethyst::ecs::{prelude::World, Entities, Join, ReadStorage};
 
-use crate::components::*;
+use crate::components::{MovementTest, MovementTestScopeTag};
 use dsf_core::levels::load_level;
 use dsf_core::utility::files::get_assets_dir;
 

@@ -8,7 +8,7 @@ use dsf_core::levels::load_sprite_render;
 use dsf_core::resources::{AssetType, Assets, SignalEdge, SignalEdgeDetector, SpriteType};
 
 /// Responsible for changing transient configurations for the editor. These settings stay alive
-/// as long as the EditorState lives.
+/// as long as the `EditorState` lives.
 ///
 /// Currently, this system is responsible for:
 ///
@@ -20,7 +20,6 @@ use dsf_core::resources::{AssetType, Assets, SignalEdge, SignalEdgeDetector, Spr
 pub struct ConfigureEditorSystem;
 
 impl<'s> System<'s> for ConfigureEditorSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<RefreshPreviewsEvent>>,
         Read<'s, InputHandler<StringBindings>>,
@@ -53,7 +52,6 @@ impl<'s> System<'s> for ConfigureEditorSystem {
 pub struct EditorUiUpdateSystem;
 
 impl<'s> System<'s> for EditorUiUpdateSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, UiImage>,
         UiFinder<'s>,
@@ -67,7 +65,7 @@ impl<'s> System<'s> for EditorUiUpdateSystem {
         if let Some(toggle_copy_air) = toggle_copy_air {
             let sprite_nr = if status.copy_air { 0 } else { 1 };
             *toggle_copy_air = UiImage::Sprite(load_sprite_render(
-                &SpriteType::EditorUiIcons,
+                SpriteType::EditorUiIcons,
                 sprite_nr,
                 &assets,
             ));
@@ -76,7 +74,7 @@ impl<'s> System<'s> for EditorUiUpdateSystem {
         if let Some(toggle_force_place) = toggle_force_place {
             let sprite_nr = 2 + if status.force_place { 0 } else { 1 };
             *toggle_force_place = UiImage::Sprite(load_sprite_render(
-                &SpriteType::EditorUiIcons,
+                SpriteType::EditorUiIcons,
                 sprite_nr,
                 &assets,
             ));
@@ -88,14 +86,13 @@ impl<'s> System<'s> for EditorUiUpdateSystem {
                 .get_key()
                 .as_ref()
                 .map(|selected_key| level_edit.get_tile_def(selected_key))
-                .map(|tile_def| {
+                .and_then(|tile_def| {
                     if let AssetType::Still(sprite, sprite_nr) = tile_def.get_preview() {
-                        Some(load_sprite_render(&sprite, sprite_nr, &assets))
+                        Some(load_sprite_render(sprite, sprite_nr, &assets))
                     } else {
                         None
                     }
                 })
-                .flatten()
             {
                 *brush_preview = UiImage::Sprite(sprite_render);
             } else {
@@ -111,9 +108,5 @@ fn get_image<'a>(
     ui_image: &'a mut WriteStorage<'_, UiImage>,
 ) -> Option<&'a mut UiImage> {
     let toggle_entity = finder.find(key);
-    if let Some(toggle_entity) = toggle_entity {
-        ui_image.get_mut(toggle_entity)
-    } else {
-        None
-    }
+    toggle_entity.and_then(move |toggle_entity| ui_image.get_mut(toggle_entity))
 }

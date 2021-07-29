@@ -24,7 +24,7 @@ pub struct AudioSettings {
 /// These will only be used if the settings cannot be loaded from either the user settings or
 /// the default settings files. Under normal circumstances, these values WILL NOT BE USED.
 ///
-/// To change the default settings, check out the assets/config/default_settings/audio.ron file.
+/// To change the default settings, check out the `assets/config/default_settings/audio.ron` file.
 impl Default for AudioSettings {
     fn default() -> Self {
         AudioSettings {
@@ -35,7 +35,7 @@ impl Default for AudioSettings {
 }
 
 impl AudioSettings {
-    /// Add the given delta to the current music volume and write the SoundConfig to a user
+    /// Add the given delta to the current music volume and write the `SoundConfig` to a user
     /// settings file.
     pub fn add_to_music_volume(&mut self, delta: f32) {
         self.music_volume = Self::add_volume(self.music_volume, delta);
@@ -43,7 +43,7 @@ impl AudioSettings {
             .expect("Failed to write user audio settings file.");
     }
 
-    /// Add the given delta to the current sound effects volume and write the SoundConfig to a user
+    /// Add the given delta to the current sound effects volume and write the `SoundConfig` to a user
     /// settings file.
     pub fn add_to_sfx_volume(&mut self, delta: f32) {
         self.sound_effects_volume = Self::add_volume(self.sound_effects_volume, delta);
@@ -66,11 +66,13 @@ impl AudioSettings {
     }
 
     /// Return a pretty printed representation of the music volume.
+    #[must_use]
     pub fn format_music_volume(&self) -> String {
         Self::format_volume(self.music_volume)
     }
 
     /// Return a pretty printed representation of the sound effects volume.
+    #[must_use]
     pub fn format_sfx_volume(&self) -> String {
         Self::format_volume(self.sound_effects_volume)
     }
@@ -84,13 +86,14 @@ impl AudioSettings {
     }
 }
 
-/// Loads the most relevant instance of AudioSettings.
+/// Loads the most relevant instance of `AudioSettings`.
 ///
-/// If the user AudioSettings file exists, tries to load from user settings first. If that fails,
+/// If the user `AudioSettings` file exists, tries to load from user settings first. If that fails,
 /// log an error and try to load from default settings.
 ///
-/// If the default AudioSettings file fails to load, fall back to the Default trait implementation
-/// as a last resort (ie: AudioSettings::default()).
+/// If the default `AudioSettings` file fails to load, fall back to the Default trait implementation
+/// as a last resort (ie: `AudioSettings::default()`).
+#[must_use]
 pub fn load_audio_settings() -> AudioSettings {
     let user_settings_file = get_user_settings_dir().join("audio.ron");
     if user_settings_file.exists() {

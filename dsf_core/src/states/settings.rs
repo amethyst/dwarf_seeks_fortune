@@ -28,9 +28,9 @@ pub struct SettingsState {
 }
 
 impl SettingsState {
-    fn init_ui(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        UiHandles::add_ui(&UiType::Fps, data.world);
-        self.ui = UiHandles::add_ui(&UiType::Settings, data.world);
+    fn init_ui(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) {
+        UiHandles::add_ui(UiType::Fps, data.world);
+        self.ui = UiHandles::add_ui(UiType::Settings, data.world);
         // invoke a world update to finish creating our ui entities
         data.data.update(data.world);
         // look up our buttons
@@ -101,9 +101,9 @@ impl SettingsState {
 }
 
 impl SimpleState for SettingsState {
-    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+    fn on_start(&mut self, mut data: StateData<'_, GameData<'_, '_>>) {
         info!("SettingsState on_start");
-        self.init_ui(data);
+        self.init_ui(&mut data);
     }
 
     fn on_stop(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -122,9 +122,9 @@ impl SimpleState for SettingsState {
         self.label_sfx_volume = None;
     }
 
-    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+    fn on_resume(&mut self, mut data: StateData<'_, GameData<'_, '_>>) {
         info!("SettingsState on_resume");
-        self.init_ui(data);
+        self.init_ui(&mut data);
     }
 
     fn handle_event(

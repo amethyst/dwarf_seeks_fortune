@@ -8,8 +8,8 @@ use amethyst::{
 
 use dsf_core::resources::DepthLayer;
 
-use crate::components::*;
-use crate::resources::*;
+use crate::components::SelectionTag;
+use crate::resources::EditorStatus;
 use amethyst::core::ecs::ReadStorage;
 
 /// Responsible for managing the selection.
@@ -17,7 +17,6 @@ use amethyst::core::ecs::ReadStorage;
 pub struct SelectionSystem;
 
 impl<'s> System<'s> for SelectionSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, SelectionTag>,

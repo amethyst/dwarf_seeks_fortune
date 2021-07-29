@@ -63,13 +63,14 @@ impl DebugSettings {
     }
 }
 
-/// Loads the most relevant instance of DebugSettings.
+/// Loads the most relevant instance of `DebugSettings`.
 ///
-/// If the user DebugSettings file exists, tries to load from user settings first. If that fails,
+/// If the user `DebugSettings` file exists, tries to load from user settings first. If that fails,
 /// log an error and try to load from default settings.
 ///
-/// If the default DebugSettings file fails to load, fall back to the Default trait implementation
-/// as a last resort (ie: DebugSettings::default()).
+/// If the default `DebugSettings` file fails to load, fall back to the Default trait implementation
+/// as a last resort (ie: `DebugSettings::default()`).
+#[must_use]
 pub fn load_debug_settings() -> DebugSettings {
     let user_settings_file = get_user_settings_dir().join("debug.ron");
     if user_settings_file.exists() {

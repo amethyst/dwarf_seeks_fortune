@@ -13,9 +13,15 @@ use amethyst::{
 
 use dsf_precompile::MyPrefabData;
 
-use crate::components::*;
+use crate::components::{
+    BackgroundTag, Block, DebugPosGhostTag, DebugSteeringGhostTag, ExitDoor, Key, KeyDisplay,
+    Player, Pos, Steering, SteeringIntent, Tool, Velocity,
+};
 use crate::levels::LevelSave;
-use crate::resources::*;
+use crate::resources::{
+    get_asset_dimensions, Archetype, AssetType, Assets, DebugSettings, DepthLayer, History,
+    SpriteType, TileDefinition, TileDefinitions, TileMap, WinCondition, WorldBounds,
+};
 use crate::utility::files::get_world_dir;
 
 pub fn load_tile_definitions() -> Result<TileDefinitions, ConfigError> {
@@ -36,7 +42,7 @@ pub fn load_level(level_file: &Path, world: &mut World) -> Result<(), ConfigErro
         let transform = tile_def
             .asset
             .as_ref()
-            .map(|asset| load_transform(pos, &tile_def.depth, &tile_def.dimens, asset));
+            .map(|asset| load_transform(*pos, tile_def.depth, tile_def.dimens, asset));
         let mut builder = world.create_entity();
         if let Some(still_asset) = still_asset {
             builder = builder.with(still_asset);
@@ -50,13 +56,13 @@ pub fn load_level(level_file: &Path, world: &mut World) -> Result<(), ConfigErro
         builder = builder.with(Block { pos: *pos });
         match tile_def.archetype {
             Some(Archetype::Player) => {
-                let _ = build_player(builder, pos, tile_def);
+                let _ = build_player(builder, *pos, tile_def);
                 if display_debug_frames {
                     build_frames(world, tile_def);
                 }
             }
             Some(Archetype::Key) => {
-                win_condition.add_key(pos);
+                win_condition.add_key(*pos);
                 builder.with(Key::new(*pos)).build();
             }
             Some(Archetype::Tool(tool_type)) => {
@@ -81,29 +87,29 @@ pub fn load_level(level_file: &Path, world: &mut World) -> Result<(), ConfigErro
     });
     add_key_displays_to_door(world, &win_condition);
     world.insert(win_condition);
-    world.insert(TileMap::for_play(level, tile_defs));
+    world.insert(TileMap::for_play(&level, tile_defs));
     world.insert(History::default());
     Ok(())
 }
 
-fn build_player(builder: EntityBuilder<'_>, pos: &Pos, tile_def: &TileDefinition) -> Entity {
+fn build_player(builder: EntityBuilder<'_>, pos: Pos, tile_def: &TileDefinition) -> Entity {
     builder
         .with(Transparent)
         .with(Velocity::default())
         .with(SteeringIntent::default())
-        .with(Steering::new(*pos, tile_def.dimens))
+        .with(Steering::new(pos, tile_def.dimens))
         .with(Player::default())
         .build()
 }
 
 pub fn add_background(world: &mut World, world_bounds: &WorldBounds) {
     let transform = load_transform(
-        &world_bounds.pos,
-        &DepthLayer::Background,
-        &world_bounds.dimens,
+        world_bounds.pos,
+        DepthLayer::Background,
+        world_bounds.dimens,
         &AssetType::Still(SpriteType::Selection, 1),
     );
-    let asset = load_asset_from_world(&SpriteType::Selection, 1, world);
+    let asset = load_asset_from_world(SpriteType::Selection, 1, world);
     world
         .create_entity()
         .with(BackgroundTag)
@@ -152,7 +158,7 @@ fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
                 transform.set_translation_y((-1.5 + y_offset as f32) * 64.);
                 transform.set_translation_z(1.); //One higher than parent.
                 transform.set_scale(Vector3::new(0.5, 0.5, 1.0));
-                let sprite = load_asset_from_world(&SpriteType::Blocks, 3, world);
+                let sprite = load_asset_from_world(SpriteType::Blocks, 3, world);
                 world
                     .create_entity()
                     .with(Parent {
@@ -167,18 +173,16 @@ fn add_key_displays_to_door(world: &mut World, win_condition: &WinCondition) {
 }
 
 fn build_frames(world: &mut World, tile_def: &TileDefinition) {
-    let frame = world
-        .read_resource::<Assets>()
-        .get_still(&SpriteType::Frame);
+    let frame = world.read_resource::<Assets>().get_still(SpriteType::Frame);
     let sprite_render = SpriteRender {
         sprite_sheet: frame,
         sprite_number: 0, // First sprite
     };
 
     let steering_ghost_transform = load_transform(
-        &Pos::default(),
-        &DepthLayer::UiElements,
-        &tile_def.dimens,
+        Pos::default(),
+        DepthLayer::UiElements,
+        tile_def.dimens,
         &AssetType::Still(SpriteType::Frame, 0),
     );
     world
@@ -188,9 +192,9 @@ fn build_frames(world: &mut World, tile_def: &TileDefinition) {
         .with(DebugSteeringGhostTag)
         .build();
     let pos_ghost_transform = load_transform(
-        &Pos::default(),
-        &DepthLayer::UiElements,
-        &Pos::new(1, 1),
+        Pos::default(),
+        DepthLayer::UiElements,
+        Pos::new(1, 1),
         &AssetType::Still(SpriteType::Frame, 0),
     );
     world
@@ -201,7 +205,8 @@ fn build_frames(world: &mut World, tile_def: &TileDefinition) {
         .build();
 }
 
-pub fn load_transform(pos: &Pos, depth: &DepthLayer, dimens: &Pos, asset: &AssetType) -> Transform {
+#[must_use]
+pub fn load_transform(pos: Pos, depth: DepthLayer, dimens: Pos, asset: &AssetType) -> Transform {
     let asset_dimensions = get_asset_dimensions(asset);
     let mut transform = Transform::default();
     transform.set_translation_xyz(
@@ -217,11 +222,12 @@ pub fn load_transform(pos: &Pos, depth: &DepthLayer, dimens: &Pos, asset: &Asset
     transform
 }
 
+#[must_use]
 pub fn load_still_asset(tile: &TileDefinition, assets: &Assets) -> Option<SpriteRender> {
     match &tile.asset? {
         AssetType::Animated(..) => None,
         AssetType::Still(spritesheet, sprite_nr) => {
-            let handle = assets.get_still(spritesheet);
+            let handle = assets.get_still(*spritesheet);
             Some(SpriteRender {
                 sprite_sheet: handle,
                 sprite_number: *sprite_nr,
@@ -231,7 +237,7 @@ pub fn load_still_asset(tile: &TileDefinition, assets: &Assets) -> Option<Sprite
 }
 
 pub fn load_asset_from_world(
-    sprite: &SpriteType,
+    sprite: SpriteType,
     sprite_nr: usize,
     world: &mut World,
 ) -> SpriteRender {
@@ -242,20 +248,22 @@ pub fn load_asset_from_world(
     }
 }
 
-pub fn load_sprite_render(sprite: &SpriteType, sprite_nr: usize, assets: &Assets) -> SpriteRender {
+#[must_use]
+pub fn load_sprite_render(sprite: SpriteType, sprite_nr: usize, assets: &Assets) -> SpriteRender {
     SpriteRender {
         sprite_sheet: assets.get_still(sprite),
         sprite_number: sprite_nr,
     }
 }
 
+#[must_use]
 pub fn load_anim_asset(
     tile: &TileDefinition,
     assets: &Assets,
 ) -> Option<Handle<Prefab<MyPrefabData>>> {
     match &tile.asset? {
         AssetType::Animated(anim) => {
-            let handle = assets.get_animated(anim);
+            let handle = assets.get_animated(*anim);
             Some(handle)
         }
         AssetType::Still(..) => None,
@@ -266,11 +274,11 @@ pub fn attach_graphics(
     world: &mut World,
     entity: Entity,
     asset: &AssetType,
-    dimens: &Pos,
+    dimens: Pos,
     tint: Option<Tint>,
 ) -> Entity {
     let still_asset = if let AssetType::Still(sprite, sprite_nr) = *asset {
-        Some(load_asset_from_world(&sprite, sprite_nr, world))
+        Some(load_asset_from_world(sprite, sprite_nr, world))
     } else {
         None
     };
@@ -292,7 +300,7 @@ pub fn attach_graphics(
         .build()
 }
 
-fn transform_scale(dimens: &Pos, asset: &AssetType) -> Transform {
+fn transform_scale(dimens: Pos, asset: &AssetType) -> Transform {
     let asset_dimensions = get_asset_dimensions(asset);
     let mut transform = Transform::default();
     transform.set_scale(Vector3::new(

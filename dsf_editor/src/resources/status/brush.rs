@@ -30,6 +30,7 @@ impl Brush {
         new_key.clone()
     }
 
+    #[must_use]
     pub fn get_key(&self) -> &Option<String> {
         self.palette
             .get(self.palette_index)

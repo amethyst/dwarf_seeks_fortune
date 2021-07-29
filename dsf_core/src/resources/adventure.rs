@@ -8,7 +8,7 @@ use amethyst::renderer::palette::Srgba;
 use amethyst::renderer::resources::Tint;
 use serde::{Deserialize, Serialize};
 
-use crate::components::*;
+use crate::components::{MapCursor, Pos};
 use crate::levels::{load_asset_from_world, load_transform, LevelSave};
 use crate::resources::{AssetType, DepthLayer, SpriteType, UserCache};
 use crate::utility::files::{get_adventures_dir, get_levels_dir};
@@ -19,6 +19,7 @@ pub struct PositionOnMap {
 }
 
 impl PositionOnMap {
+    #[must_use]
     pub fn new(pos: Pos) -> Self {
         PositionOnMap { pos }
     }
@@ -106,7 +107,7 @@ pub fn create_default_adventure() {
 fn level_files() -> Vec<String> {
     fs::read_dir(get_levels_dir())
         .expect("Failed to read contents of the levels directory.")
-        .map(|file| {
+        .filter_map(|file| {
             if let Ok(file) = file {
                 if file.path().is_file() {
                     Some(
@@ -124,7 +125,6 @@ fn level_files() -> Vec<String> {
                 None
             }
         })
-        .flatten()
         .collect()
 }
 
@@ -132,8 +132,8 @@ pub fn load_adventure(path: &Path, world: &mut World) -> Result<(), ConfigError>
     let adventure = Adventure::load(path)?;
     for (pos, map_element) in &adventure.nodes {
         match map_element {
-            MapElement::Road => load_road(pos, world),
-            MapElement::Node(node) => load_node(pos, node, world),
+            MapElement::Road => load_road(*pos, world),
+            MapElement::Node(node) => load_node(*pos, node, world),
         }
     }
     let initial_cursor_pos = {
@@ -144,7 +144,7 @@ pub fn load_adventure(path: &Path, world: &mut World) -> Result<(), ConfigError>
             Pos::default()
         }
     };
-    load_cursor(world, &initial_cursor_pos);
+    load_cursor(world, initial_cursor_pos);
     world.insert(adventure);
     world.insert(PositionOnMap::new(initial_cursor_pos));
     Ok(())
@@ -159,12 +159,12 @@ fn cursor_position(path: &Path, world: &mut World) -> Pos {
     )
 }
 
-fn load_cursor(world: &mut World, pos: &Pos) {
-    let sprite_render = load_asset_from_world(&SpriteType::LevelSelect, 3, world);
+fn load_cursor(world: &mut World, pos: Pos) {
+    let sprite_render = load_asset_from_world(SpriteType::LevelSelect, 3, world);
     let transform = load_transform(
         pos,
-        &DepthLayer::Player,
-        &Pos::new(1, 1),
+        DepthLayer::Player,
+        Pos::new(1, 1),
         &AssetType::Still(SpriteType::LevelSelect, 3),
     );
     world
@@ -176,12 +176,12 @@ fn load_cursor(world: &mut World, pos: &Pos) {
         .build();
 }
 
-fn load_road(pos: &Pos, world: &mut World) {
-    let sprite_render_road = load_asset_from_world(&SpriteType::LevelSelect, 1, world);
+fn load_road(pos: Pos, world: &mut World) {
+    let sprite_render_road = load_asset_from_world(SpriteType::LevelSelect, 1, world);
     let transform = load_transform(
         pos,
-        &DepthLayer::Blocks,
-        &Pos::new(1, 1),
+        DepthLayer::Blocks,
+        Pos::new(1, 1),
         &AssetType::Still(SpriteType::LevelSelect, 1),
     );
     world
@@ -191,12 +191,12 @@ fn load_road(pos: &Pos, world: &mut World) {
         .build();
 }
 
-fn load_node(pos: &Pos, _node: &AdventureNode, world: &mut World) {
-    let sprite_render_node = load_asset_from_world(&SpriteType::LevelSelect, 0, world);
+fn load_node(pos: Pos, _node: &AdventureNode, world: &mut World) {
+    let sprite_render_node = load_asset_from_world(SpriteType::LevelSelect, 0, world);
     let transform = load_transform(
         pos,
-        &DepthLayer::Blocks,
-        &Pos::new(1, 1),
+        DepthLayer::Blocks,
+        Pos::new(1, 1),
         &AssetType::Still(SpriteType::LevelSelect, 0),
     );
     world

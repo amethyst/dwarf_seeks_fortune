@@ -11,9 +11,11 @@ pub struct Selection {
 }
 
 impl Selection {
+    #[must_use]
     pub fn lower_bounds(&self) -> Pos {
         Pos::new(min(self.start.x, self.end.x), min(self.start.y, self.end.y))
     }
+    #[must_use]
     pub fn dimens(&self) -> Pos {
         Pos::new(
             (self.start.x - self.end.x).abs() + 1,

@@ -10,8 +10,8 @@ use dsf_core::levels::{load_anim_asset, load_still_asset, load_transform};
 use dsf_core::resources::Assets;
 use dsf_precompile::MyPrefabData;
 
-use crate::components::*;
-use crate::resources::*;
+use crate::components::PaintedTile;
+use crate::resources::LevelEdit;
 use amethyst::core::ecs::Write;
 use amethyst::renderer::palette::Srgba;
 use amethyst::renderer::resources::Tint;
@@ -22,7 +22,6 @@ use amethyst::renderer::resources::Tint;
 pub struct TilePaintSystem;
 
 impl<'s> System<'s> for TilePaintSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadStorage<'s, BackgroundTag>,
         WriteStorage<'s, Transform>,
@@ -65,9 +64,9 @@ impl<'s> System<'s> for TilePaintSystem {
             .drain_dirty()
             .drain(..)
             // Do not create entities for dummy tiles:
-            .filter(|pos| level_edit.tile_map.is_tile_def_key(pos))
+            .filter(|pos| level_edit.tile_map.is_tile_def_key(*pos))
             .map(|dirty_pos| {
-                let tile_def = level_edit.tile_map.get_tile(&dirty_pos)
+                let tile_def = level_edit.tile_map.get_tile(dirty_pos)
                     .expect("Cannot panic, we previously checked that there is a proper tile in this location.");
                 (dirty_pos, tile_def)
             })
@@ -75,9 +74,9 @@ impl<'s> System<'s> for TilePaintSystem {
                 let still_asset = load_still_asset(tile_def, &assets);
                 let anim_asset = load_anim_asset(tile_def, &assets);
                 let transform = tile_def.asset.as_ref().map(|asset| load_transform(
-                        &pos,
-                        &tile_def.depth,
-                        &tile_def.dimens,
+                        pos,
+                        tile_def.depth,
+                        tile_def.dimens,
                         asset,
                     ));
                 let mut builder = entities.build_entity();

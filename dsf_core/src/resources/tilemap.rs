@@ -1,5 +1,5 @@
-use crate::components::*;
-use crate::levels::*;
+use crate::components::Pos;
+use crate::levels::LevelSave;
 use crate::resources::{TileDefinition, TileDefinitions, WorldBounds};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -12,17 +12,19 @@ pub struct TileMap {
 }
 
 impl TileMap {
-    /// Construct a TileMap for use during the PlayState.
+    /// Construct a `TileMap` for use during the `PlayState`.
     /// Keeps track of some relevant tiles only: climbable, collidable, destructable tiles.
-    pub fn for_play(level: LevelSave, tile_defs: TileDefinitions) -> Self {
+    #[must_use]
+    pub fn for_play(level: &LevelSave, tile_defs: TileDefinitions) -> Self {
         TileMap::new(level, tile_defs, true)
     }
 
-    pub fn for_editing(level: LevelSave, tile_defs: TileDefinitions) -> Self {
+    #[must_use]
+    pub fn for_editing(level: &LevelSave, tile_defs: TileDefinitions) -> Self {
         TileMap::new(level, tile_defs, false)
     }
 
-    fn new(level: LevelSave, tile_defs: TileDefinitions, apply_filter: bool) -> Self {
+    fn new(level: &LevelSave, tile_defs: TileDefinitions, apply_filter: bool) -> Self {
         let mut tiles = HashMap::new();
         level.tiles.iter()
             .map(|(pos, key)| {
@@ -58,10 +60,11 @@ impl TileMap {
         }
     }
 
-    pub fn get_tile(&self, pos: &Pos) -> Option<&TileDefinition> {
+    #[must_use]
+    pub fn get_tile(&self, pos: Pos) -> Option<&TileDefinition> {
         self.tiles
-            .get(pos)
-            .map(|tile| match tile {
+            .get(&pos)
+            .and_then(|tile| match tile {
                 Tile::Dummy(pos) => match self.tiles.get(pos) {
                     Some(Tile::TileDefKey(key)) => Some(key),
                     _ => {
@@ -72,12 +75,12 @@ impl TileMap {
                 Tile::TileDefKey(key) => Some(key),
                 _ => None,
             })
-            .flatten()
             .map(|tile_def_key| self.tile_defs.get(tile_def_key))
     }
 
-    pub fn is_tile_def_key(&self, pos: &Pos) -> bool {
-        matches!(self.tiles.get(pos), Some(Tile::TileDefKey(_)))
+    #[must_use]
+    pub fn is_tile_def_key(&self, pos: Pos) -> bool {
+        matches!(self.tiles.get(&pos), Some(Tile::TileDefKey(_)))
     }
 
     /// Removes the tile at the given location. Also removes any Dummy tiles associated with the
@@ -90,10 +93,10 @@ impl TileMap {
     /// at a dummy.
     ///
     /// If no tiles were removed, then this returns None.
-    pub fn remove_tile(&mut self, pos: &Pos) -> Option<Pos> {
+    pub fn remove_tile(&mut self, pos: Pos) -> Option<Pos> {
         let actual_pos = self.get_actual_pos(pos);
         if let Some(actual_pos) = actual_pos {
-            let tile_def = self.get_tile(&actual_pos).unwrap_or_else(|| unreachable!());
+            let tile_def = self.get_tile(actual_pos).unwrap_or_else(|| unreachable!());
             let dimens = tile_def.dimens;
             (0..dimens.x).for_each(|x| {
                 (0..dimens.y).for_each(|y| {
@@ -109,15 +112,16 @@ impl TileMap {
     ///
     /// Example: if there is a 2x2 tile at position (0, 0), enquiring about any of the following
     /// four positions will return Some((0, 0)): (0, 0), (1, 0), (0, 1), (1, 1).
-    pub fn get_actual_pos(&self, pos: &Pos) -> Option<Pos> {
-        match self.tiles.get(pos) {
-            Some(Tile::TileDefKey(_)) => Some(*pos),
+    #[must_use]
+    pub fn get_actual_pos(&self, pos: Pos) -> Option<Pos> {
+        match self.tiles.get(&pos) {
+            Some(Tile::TileDefKey(_)) => Some(pos),
             Some(Tile::Dummy(anchor_pos)) => Some(*anchor_pos),
             _ => None,
         }
     }
 
-    pub fn put_tile(&mut self, pos: Pos, tile_def_key: String, dimensions: &Pos) {
+    pub fn put_tile(&mut self, pos: Pos, tile_def_key: String, dimensions: Pos) {
         self.tiles.insert(pos, Tile::TileDefKey(tile_def_key));
         (0..dimensions.x).for_each(|x| {
             (0..dimensions.y).for_each(|y| {
@@ -149,6 +153,7 @@ pub enum Tile {
 
 impl Tile {
     /// Returns true iff the enum is an actual tile, rather than an air block or a dummy reference.
+    #[must_use]
     pub fn is_tile_def(&self) -> bool {
         matches!(self, Tile::TileDefKey(_))
     }

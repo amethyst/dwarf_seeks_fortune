@@ -1,4 +1,4 @@
-use crate::components::*;
+use crate::components::{CameraFrame, Player};
 
 use amethyst::{
     core::transform::Transform,

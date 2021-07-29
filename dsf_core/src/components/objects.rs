@@ -20,6 +20,7 @@ impl Component for Key {
 }
 
 impl Key {
+    #[must_use]
     pub fn new(pos: Pos) -> Self {
         Key { pos }
     }
@@ -38,6 +39,7 @@ impl Component for Tool {
 }
 
 impl Tool {
+    #[must_use]
     pub fn new(tool_type: ToolType, sprite: SpriteType, sprite_nr: usize) -> Self {
         Tool {
             tool_type,
@@ -72,6 +74,7 @@ impl Component for KeyDisplay {
 }
 
 impl KeyDisplay {
+    #[must_use]
     pub fn new(pos: Pos) -> Self {
         KeyDisplay { pos }
     }

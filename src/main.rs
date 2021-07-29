@@ -1,3 +1,6 @@
+//! Dwarf Seeks Fortune, is A 2D puzzle platformer made with the Amethyst game engine
+//!
+
 #![forbid(unsafe_code)]
 #![deny(
     rust_2018_compatibility,
@@ -6,7 +9,10 @@
     nonstandard_style,
     future_incompatible,
     missing_copy_implementations,
-    missing_debug_implementations
+    missing_debug_implementations,
+    missing_docs,
+    clippy::all,
+    clippy::pedantic
 )]
 
 #[macro_use]

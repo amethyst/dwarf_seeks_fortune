@@ -1,5 +1,5 @@
-use crate::components::*;
-use crate::resources::*;
+use crate::components::{Player, Steering};
+use crate::resources::{CurrentState, DebugSettings, History, Rewind};
 use amethyst::{
     core::timing::Time,
     core::transform::Transform,
@@ -11,7 +11,6 @@ use amethyst::{
 pub struct RewindControlSystem;
 
 impl<'s> System<'s> for RewindControlSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, CurrentState>,
         Write<'s, Rewind>,
@@ -51,7 +50,6 @@ impl<'s> System<'s> for RewindControlSystem {
 pub struct RewindSystem;
 
 impl<'s> System<'s> for RewindSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Steering>,

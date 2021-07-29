@@ -6,7 +6,7 @@ use amethyst::{
 
 use dsf_core::resources::DepthLayer;
 
-use crate::resources::*;
+use crate::resources::LevelEdit;
 use amethyst::core::ecs::ReadStorage;
 use dsf_core::components::BackgroundTag;
 
@@ -16,7 +16,6 @@ use dsf_core::components::BackgroundTag;
 pub struct UpdateBackgroundSystem;
 
 impl<'s> System<'s> for UpdateBackgroundSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, BackgroundTag>,

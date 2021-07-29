@@ -1,4 +1,4 @@
-use crate::components::*;
+use crate::components::Pos;
 
 /// Holds the full history of the current game. Used to rewind games to an earlier point.
 ///
@@ -39,6 +39,7 @@ pub struct Frame {
 }
 
 impl Frame {
+    #[must_use]
     pub fn new(player_position: Pos) -> Self {
         Frame { player_position }
     }
@@ -66,7 +67,8 @@ pub struct Rewind {
 }
 
 impl Rewind {
-    pub fn is_ready(&self) -> bool {
+    #[must_use]
+    pub fn is_ready(self) -> bool {
         self.cooldown.is_sign_negative()
     }
 }

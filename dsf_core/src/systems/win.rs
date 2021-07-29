@@ -5,8 +5,8 @@ use amethyst::{
     ecs::prelude::{Join, Read, ReadStorage, System, Write},
 };
 
-use crate::components::*;
-use crate::resources::*;
+use crate::components::{ExitDoor, Key, KeyDisplay, Player, Steering};
+use crate::resources::{SoundType, UiHandles, UiType, WinCondition};
 use crate::systems::SoundEvent;
 use amethyst::core::ecs::shrev::EventChannel;
 
@@ -23,7 +23,6 @@ const DOOR_HEIGHT: f32 = 4.;
 pub struct KeyCollectionSystem;
 
 impl<'s> System<'s> for KeyCollectionSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<SoundEvent>>,
         ReadStorage<'s, Player>,
@@ -72,7 +71,7 @@ impl<'s> System<'s> for KeyCollectionSystem {
                 .next();
             if let Some((key, key_entity)) = collected_key {
                 sound_channel.single_write(SoundEvent::new(SoundType::KeyPickup));
-                win.set_key_collected(&key.pos);
+                win.set_key_collected(key.pos);
                 entities.delete(key_entity).expect("Failed to delete key.");
                 for (key_display, display_entity) in (&key_displays, &entities).join() {
                     if key_display.pos == key.pos {
@@ -92,7 +91,6 @@ impl<'s> System<'s> for KeyCollectionSystem {
 pub struct WinSystem;
 
 impl<'s> System<'s> for WinSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<SoundEvent>>,
         ReadStorage<'s, Player>,
@@ -131,7 +129,7 @@ impl<'s> System<'s> for WinSystem {
                     sound_channel.single_write(SoundEvent::new(SoundType::Win));
                     win.reached_open_door = true;
                     lazy.exec_mut(move |world| {
-                        UiHandles::add_ui(&UiType::WinMessage, world);
+                        UiHandles::add_ui(UiType::WinMessage, world);
                     });
                 }
             }

@@ -18,21 +18,25 @@ pub struct Direction2D {
 }
 
 impl Direction2D {
+    #[must_use]
     pub fn new(signum_x: f32, signum_y: f32) -> Self {
         Direction2D {
             x: Direction1D::new(signum_x),
             y: Direction1D::new(signum_y),
         }
     }
+    #[must_use]
     pub fn from(x: Direction1D, y: Direction1D) -> Self {
         Direction2D { x, y }
     }
 
-    pub fn is_opposite(&self, other: &Direction2D) -> bool {
-        self.x.is_opposite(&other.x) || self.y.is_opposite(&other.y)
+    #[must_use]
+    pub fn is_opposite(self, other: Direction2D) -> bool {
+        self.x.is_opposite(other.x) || self.y.is_opposite(other.y)
     }
 
-    pub fn is_neutral(&self) -> bool {
+    #[must_use]
+    pub fn is_neutral(self) -> bool {
         self.x == Direction1D::Neutral && self.y == Direction1D::Neutral
     }
 }
@@ -47,6 +51,7 @@ pub enum Direction1D {
 }
 
 impl Direction1D {
+    #[must_use]
     pub fn new(signum: f32) -> Self {
         if signum.abs() <= f32::EPSILON {
             Direction1D::Neutral
@@ -56,32 +61,39 @@ impl Direction1D {
             Direction1D::Negative
         }
     }
-    pub fn is_opposite(&self, other: &Direction1D) -> bool {
-        (*self == Direction1D::Negative && *other == Direction1D::Positive)
-            || (*self == Direction1D::Positive && *other == Direction1D::Negative)
+    #[must_use]
+    pub fn is_opposite(self, other: Direction1D) -> bool {
+        (self == Direction1D::Negative && other == Direction1D::Positive)
+            || (self == Direction1D::Positive && other == Direction1D::Negative)
     }
-    pub fn is_positive(&self) -> bool {
-        self == &Direction1D::Positive
+    #[must_use]
+    pub fn is_positive(self) -> bool {
+        self == Direction1D::Positive
     }
-    pub fn is_negative(&self) -> bool {
-        self == &Direction1D::Negative
+    #[must_use]
+    pub fn is_negative(self) -> bool {
+        self == Direction1D::Negative
     }
-    pub fn is_neutral(&self) -> bool {
-        self == &Direction1D::Neutral
+    #[must_use]
+    pub fn is_neutral(self) -> bool {
+        self == Direction1D::Neutral
     }
 
-    pub fn aligns_with(&self, direction: f32) -> bool {
+    #[must_use]
+    pub fn aligns_with(self, direction: f32) -> bool {
         let other = Direction1D::new(direction);
-        self != &Direction1D::Neutral && self == &other
+        self != Direction1D::Neutral && self == other
     }
-    pub fn signum(&self) -> f32 {
+    #[must_use]
+    pub fn signum(self) -> f32 {
         match self {
             Direction1D::Positive => 1.,
             Direction1D::Negative => -1.,
             Direction1D::Neutral => 0.,
         }
     }
-    pub fn signum_i(&self) -> i32 {
+    #[must_use]
+    pub fn signum_i(self) -> i32 {
         match self {
             Direction1D::Positive => 1,
             Direction1D::Negative => -1,
@@ -123,19 +135,23 @@ pub struct Pos {
 }
 
 impl Pos {
+    #[must_use]
     pub fn new(x: i32, y: i32) -> Self {
         Pos { x, y }
     }
 
-    pub fn append_x(&self, x: i32) -> Self {
+    #[must_use]
+    pub fn append_x(self, x: i32) -> Self {
         Pos::new(self.x + x, self.y)
     }
 
-    pub fn append_y(&self, y: i32) -> Self {
+    #[must_use]
+    pub fn append_y(self, y: i32) -> Self {
         Pos::new(self.x, self.y + y)
     }
 
-    pub fn append_xy(&self, x: i32, y: i32) -> Self {
+    #[must_use]
+    pub fn append_xy(self, x: i32, y: i32) -> Self {
         Pos::new(self.x + x, self.y + y)
     }
 }
@@ -187,7 +203,7 @@ impl Component for Steering {
 
 /// Specifies how the entity intents to move. For the player, this is mostly informed by the
 /// keyboard input. For enemies, this will be set by the AI. For all entities with Steering,
-/// the SteeringSystem then actually moves the entity based on this intent.
+/// the `SteeringSystem` then actually moves the entity based on this intent.
 #[derive(Copy, Clone, Debug, Default, Deserialize, Serialize, PrefabData)]
 #[prefab(Component)]
 #[serde(deny_unknown_fields)]
@@ -223,7 +239,7 @@ impl Component for SteeringIntent {
     type Storage = HashMapStorage<Self>;
 }
 
-/// SteeringMode influences max speeds, ability to jump, ability to move, etc.
+/// `SteeringMode` influences max speeds, ability to jump, ability to move, etc.
 #[derive(Copy, Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub enum SteeringMode {
     /// Standard mode. There is flat ground beneath the entity and the entity can either move
@@ -264,8 +280,9 @@ impl Default for SteeringMode {
 
 impl SteeringMode {
     /// Calculate the y offset from the initial y-position at the time this movement began.
-    /// This method is only valid for SteeringMode::Falling and SteeringMode::Jumping. It will
+    /// This method is only valid for `SteeringMode::Falling` and `SteeringMode::Jumping`. It will
     /// return 0. otherwise.
+    #[must_use]
     pub fn calc_delta_y(&self, duration: f32) -> f32 {
         match self {
             SteeringMode::Jumping { .. } => -50. * (duration - 0.209).powf(2.) + 2.2,
@@ -274,6 +291,7 @@ impl SteeringMode {
         }
     }
 
+    #[must_use]
     pub fn jump_to_fall(&self) -> Self {
         if let SteeringMode::Jumping {
             x_movement,
@@ -291,6 +309,7 @@ impl SteeringMode {
         }
     }
 
+    #[must_use]
     pub fn add_to_duration(&self, delta_time: f32) -> Self {
         match *self {
             SteeringMode::Jumping {
@@ -317,6 +336,7 @@ impl SteeringMode {
 }
 
 impl Steering {
+    #[must_use]
     pub fn new(pos: Pos, dimens: Pos) -> Steering {
         Steering {
             pos,
@@ -327,10 +347,12 @@ impl Steering {
         }
     }
 
+    #[must_use]
     pub fn is_grounded(&self) -> bool {
         self.mode == SteeringMode::Grounded
     }
 
+    #[must_use]
     pub fn is_mid_air(&self) -> bool {
         matches!(
             self.mode,
@@ -338,10 +360,12 @@ impl Steering {
         )
     }
 
+    #[must_use]
     pub fn is_jumping(&self) -> bool {
         matches!(self.mode, SteeringMode::Jumping { .. })
     }
 
+    #[must_use]
     pub fn jump_has_peaked(&self) -> bool {
         if let SteeringMode::Jumping { duration, .. } = self.mode {
             duration > 0.209
@@ -350,10 +374,12 @@ impl Steering {
         }
     }
 
+    #[must_use]
     pub fn is_falling(&self) -> bool {
         matches!(self.mode, SteeringMode::Falling { .. })
     }
 
+    #[must_use]
     pub fn is_climbing(&self) -> bool {
         self.mode == SteeringMode::Climbing
     }
@@ -363,6 +389,7 @@ impl Steering {
     ///
     /// The discrete position is the bottom-left corner of the entity, a translation is the
     /// center point of the entity.
+    #[must_use]
     pub fn to_centered_coords(self, pos: Pos) -> (f32, f32) {
         (
             pos.x as f32 + 0.5 * self.dimens.x as f32,
@@ -374,6 +401,7 @@ impl Steering {
     /// anchored coordinates, describing the bottom-left corner of the entity.
     ///
     /// Note that this does NOT return a discrete position: output is not rounded or floored.
+    #[must_use]
     pub fn to_anchor_coords(self, transform: &Transform) -> (f32, f32) {
         (
             transform.translation().x - 0.5 * self.dimens.x as f32,

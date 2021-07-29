@@ -28,9 +28,9 @@ impl MainMenuState {
         MainMenuState::default()
     }
 
-    fn init_ui(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        UiHandles::add_ui(&UiType::Fps, data.world);
-        self.ui = UiHandles::add_ui(&UiType::MainMenu, data.world);
+    fn init_ui(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) {
+        UiHandles::add_ui(UiType::Fps, data.world);
+        self.ui = UiHandles::add_ui(UiType::MainMenu, data.world);
         // invoke a world update to finish creating our ui entities
         data.data.update(data.world);
         // look up our buttons
@@ -44,9 +44,9 @@ impl MainMenuState {
 }
 
 impl SimpleState for MainMenuState {
-    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+    fn on_start(&mut self, mut data: StateData<'_, GameData<'_, '_>>) {
         info!("MainMenuState on_start");
-        self.init_ui(data);
+        self.init_ui(&mut data);
     }
 
     fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -58,9 +58,9 @@ impl SimpleState for MainMenuState {
         self.exit_button = None;
     }
 
-    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+    fn on_resume(&mut self, mut data: StateData<'_, GameData<'_, '_>>) {
         info!("MainMenuState on_resume");
-        self.init_ui(data);
+        self.init_ui(&mut data);
     }
 
     fn handle_event(

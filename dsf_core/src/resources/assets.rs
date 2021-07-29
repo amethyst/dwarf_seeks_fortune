@@ -17,11 +17,13 @@ pub struct Assets {
 }
 
 impl Assets {
+    #[must_use]
     pub fn put_still(mut self, asset_type: SpriteType, asset: Handle<SpriteSheet>) -> Self {
         self.stills.insert(asset_type, asset);
         self
     }
 
+    #[must_use]
     pub fn put_animated(
         mut self,
         asset_type: AnimType,
@@ -31,6 +33,7 @@ impl Assets {
         self
     }
 
+    #[must_use]
     pub fn put_sound(mut self, sound_type: SoundType, asset: SourceHandle) -> Self {
         self.sounds
             .entry(sound_type)
@@ -39,10 +42,11 @@ impl Assets {
         self
     }
 
-    pub fn get_still(&self, asset_type: &SpriteType) -> Handle<SpriteSheet> {
+    #[must_use]
+    pub fn get_still(&self, asset_type: SpriteType) -> Handle<SpriteSheet> {
         (*self
             .stills
-            .get(asset_type)
+            .get(&asset_type)
             .or_else(|| {
                 error!("Spritesheet asset {:?} is missing!", asset_type);
                 self.stills.get(&SpriteType::NotFound)
@@ -51,10 +55,11 @@ impl Assets {
         .clone()
     }
 
-    pub fn get_animated(&self, asset_type: &AnimType) -> Handle<Prefab<MyPrefabData>> {
+    #[must_use]
+    pub fn get_animated(&self, asset_type: AnimType) -> Handle<Prefab<MyPrefabData>> {
         (*self
             .animated
-            .get(asset_type)
+            .get(&asset_type)
             .or_else(|| {
                 error!("Animation asset {:?} is missing!", asset_type);
                 self.animated.get(&AnimType::NotFound)
@@ -63,10 +68,11 @@ impl Assets {
         .clone()
     }
 
-    pub fn get_sound(&self, asset_type: &SoundType) -> Option<SourceHandle> {
+    #[must_use]
+    pub fn get_sound(&self, asset_type: SoundType) -> Option<SourceHandle> {
         self
             .sounds
-            .get(asset_type)
+            .get(&asset_type)
             .or_else(|| {
                 error!("There are no sounds of type {:?}. Add them to the LoadingConfig to start using them.", asset_type);
                 None
@@ -124,6 +130,7 @@ pub enum AnimType {
 /// Matches a still or animated asset to its dimensions in pixels. Required to calculate the
 /// correct scale factor for the entity to make it fit within its in-world bounds.
 #[allow(clippy::match_single_binding)]
+#[must_use]
 pub fn get_asset_dimensions(asset: &AssetType) -> Pos {
     match asset {
         AssetType::Still(sprite_type, _) => match sprite_type {

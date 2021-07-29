@@ -1,7 +1,7 @@
 use crate::resources::{AnimType, SoundType, SpriteType, UiType};
 use serde::{Deserialize, Serialize};
 
-/// This specifies all assets that must be loaded by the LoadingState.
+/// This specifies all assets that must be loaded by the `LoadingState`.
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(default)]
 #[serde(deny_unknown_fields)]

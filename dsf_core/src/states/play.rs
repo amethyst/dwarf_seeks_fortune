@@ -17,9 +17,9 @@ use amethyst::{GameData, SimpleState, SimpleTrans};
 
 use dsf_precompile::AnimationId;
 
-use crate::entities::*;
-use crate::levels::*;
-use crate::resources::*;
+use crate::entities::create_camera;
+use crate::levels::load_level;
+use crate::resources::{CurrentState, DebugSettings, SoundType, UiHandles, UiType};
 use crate::states::window_event_handler;
 use crate::systems;
 use crate::systems::SoundEvent;
@@ -34,13 +34,15 @@ pub struct PlayState {
 }
 
 impl<'a, 'b> PlayState {
-    /// Creates a PlayState that starts in demo mode. It loads the demo level.
+    /// Creates a `PlayState` that starts in demo mode. It loads the demo level.
+    #[must_use]
     pub fn demo() -> Self {
         let level_file = get_levels_dir().join("demo_level.ron");
         PlayState::new(level_file)
     }
 
-    /// Creates a new PlayState that will load the given level.
+    /// Creates a new `PlayState` that will load the given level.
+    #[must_use]
     pub fn new(level_file: PathBuf) -> Self {
         PlayState {
             level_file,
@@ -113,8 +115,8 @@ impl<'a, 'b> PlayState {
 
     fn reset_level(&self, world: &mut World) {
         world.delete_all();
-        UiHandles::add_ui(&UiType::Fps, world);
-        UiHandles::add_ui(&UiType::Play, world);
+        UiHandles::add_ui(UiType::Fps, world);
+        UiHandles::add_ui(UiType::Play, world);
         create_camera(world);
         load_level(&self.level_file, world).expect("Failed to load level!");
     }
@@ -169,7 +171,6 @@ impl SimpleState for PlayState {
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         // Execute a pass similar to a system
         data.world.exec(
-            #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
                 Entities<'_>,
                 ReadStorage<'_, AnimationSet<AnimationId, SpriteRender>>,

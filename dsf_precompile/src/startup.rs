@@ -40,19 +40,15 @@ impl SimpleState for MainState {
         data: StateData<'_, GameData<'_, '_>>,
         event: StateEvent,
     ) -> SimpleTrans {
-        if let Some(ref mut state) = self.real_state {
-            state.handle_event(data, event)
-        } else {
-            Trans::None
-        }
+        self.real_state
+            .as_mut()
+            .map_or(Trans::None, |state| state.handle_event(data, event))
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
-        if let Some(ref mut state) = self.real_state {
-            state.update(data)
-        } else {
-            Trans::None
-        }
+        self.real_state
+            .as_mut()
+            .map_or(Trans::None, |state| state.update(data))
     }
 }
 

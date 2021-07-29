@@ -14,7 +14,6 @@ use amethyst::ui::{UiFinder, UiText};
 pub struct MapCursorSystem;
 
 impl<'s> System<'s> for MapCursorSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<SoundEvent>>,
         WriteStorage<'s, Transform>,
@@ -46,14 +45,14 @@ impl<'s> System<'s> for MapCursorSystem {
             if cursor.last_direction.is_neutral() && !new_direction.is_neutral() {
                 // Start movement now. Move once, then set cooldown to High.
                 move_cursor(
-                    &new_direction,
+                    new_direction,
                     &mut pos_on_map,
                     transform,
                     &adventure,
                     &mut sound_channel,
                 );
                 cursor.cooldown = config.map_cursor_move_high_cooldown;
-            } else if cursor.last_direction.is_opposite(&new_direction) {
+            } else if cursor.last_direction.is_opposite(new_direction) {
                 // Reset movement. Set cooldown to high.
                 cursor.cooldown = config.map_cursor_move_high_cooldown;
             } else if !new_direction.is_neutral() {
@@ -63,7 +62,7 @@ impl<'s> System<'s> for MapCursorSystem {
                 if cursor.cooldown.is_sign_negative() {
                     cursor.cooldown = config.map_cursor_move_low_cooldown;
                     move_cursor(
-                        &new_direction,
+                        new_direction,
                         &mut pos_on_map,
                         transform,
                         &adventure,
@@ -79,16 +78,16 @@ impl<'s> System<'s> for MapCursorSystem {
 /// Move on both x and y directions if possible. If the target position is not available, move
 /// on just the x-axis. If that position is not available either, move on just the y-axis.
 fn move_cursor(
-    direction: &Direction2D,
+    direction: Direction2D,
     pos_on_map: &mut PositionOnMap,
     transform: &mut Transform,
     adventure: &Adventure,
     sound_channel: &mut EventChannel<SoundEvent>,
 ) {
-    let target_pos = if !direction.x.is_neutral() {
-        pos_on_map.pos.append_x(direction.x.signum_i())
-    } else {
+    let target_pos = if direction.x.is_neutral() {
         pos_on_map.pos.append_y(direction.y.signum_i())
+    } else {
+        pos_on_map.pos.append_x(direction.x.signum_i())
     };
 
     if adventure.nodes.contains_key(&target_pos) {
@@ -105,7 +104,6 @@ fn move_cursor(
 pub struct LevelSelectUiUpdateSystem;
 
 impl<'s> System<'s> for LevelSelectUiUpdateSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, UiText>,
         UiFinder<'s>,
@@ -116,11 +114,7 @@ impl<'s> System<'s> for LevelSelectUiUpdateSystem {
     fn run(&mut self, (mut ui_text, finder, adventure, pos_on_map): Self::SystemData) {
         let label_title = {
             let label_title_entity = finder.find("label_node_title");
-            if let Some(fps_entity) = label_title_entity {
-                ui_text.get_mut(fps_entity)
-            } else {
-                None
-            }
+            label_title_entity.and_then(|fps_entity| ui_text.get_mut(fps_entity))
         };
         if let Some(mut label_title) = label_title {
             let selected = adventure.nodes.get(&pos_on_map.pos);

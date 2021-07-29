@@ -12,10 +12,10 @@ pub struct LevelEdit {
     pub dirty: HashSet<Pos>,
 }
 
-/// Implements the standard converter from LevelEdit to LevelSave. In other words: convert a level
+/// Implements the standard converter from `LevelEdit` to `LevelSave`. In other words: convert a level
 /// from a format that the editor uses, to the format that levels are stored in on disk.
 ///
-/// Note that only TileDefKey entries are saved, Dummy entries are discarded, because they can be
+/// Note that only `TileDefKey` entries are saved, Dummy entries are discarded, because they can be
 /// derived from the primary entries and only exist for faster lookup.
 impl From<LevelEdit> for LevelSave {
     fn from(mut item: LevelEdit) -> Self {
@@ -36,7 +36,7 @@ impl LevelEdit {
     pub(crate) fn new(level_save: LevelSave, tile_defs: TileDefinitions) -> Self {
         let initial_dirty = level_save.tiles.keys().copied().collect::<HashSet<Pos>>();
         LevelEdit {
-            tile_map: TileMap::for_editing(level_save, tile_defs),
+            tile_map: TileMap::for_editing(&level_save, tile_defs),
             dirty: initial_dirty,
         }
     }
@@ -45,7 +45,7 @@ impl LevelEdit {
     ///
     /// The process of re-collecting them before draining them (or otherwise iterating over them)
     /// again allows you to iterate over them without having an outstanding mutable borrow on the
-    /// LevelEdit. This allows you to access the tile map while iterating.
+    /// `LevelEdit`. This allows you to access the tile map while iterating.
     pub(crate) fn drain_dirty(&mut self) -> Vec<Pos> {
         self.dirty.drain().collect::<Vec<Pos>>()
     }
@@ -54,7 +54,7 @@ impl LevelEdit {
     pub(crate) fn place_tile(&mut self, force_place: bool, pos: Pos, tile: Option<Tile>) {
         let mut dry_run = self.check_place_tile(force_place, pos, tile);
         dry_run.to_be_removed.iter().for_each(|delete_pos| {
-            if let Some(removed_pos) = self.tile_map.remove_tile(delete_pos) {
+            if let Some(removed_pos) = self.tile_map.remove_tile(*delete_pos) {
                 self.dirty.insert(removed_pos);
             }
         });
@@ -62,7 +62,7 @@ impl LevelEdit {
             .to_be_added
             .drain(..)
             .for_each(|(pos, key, dimensions)| {
-                self.tile_map.put_tile(pos, key, &dimensions);
+                self.tile_map.put_tile(pos, key, dimensions);
                 self.dirty.insert(pos);
             });
     }
@@ -83,11 +83,11 @@ impl LevelEdit {
             // Air blocks are ignored unless force_place is enabled.
             // Delete whatever is at that location:
             Some(Tile::AirBlock) if force_place => {
-                PlaceTileDryRun::remove_single(self.tile_map.get_actual_pos(&pos))
+                PlaceTileDryRun::remove_single(self.tile_map.get_actual_pos(pos))
             }
             // When explicitly placing an empty Option, remove whatever is at that location whether
             // force_place is enabled or not:
-            None => PlaceTileDryRun::remove_single(self.tile_map.get_actual_pos(&pos)),
+            None => PlaceTileDryRun::remove_single(self.tile_map.get_actual_pos(pos)),
             // In all other cases, do nothing:
             _ => PlaceTileDryRun::default(),
         }
@@ -96,12 +96,12 @@ impl LevelEdit {
     /// Does a dry run to check what would happen if we added a new tile.
     fn check_add_tile(&self, pos: Pos, key: String, force_place: bool) -> PlaceTileDryRun {
         let dimensions = self.get_tile_def(&key).dimens;
-        let obstructed = !self.bounds().encloses(&pos, &dimensions)
+        let obstructed = !self.bounds().encloses(pos, dimensions)
             || (!force_place
                 && (0..dimensions.x).any(|x| {
                     (0..dimensions.y).any(|y| {
                         self.tile_map
-                            .get_tile(&Pos::new(pos.x + x, pos.y + y))
+                            .get_tile(Pos::new(pos.x + x, pos.y + y))
                             .is_some()
                     })
                 }));
@@ -110,11 +110,7 @@ impl LevelEdit {
         } else {
             let to_be_removed = (0..dimensions.x)
                 .flat_map(|x| (0..dimensions.y).map(move |y| (x, y)))
-                .map(|(x, y)| {
-                    self.tile_map
-                        .get_actual_pos(&Pos::new(pos.x + x, pos.y + y))
-                })
-                .flatten()
+                .filter_map(|(x, y)| self.tile_map.get_actual_pos(Pos::new(pos.x + x, pos.y + y)))
                 .collect();
             PlaceTileDryRun {
                 to_be_added: vec![(pos, key, dimensions)],
@@ -123,7 +119,7 @@ impl LevelEdit {
         }
     }
 
-    /// Returns the TileDefinition that belongs to the given key.
+    /// Returns the `TileDefinition` that belongs to the given key.
     pub(crate) fn get_tile_def(&self, tile_def_key: &str) -> &TileDefinition {
         self.tile_map.tile_defs.get(tile_def_key)
     }

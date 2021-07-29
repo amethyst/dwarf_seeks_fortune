@@ -26,7 +26,6 @@ pub struct RefreshPreviewsSystem {
 }
 
 impl<'s> System<'s> for RefreshPreviewsSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Read<'s, EventChannel<RefreshPreviewsEvent>>,
         Read<'s, EditorStatus>,
@@ -104,7 +103,7 @@ impl<'s> System<'s> for RefreshPreviewsSystem {
                         world,
                         preview,
                         &asset,
-                        dimens,
+                        *dimens,
                         Some(Tint(Srgba::new(0.5, 0.5, 0.5, 0.7))),
                     );
                 });

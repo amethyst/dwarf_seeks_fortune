@@ -3,7 +3,7 @@ use crate::resources::{Brush, Selection};
 /// Contains some transient data related to the status of the editor.
 /// Holds things like the position of the cursor.
 /// This is not persisted upon exiting the editor, though it persists through play testing.
-/// Is only reset when the EditorState goes through on_create.
+/// Is only reset when the `EditorState` goes through `on_create`.
 #[derive(Debug)]
 pub struct EditorStatus {
     /// Contains information on which tile is currently selected to be placed. Also contains the

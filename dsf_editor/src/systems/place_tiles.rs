@@ -12,7 +12,6 @@ use crate::systems::RefreshPreviewsEvent;
 pub struct PlaceTilesSystem;
 
 impl<'s> System<'s> for PlaceTilesSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<RefreshPreviewsEvent>>,
         Write<'s, SignalEdgeDetector>,

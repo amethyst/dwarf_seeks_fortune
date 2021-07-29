@@ -22,6 +22,7 @@ impl Default for WorldBounds {
 }
 
 impl WorldBounds {
+    #[must_use]
     pub fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
         WorldBounds {
             pos: Pos::new(x, y),
@@ -30,36 +31,43 @@ impl WorldBounds {
     }
 
     /// Inclusive lower bound.
+    #[must_use]
     pub fn x(&self) -> i32 {
         self.pos.x
     }
 
     /// Inclusive lower bound.
+    #[must_use]
     pub fn y(&self) -> i32 {
         self.pos.y
     }
 
+    #[must_use]
     pub fn width(&self) -> i32 {
         self.dimens.x
     }
 
+    #[must_use]
     pub fn height(&self) -> i32 {
         self.dimens.y
     }
 
     /// Exclusive upper bound.
+    #[must_use]
     pub fn upper_x(&self) -> i32 {
         self.pos.x + self.dimens.x
     }
 
     /// Exclusive upper bound.
+    #[must_use]
     pub fn upper_y(&self) -> i32 {
         self.pos.y + self.dimens.y
     }
 
     /// Clamp the given position inside the world bounds.
     /// The resulting position is always inside the world.
-    pub fn clamp(&self, pos: &Pos) -> Pos {
+    #[must_use]
+    pub fn clamp(&self, pos: Pos) -> Pos {
         Pos::new(self.clamp_x(pos.x), self.clamp_y(pos.y))
     }
 
@@ -91,7 +99,8 @@ impl WorldBounds {
     /// enclosed within the world bounds.
     /// Can be used to check if a tile can be placed in the world.
     /// If it's (partially) out of bounds, this method will return false.
-    pub fn encloses(&self, pos: &Pos, dimensions: &Pos) -> bool {
+    #[must_use]
+    pub fn encloses(&self, pos: Pos, dimensions: Pos) -> bool {
         self.x() <= pos.x
             && self.y() <= pos.y
             && self.upper_x() >= pos.x + dimensions.x

@@ -5,6 +5,7 @@ pub struct TileEdit {
 }
 
 impl TileEdit {
+    #[must_use]
     pub fn new(tile_def_key: String) -> Self {
         TileEdit {
             tile_def_key,

@@ -1,4 +1,4 @@
-use crate::components::*;
+use crate::components::MovementTestScopeTag;
 
 use amethyst::core::ecs::Entities;
 

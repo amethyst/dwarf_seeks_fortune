@@ -14,7 +14,7 @@ use amethyst::{GameData, SimpleState, SimpleTrans};
 
 use dsf_precompile::AnimationId;
 
-use crate::components::*;
+use crate::components::MovementTest;
 
 use crate::states::setup_test;
 use crate::systems;
@@ -45,7 +45,7 @@ impl SimpleState for MovementTestState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("MovementTestState on_start");
         self.dispatcher.setup(data.world);
-        UiHandles::add_ui(&UiType::Fps, data.world);
+        UiHandles::add_ui(UiType::Fps, data.world);
         create_camera(data.world);
         data.world.insert(History::default());
     }
@@ -98,10 +98,9 @@ impl SimpleState for MovementTestState {
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
-        self.dispatcher.dispatch(&data.world);
+        self.dispatcher.dispatch(data.world);
         // Execute a pass similar to a system
         data.world.exec(
-            #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
                 Entities<'_>,
                 ReadStorage<'_, AnimationSet<AnimationId, SpriteRender>>,
@@ -114,7 +113,7 @@ impl SimpleState for MovementTestState {
                     // Adds the `Fly` animation to AnimationControlSet and loops infinitely
                     control_set.add_animation(
                         AnimationId::Fly,
-                        &animation_set.get(&AnimationId::Fly).unwrap(),
+                        animation_set.get(&AnimationId::Fly).unwrap(),
                         EndControl::Loop(None),
                         1.0,
                         AnimationCommand::Start,

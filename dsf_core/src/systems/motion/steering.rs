@@ -1,5 +1,5 @@
-use crate::components::*;
-use crate::resources::*;
+use crate::components::{Direction1D, Direction2D, Pos, Steering, SteeringIntent, SteeringMode};
+use crate::resources::{Frame, History, SoundType, TileDefinition, TileMap};
 use crate::systems::SoundEvent;
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::{Time, Transform};
@@ -9,7 +9,6 @@ use amethyst::ecs::prelude::{Join, Read, ReadStorage, System, Write, WriteStorag
 pub struct SteeringSystem;
 
 impl<'s> System<'s> for SteeringSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<SoundEvent>>,
         WriteStorage<'s, SteeringIntent>,
@@ -268,23 +267,19 @@ fn aligned_with_grid(destination_pos: f32, actual_pos: f32, input: Direction1D) 
 /// it cannot be landed on from a jump or fall.
 fn on_solid_ground(steering: &Steering, tile_map: &TileMap) -> bool {
     (0..steering.dimens.x).any(|i| {
-        let tile = tile_map.get_tile(&Pos::new(steering.pos.x + i, steering.pos.y - 1));
-        let tile_above = tile_map.get_tile(&Pos::new(steering.pos.x + i, steering.pos.y));
-        tile.map(|tile| {
+        let tile = tile_map.get_tile(Pos::new(steering.pos.x + i, steering.pos.y - 1));
+        let tile_above = tile_map.get_tile(Pos::new(steering.pos.x + i, steering.pos.y));
+        tile.map_or(false, |tile| {
             tile.provides_platform()
-                && (!tile.climbable
-                    || !tile_above
-                        .map(|tile_above| tile_above.climbable)
-                        .unwrap_or(false))
+                && (!tile.climbable || !tile_above.map_or(false, |tile_above| tile_above.climbable))
         })
-        .unwrap_or(false)
     })
 }
 
 fn is_grounded(steering: &Steering, tile_map: &TileMap) -> bool {
     (0..steering.dimens.x).any(|i| {
-        let tile = tile_map.get_tile(&Pos::new(steering.pos.x + i, steering.pos.y - 1));
-        tile.map(|tile| tile.provides_platform()).unwrap_or(false)
+        let tile = tile_map.get_tile(Pos::new(steering.pos.x + i, steering.pos.y - 1));
+        tile.map_or(false, TileDefinition::provides_platform)
     })
 }
 
@@ -292,11 +287,11 @@ fn is_grounded(steering: &Steering, tile_map: &TileMap) -> bool {
 /// This function returns true iff the player is underneath a 2-high ceiling.
 fn is_underneath_ceiling(steering: &Steering, tile_map: &TileMap) -> bool {
     (0..steering.dimens.x).any(|i| {
-        let tile = tile_map.get_tile(&Pos::new(
+        let tile = tile_map.get_tile(Pos::new(
             steering.pos.x + i,
             steering.pos.y + steering.dimens.y,
         ));
-        tile.map(|tile| tile.collides_bottom()).unwrap_or(false)
+        tile.map_or(false, TileDefinition::collides_bottom)
     })
 }
 
@@ -328,18 +323,16 @@ fn is_against_wall(
         steering.dimens.y
     };
     (0..nr_blocks_to_check).any(|i| {
-        let tile = tile_map.get_tile(&Pos::new(steering.pos.x + x_offset, floored_y as i32 + i));
-        let tile_in_front = tile_map.get_tile(&Pos::new(
+        let tile = tile_map.get_tile(Pos::new(steering.pos.x + x_offset, floored_y as i32 + i));
+        let tile_in_front = tile_map.get_tile(Pos::new(
             steering.pos.x + x_offset_for_tile_in_front,
             floored_y as i32 + i,
         ));
-        tile.map(|tile| {
+        tile.map_or(false, |tile| {
             tile.collides_horizontally()
                 && tile_in_front
-                    .map(|tile_in_front| !tile_in_front.collides_horizontally())
-                    .unwrap_or(true)
+                    .map_or(true, |tile_in_front| !tile_in_front.collides_horizontally())
         })
-        .unwrap_or(false)
     })
 }
 
@@ -354,18 +347,18 @@ fn can_climb_down(steering: &Steering, tile_map: &TileMap) -> bool {
 fn can_climb(steering: &Steering, tile_map: &TileMap, y_range: (i32, i32)) -> bool {
     (0..steering.dimens.x).all(|x_offset| {
         (y_range.0..y_range.1).all(|y_offset| {
-            let tile = tile_map.get_tile(&Pos::new(
+            let tile = tile_map.get_tile(Pos::new(
                 steering.pos.x + x_offset,
                 steering.pos.y + y_offset,
             ));
-            tile.map(|tile| tile.climbable).unwrap_or(false)
+            tile.map_or(false, |tile| tile.climbable)
         })
     })
 }
 
 fn above_air(steering: &Steering, tile_map: &TileMap) -> bool {
     (0..steering.dimens.x).all(|x_offset| {
-        let tile = tile_map.get_tile(&Pos::new(steering.pos.x + x_offset, steering.pos.y - 1));
-        tile.map(|tile| !tile.provides_platform()).unwrap_or(true)
+        let tile = tile_map.get_tile(Pos::new(steering.pos.x + x_offset, steering.pos.y - 1));
+        tile.map_or(false, |tile| tile.climbable)
     })
 }

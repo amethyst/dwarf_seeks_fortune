@@ -27,6 +27,7 @@ impl Default for TileDefinitions {
 }
 
 impl<'a> TileDefinitions {
+    #[must_use]
     pub fn get(&'a self, key: &str) -> &'a TileDefinition {
         self.map
             .get(key)
@@ -77,8 +78,9 @@ pub struct TileDefinition {
 }
 
 impl TileDefinition {
-    /// Use the fallback if the real TileDefinition could not be found.
+    /// Use the fallback if the real `TileDefinition` could not be found.
     /// This avoids the game having to panic if a level file is slightly corrupted or out of date.
+    #[must_use]
     pub fn fallback() -> Self {
         TileDefinition {
             depth: DepthLayer::Blocks,
@@ -96,6 +98,7 @@ impl TileDefinition {
 
     /// True if and only if the tile collides at the top.
     /// In other words, if you can stand on top of this tile.
+    #[must_use]
     pub fn provides_platform(&self) -> bool {
         if let Some(collision) = &self.collision {
             collision.collides_top
@@ -105,6 +108,7 @@ impl TileDefinition {
     }
 
     /// True if and only if the tile collides on the right and left sides.
+    #[must_use]
     pub fn collides_horizontally(&self) -> bool {
         if let Some(collision) = &self.collision {
             collision.collides_side
@@ -114,6 +118,7 @@ impl TileDefinition {
     }
 
     /// True if and only if the tile collides on the bottom.
+    #[must_use]
     pub fn collides_bottom(&self) -> bool {
         if let Some(collision) = &self.collision {
             collision.collides_bottom
@@ -122,12 +127,14 @@ impl TileDefinition {
         }
     }
 
+    #[must_use]
     pub fn is_breakable(&self) -> bool {
         self.sturdiness == Sturdiness::Breakable
     }
 
     /// This returns the preview asset if it exists and the standard asset otherwise.
     /// Mainly used by the editor.
+    #[must_use]
     pub fn get_preview(&self) -> AssetType {
         self.preview_asset.or(self.asset).unwrap_or_default()
     }
@@ -160,7 +167,8 @@ impl Default for DepthLayer {
 }
 
 impl DepthLayer {
-    pub fn z(&self) -> f32 {
+    #[must_use]
+    pub fn z(self) -> f32 {
         match self {
             DepthLayer::Background => 0.,
             DepthLayer::DebugLines => 1.,

@@ -4,7 +4,7 @@ use amethyst::{
     GameData, SimpleState, SimpleTrans, StateData, StateEvent, Trans,
 };
 
-use crate::resources::*;
+use crate::resources::{UiHandles, UiType};
 use crate::states::window_event_handler;
 
 #[derive(Copy, Clone, Default, Debug)]
@@ -15,7 +15,7 @@ pub struct PausedState {
 impl SimpleState for PausedState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         info!("PausedState on_start");
-        self.ui = UiHandles::add_ui(&UiType::Paused, data.world);
+        self.ui = UiHandles::add_ui(UiType::Paused, data.world);
     }
 
     fn handle_event(

@@ -9,7 +9,6 @@ use amethyst::input::{InputHandler, StringBindings};
 pub struct PlayerSystem;
 
 impl<'s> System<'s> for PlayerSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Player>,
         ReadStorage<'s, Steering>,
@@ -44,7 +43,7 @@ impl<'s> System<'s> for PlayerSystem {
             let old_walk = intent.walk;
             let new_walk = Direction1D::new(input_x);
             let turn_around = steering.is_grounded()
-                && steering.facing.x.is_opposite(&new_walk)
+                && steering.facing.x.is_opposite(new_walk)
                 && old_walk.is_neutral();
             player.turn_around_timer = if turn_around {
                 // Player wants to turn around, initialise turn-around timer.

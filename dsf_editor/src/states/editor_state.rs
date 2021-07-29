@@ -13,7 +13,7 @@ use amethyst::{
 };
 use dsf_precompile::AnimationId;
 
-use crate::resources::*;
+use crate::resources::{setup_debug_lines, EditorStatus, LevelEdit};
 use crate::states::file_actions::{auto_save, auto_save_file, load_auto_save};
 use crate::systems;
 
@@ -26,8 +26,8 @@ use crate::systems::RefreshPreviewsEvent;
 use amethyst::core::Transform;
 use amethyst::renderer::Transparent;
 use dsf_core::components::Pos;
-use dsf_core::entities::*;
-use dsf_core::levels::*;
+use dsf_core::entities::create_camera;
+use dsf_core::levels::{add_background, attach_graphics, load_tile_definitions};
 use dsf_core::resources::{
     AssetType, Assets, DepthLayer, EventReaders, SpriteType, UiHandles, UiType,
 };
@@ -84,7 +84,7 @@ impl<'a, 'b> EditorState {
     /// Perform setup that should be executed both upon starting and upon resuming the State.
     fn setup(&self, world: &mut World) {
         init_cursor(world);
-        UiHandles::add_ui(&UiType::Editor, world);
+        UiHandles::add_ui(UiType::Editor, world);
         setup_debug_lines(world);
         create_camera(world);
         let tile_defs = load_tile_definitions().expect("Tile definitions failed to load!");
@@ -165,7 +165,6 @@ impl SimpleState for EditorState {
         self.dispatcher.dispatch(data.world);
         // Execute a pass similar to a system
         data.world.exec(
-            #[allow(clippy::type_complexity)]
             |(entities, animation_sets, mut control_sets): (
                 Entities<'_>,
                 ReadStorage<'_, AnimationSet<AnimationId, SpriteRender>>,
@@ -201,7 +200,7 @@ impl SimpleState for EditorState {
                     Write<'_, EventReaders>,
                     Read<'_, EventChannel<InputEvent<StringBindings>>>,
                 )| {
-                    readers.drain_event_channel(channel);
+                    readers.drain_event_channel(&channel);
                 },
             );
         }
@@ -213,7 +212,7 @@ impl SimpleState for EditorState {
 fn init_cursor(world: &mut World) {
     let sprite_handle = world
         .read_resource::<Assets>()
-        .get_still(&SpriteType::Selection);
+        .get_still(SpriteType::Selection);
     let mut selection_transform = Transform::default();
     selection_transform.set_translation_z((&DepthLayer::Selection).z());
     world
@@ -237,7 +236,7 @@ fn init_cursor(world: &mut World) {
         world,
         cursor_entity,
         &AssetType::Still(SpriteType::Selection, 0),
-        &Pos::new(1, 1),
+        Pos::new(1, 1),
         None,
     );
     world.exec(

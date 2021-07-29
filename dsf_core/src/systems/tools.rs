@@ -6,9 +6,9 @@ use amethyst::{
     input::{InputHandler, StringBindings},
 };
 
-use crate::components::*;
-use crate::levels::*;
-use crate::resources::*;
+use crate::components::{Block, EquippedTag, Player, Pos, Steering, Tool};
+use crate::levels::load_asset_from_world;
+use crate::resources::{SoundType, TileDefinition, TileMap, ToolType};
 use crate::systems::SoundEvent;
 use amethyst::core::ecs::shrev::EventChannel;
 use amethyst::core::Parent;
@@ -25,7 +25,6 @@ const TOOL_HEIGHT: f32 = 2.;
 pub struct PickupSystem;
 
 impl<'s> System<'s> for PickupSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<SoundEvent>>,
         WriteStorage<'s, Player>,
@@ -74,7 +73,7 @@ impl<'s> System<'s> for PickupSystem {
                     world
                         .delete_entity(tool_entity)
                         .expect("Tried to delete tool, but failed.");
-                    let render = load_asset_from_world(&sprite, sprite_nr, world);
+                    let render = load_asset_from_world(sprite, sprite_nr, world);
                     world
                         .create_entity()
                         .with(EquippedTag)
@@ -94,7 +93,6 @@ impl<'s> System<'s> for PickupSystem {
 pub struct UseToolSystem;
 
 impl<'s> System<'s> for UseToolSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<SoundEvent>>,
         WriteStorage<'s, Player>,
@@ -147,9 +145,9 @@ impl<'s> System<'s> for UseToolSystem {
                 if at_least_one_is_breakable && none_are_unbreakable {
                     sound_channel.single_write(SoundEvent::new(SoundType::Mining));
                     player.equipped = None;
-                    targeted_blocks.iter().for_each(|pos| {
-                        tile_map.remove_tile(pos);
-                    });
+                    for pos in &targeted_blocks {
+                        tile_map.remove_tile(*pos);
+                    }
                     for (_, entity) in (&equipped_tags, &entities).join() {
                         entities
                             .delete(entity)
@@ -169,18 +167,16 @@ impl<'s> System<'s> for UseToolSystem {
 fn at_least_one_is_breakable(blocks: &[Pos], tile_map: &TileMap) -> bool {
     blocks.iter().any(|pos| {
         tile_map
-            .get_tile(pos)
-            .map(|block| block.is_breakable())
-            .unwrap_or(false)
+            .get_tile(*pos)
+            .map_or(false, TileDefinition::is_breakable)
     })
 }
 
 fn none_are_unbreakable(blocks: &[Pos], tile_map: &TileMap) -> bool {
     blocks.iter().all(|pos| {
         tile_map
-            .get_tile(pos)
-            .map(|block| block.is_breakable())
-            .unwrap_or(true)
+            .get_tile(*pos)
+            .map_or(true, TileDefinition::is_breakable)
     })
 }
 
@@ -190,7 +186,7 @@ fn tiles_to_side(depth: u8, steering: &Steering) -> Vec<Pos> {
     } else {
         -1
     };
-    (0..(depth as i32))
+    (0..(i32::from(depth)))
         .flat_map(|x| {
             (0..steering.dimens.y).map(move |y| (x, y)) //???
         })
@@ -210,7 +206,7 @@ fn tiles_below(depth: u8, steering: &Steering) -> Vec<Pos> {
         0
     };
     (0..steering.dimens.x)
-        .flat_map(|x| (0..(depth as i32)).map(move |y| (x, y)))
+        .flat_map(|x| (0..(i32::from(depth))).map(move |y| (x, y)))
         .map(|(x_offset, y_offset)| {
             Pos::new(
                 steering.pos.x + facing_offset + x_offset * steering.facing.x.signum_i(),

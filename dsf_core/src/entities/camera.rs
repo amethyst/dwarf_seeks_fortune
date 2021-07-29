@@ -1,4 +1,4 @@
-use crate::components::*;
+use crate::components::CameraFrame;
 use crate::resources::DepthLayer;
 use amethyst::{
     core::{math::Vector3, transform::Transform, Parent},

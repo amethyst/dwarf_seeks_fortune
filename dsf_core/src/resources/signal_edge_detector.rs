@@ -25,11 +25,12 @@ pub enum SignalEdge {
 }
 
 impl SignalEdgeDetector {
+    #[must_use]
     pub fn new() -> Self {
         SignalEdgeDetector::default()
     }
 
-    /// Call this at most once per frame for each action_key.
+    /// Call this at most once per frame for each `action_key`.
     pub fn edge(&mut self, action_key: &str, handler: &InputHandler<StringBindings>) -> SignalEdge {
         if !self.map.contains_key(action_key) {
             self.map.insert(action_key.to_string(), false);

@@ -3,7 +3,7 @@ use amethyst::{
     ecs::prelude::{Join, ReadStorage, System, WriteStorage},
 };
 
-use crate::components::*;
+use crate::components::{BackgroundTag, DebugPosGhostTag, DebugSteeringGhostTag, Player, Steering};
 
 /// Sometimes you just added a new component, but haven't added it to a system yet.
 /// This will result in annoying runtime errors.
@@ -15,7 +15,6 @@ use crate::components::*;
 pub struct DummySystem;
 
 impl<'s> System<'s> for DummySystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (ReadStorage<'s, BackgroundTag>,);
 
     fn run(&mut self, _: Self::SystemData) {
@@ -27,7 +26,6 @@ impl<'s> System<'s> for DummySystem {
 pub struct DebugSystem;
 
 impl<'s> System<'s> for DebugSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, Steering>,

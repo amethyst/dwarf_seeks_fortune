@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::components::*;
+use crate::components::Pos;
 
 /// Maintains some information related to winning the level.
 /// In any given level, the player must collect all keys. Once all keys are collected, the exit door
@@ -17,19 +17,21 @@ pub struct WinCondition {
 
 impl WinCondition {
     /// Add a key. Only to be used when loading a level.
-    pub fn add_key(&mut self, pos: &Pos) {
-        self.keys.insert(*pos);
+    pub fn add_key(&mut self, pos: Pos) {
+        self.keys.insert(pos);
     }
     /// How many keys are left uncollected in the level.
+    #[must_use]
     pub fn nr_keys_left(&self) -> usize {
         self.keys.len()
     }
     /// Sets the key at the given position as collected.
-    pub fn set_key_collected(&mut self, pos: &Pos) {
-        self.keys.remove(pos);
+    pub fn set_key_collected(&mut self, pos: Pos) {
+        self.keys.remove(&pos);
     }
     /// Whether or not the player has collected all keys.
     /// If this returns true, the door is open and once the player reaches it they win the level.
+    #[must_use]
     pub fn all_keys_collected(&self) -> bool {
         self.keys.is_empty()
     }

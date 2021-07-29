@@ -8,7 +8,7 @@ use amethyst::{
     winit::{Event, WindowEvent},
 };
 
-use crate::components::*;
+use crate::components::CameraFrame;
 
 use amethyst::core::ecs::ReadExpect;
 
@@ -43,7 +43,6 @@ fn toggle_fullscreen(world: &mut World) {
 /// Responds to window resize events. Recreates the camera with the new dimensions.
 fn resize_camera(world: &mut World) {
     world.exec(
-        #[allow(clippy::type_complexity)]
         |data: (
             Entities<'_>,
             WriteStorage<'_, Camera>,

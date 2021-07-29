@@ -8,7 +8,7 @@ use amethyst::core::shred::SystemData;
 
 use amethyst::prelude::World;
 
-/// Elsewhere in the application, you can broadcast SoundEvents. The PlaySfxSystem below listens
+/// Elsewhere in the application, you can broadcast `SoundEvents`. The `PlaySfxSystem` below listens
 /// for such events and actually plays the sound effect that was requested.
 #[derive(Debug, Copy, Clone)]
 pub struct SoundEvent {
@@ -16,13 +16,14 @@ pub struct SoundEvent {
 }
 
 impl SoundEvent {
+    #[must_use]
     pub fn new(sound_type: SoundType) -> Self {
         SoundEvent { sound_type }
     }
 }
 
 /// This system is responsible for playing non-location-dependent sound effects.
-/// To play any sound effect, just broadcast a SoundEvent in the corresponding event channel.
+/// To play any sound effect, just broadcast a `SoundEvent` in the corresponding event channel.
 /// This system will take care of the rest.
 #[derive(Default, Debug)]
 pub struct PlaySfxSystem {
@@ -30,7 +31,6 @@ pub struct PlaySfxSystem {
 }
 
 impl<'s> System<'s> for PlaySfxSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Read<'s, AudioSettings>,
         Read<'s, EventChannel<SoundEvent>>,
@@ -48,9 +48,8 @@ impl<'s> System<'s> for PlaySfxSystem {
         for event in sound_events.read(reader_id) {
             if let Some(volume) = config.sound_effects_volume {
                 let source = assets
-                    .get_sound(&event.sound_type)
-                    .map(|source_handle| sources.get(&source_handle))
-                    .flatten();
+                    .get_sound(event.sound_type)
+                    .and_then(|source_handle| sources.get(&source_handle));
                 if let Some(source) = source {
                     output.play_once(source, volume);
                 }

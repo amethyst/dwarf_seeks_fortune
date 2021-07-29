@@ -3,8 +3,8 @@ use amethyst::core::ecs::{Read, ReaderId, World};
 use amethyst::input::{InputEvent, StringBindings};
 use std::collections::HashMap;
 
-/// This is a resource that holds a collection of ReaderIds for state-bound systems.
-/// When a system that belongs to a State-specific dispatcher needs a ReaderId it should get it
+/// This is a resource that holds a collection of `ReaderIds` for state-bound systems.
+/// When a system that belongs to a State-specific dispatcher needs a `ReaderId` it should get it
 /// from this resource.
 ///
 /// While the State is active (IE: on top of the stack), the system reads from
@@ -39,7 +39,7 @@ impl EventReaders {
     /// The State should call this method every frame if it is not active.
     pub fn drain_event_channel(
         &mut self,
-        channel: Read<'_, EventChannel<InputEvent<StringBindings>>>,
+        channel: &Read<'_, EventChannel<InputEvent<StringBindings>>>,
     ) {
         self.reader_ids.values_mut().for_each(|mut reader_id| {
             channel.read(&mut reader_id).for_each(|_| ());

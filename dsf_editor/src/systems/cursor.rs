@@ -10,8 +10,8 @@ use amethyst::{
 use dsf_core::components::Direction2D;
 use dsf_core::resources::{SignalEdge, SignalEdgeDetector};
 
-use crate::components::*;
-use crate::resources::*;
+use crate::components::Cursor;
+use crate::resources::{EditorConfig, EditorStatus, LevelEdit};
 use crate::systems::RefreshPreviewsEvent;
 
 /// Responsible for moving the cursor across the screen and managing its blinking animation.
@@ -19,7 +19,6 @@ use crate::systems::RefreshPreviewsEvent;
 pub struct CursorSystem;
 
 impl<'s> System<'s> for CursorSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, EventChannel<RefreshPreviewsEvent>>,
         WriteStorage<'s, Transform>,
@@ -56,11 +55,13 @@ impl<'s> System<'s> for CursorSystem {
                 // Start movement now. Move once and set cooldown to High.
                 cursor.movement_cooldown = config.cursor_move_high_cooldown;
                 true
-            } else if cursor.last_direction.is_opposite(&new_direction) {
+            } else if cursor.last_direction.is_opposite(new_direction) {
                 // Reset movement. Set cooldown to high.
                 cursor.movement_cooldown = config.cursor_move_high_cooldown;
                 false
-            } else if !new_direction.is_neutral() {
+            } else if new_direction.is_neutral() {
+                false
+            } else {
                 // continue movement. Tick down cooldown.
                 // If cooldown is due, move once and reset cooldown to Low.
                 cursor.movement_cooldown -= time.delta_seconds();
@@ -70,8 +71,6 @@ impl<'s> System<'s> for CursorSystem {
                 } else {
                     false
                 }
-            } else {
-                false
             };
             cursor.last_direction = new_direction;
             let old_cursor_pos = status.selection.end;
@@ -104,7 +103,7 @@ impl<'s> System<'s> for CursorSystem {
                 status.selection.end.x += input_x as i32;
                 status.selection.end.y += input_y as i32;
             }
-            status.selection.end = level_edit.bounds().clamp(&status.selection.end);
+            status.selection.end = level_edit.bounds().clamp(status.selection.end);
             if old_cursor_pos != status.selection.end {
                 channel.single_write(RefreshPreviewsEvent);
             }

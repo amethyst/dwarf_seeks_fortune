@@ -10,9 +10,12 @@ use amethyst::{
 };
 use amethyst::{GameData, SimpleState, SimpleTrans};
 
-use crate::entities::*;
+use crate::entities::create_camera;
 
-use crate::resources::*;
+use crate::resources::{
+    load_adventure, Adventure, AdventureNode, MapElement, NodeDetails, PositionOnMap, UiHandles,
+    UiType, UserCache,
+};
 use crate::states::{window_event_handler, PlayState};
 use crate::systems;
 use crate::utility::files::{get_adventures_dir, get_levels_dir};
@@ -25,13 +28,15 @@ pub struct LevelSelectState {
 }
 
 impl<'a, 'b> LevelSelectState {
-    /// Creates a LevelSelectState that starts in demo mode. It loads the default adventure.
+    /// Creates a `LevelSelectState` that starts in demo mode. It loads the default adventure.
+    #[must_use]
     pub fn demo() -> Self {
         let adventure_file = get_adventures_dir().join("default.ron");
         LevelSelectState::new(adventure_file)
     }
 
-    /// Creates a new LevelSelectState that will load the given adventure.
+    /// Creates a new `LevelSelectState` that will load the given adventure.
+    #[must_use]
     pub fn new(adventure_file: PathBuf) -> Self {
         LevelSelectState {
             adventure_file,
@@ -51,7 +56,7 @@ impl<'a, 'b> LevelSelectState {
     ///
     /// - If the user selected a road, nothing will happen.
     /// - If the user selected a level, that level will be opened in the Play state.
-    /// - If the user selected an adventure, that adventure will be opened in a nested LevelSelect state.
+    /// - If the user selected an adventure, that adventure will be opened in a nested `LevelSelect` state.
     fn select_node(world: &mut World) -> SimpleTrans {
         world.exec(
             |(adventure, pos_on_map): (Read<'_, Adventure>, Read<'_, PositionOnMap>)| {
@@ -72,8 +77,8 @@ impl<'a, 'b> LevelSelectState {
 
     /// Prepare to start or resume.
     fn perform_setup(&self, world: &mut World) {
-        UiHandles::add_ui(&UiType::Fps, world);
-        UiHandles::add_ui(&UiType::LevelSelect, world);
+        UiHandles::add_ui(UiType::Fps, world);
+        UiHandles::add_ui(UiType::LevelSelect, world);
         create_camera(world);
         load_adventure(&self.adventure_file, world).expect("Failed to load adventure!");
     }
