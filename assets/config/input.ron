@@ -1,0 +1,29 @@
+// TODO: seperate input configurations depending on context. IE: gameplay, editor, menu, etc.
+(
+  axes: {
+    "move_y": Emulated(pos: Key(W), neg: Key(S)),
+    "move_x": Emulated(pos: Key(D), neg: Key(A)),
+    "zoom": MouseWheel(horizontal: false),
+    "pan_x":Emulated(pos: Key(Right),neg:Key(Left)),
+    "pan_y":Emulated(pos: Key(Up),neg:Key(Down)),
+  },
+  actions: {
+      "restart": [[Key(F5)]],
+      "toggleFullscreen": [[Key(F11)]],
+      "speedUp": [[Key(Add)]],
+      "slowDown": [[Key(Subtract)]],
+      "shift": [[Key(LShift)]],
+      "jump": [[Key(Space)]],
+      "select_previous_brush": [[Key(LBracket)]],
+      "select_next_brush": [[Key(RBracket)]],
+      "toggle_copy_air": [[Key(G)]],
+      "toggle_force_place": [[Key(F)]],
+      "place_blocks": [[Key(Return)]],
+      "delete_blocks": [[Key(Delete)]],
+      "y_to_start":[[Key(PageDown)]],
+      "y_to_end":[[Key(PageUp)]],
+      "x_to_start":[[Key(Home)]],
+      "x_to_end":[[Key(End)]],
+      "adjust_bounds":[[Key(LAlt)]],
+  },
+)

@@ -1,0 +1,9 @@
+// Deserialises to an AudioSettings struct.
+//
+// These are the default values. Don't change these, unless you mean to change the default for everyone.
+// To change settings just for you, copy this file to .userdata/settings/ and change it there.
+// If this file exists in .userdata/settings/, those values will be used instead of these.
+(
+    music_volume: Some(0.5),
+    sound_effects_volume: Some(0.8),
+)

@@ -1,0 +1,65 @@
+use amethyst::{
+    core::transform::Transform,
+    ecs::prelude::{Join, ReadStorage, System, WriteStorage},
+};
+
+use crate::components::{BackgroundTag, DebugPosGhostTag, DebugSteeringGhostTag, Player, Steering};
+
+/// Sometimes you just added a new component, but haven't added it to a system yet.
+/// This will result in annoying runtime errors.
+/// This system exists to solve this problem!
+/// Add the component to this system temporarily, and the game will stop crashing.
+///
+/// ... It's not pretty, I know.
+#[derive(Copy, Clone, Debug)]
+pub struct DummySystem;
+
+impl<'s> System<'s> for DummySystem {
+    type SystemData = (ReadStorage<'s, BackgroundTag>,);
+
+    fn run(&mut self, _: Self::SystemData) {
+        // Do nothing.
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct DebugSystem;
+
+impl<'s> System<'s> for DebugSystem {
+    type SystemData = (
+        WriteStorage<'s, Transform>,
+        ReadStorage<'s, Steering>,
+        ReadStorage<'s, Player>,
+        ReadStorage<'s, DebugPosGhostTag>,
+        ReadStorage<'s, DebugSteeringGhostTag>,
+    );
+
+    fn run(
+        &mut self,
+        (
+            mut transforms,
+            steerings,
+            player_tags,
+            pos_ghost_tags,
+            steering_ghost_tags,
+        ): Self::SystemData,
+    ) {
+        // Sets the transform on the ghost tags.
+        // This is a debug thing to show us where the player is going.
+        let maybe_steering = (&player_tags, &steerings)
+            .join()
+            .map(|(_, steering)| steering)
+            .next();
+        if let Some(steering) = maybe_steering {
+            for (_, transform) in (&steering_ghost_tags, &mut transforms).join() {
+                let (centered_x, centered_y) = steering.to_centered_coords(steering.destination);
+                transform.set_translation_x(centered_x);
+                transform.set_translation_y(centered_y);
+            }
+            for (_, transform) in (&pos_ghost_tags, &mut transforms).join() {
+                transform.set_translation_x(steering.pos.x as f32 + 0.5);
+                transform.set_translation_y(steering.pos.y as f32 + 0.5);
+            }
+        }
+    }
+}

@@ -1,0 +1,64 @@
+#![enable(implicit_some)]
+Container(
+    transform: (
+        id: "menu",
+        anchor: TopLeft,
+        x: 960.,
+        y: -32.,
+        width: 1920.0,
+        height: 64.0,
+    ),
+    background: SolidColor(0.70, 0.66, 0.53, 1.0),
+    children: [
+        Label(
+            transform: (
+                id: "fps_text",
+                anchor: TopLeft,
+                x: 64.,
+                y: -32.,
+                width: 128.,
+                height: 64.,
+                transparent: true,
+            ),
+            text: (
+                text: "N/A",
+                font_size: 25.,
+                color: (0., 0., 0., 1.),
+                font: File("font/square.ttf", ("TTF", ())),
+            )
+        ),
+        Image(
+            transform: (
+                id: "toggle_force_place",
+                x: 160.0,
+                y: -32.0,
+                width: 64.,
+                height: 64.,
+                anchor: TopLeft,
+            ),
+            image: Texture(File("textures/editor_ui_icons.png", ("IMAGE", ()))),
+        ),
+        Image(
+            transform: (
+                id: "toggle_copy_air",
+                x: 224.0,
+                y: -32.0,
+                width: 64.,
+                height: 64.,
+                anchor: TopLeft,
+            ),
+            image: Texture(File("textures/editor_ui_icons.png", ("IMAGE", ()))),
+        ),
+        Image(
+            transform: (
+                id: "brush_preview",
+                x: 288.0,
+                y: -32.0,
+                width: 64.,
+                height: 64.,
+                anchor: TopLeft,
+            ),
+            image: Texture(File("textures/editor_ui_icons.png", ("IMAGE", ()))),
+        ),
+    ]
+)

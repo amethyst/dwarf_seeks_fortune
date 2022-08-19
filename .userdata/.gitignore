@@ -1,0 +1,15 @@
+# Make sure that this (otherwise empty) directory is in source control:
+# Ignore everything in this directory ...
+*
+# ... except for this file:
+!.gitignore
+
+#####################################################################
+
+# The .userdata directory contains files that belong to a specific user. They are not in source control.
+# Examples of files that go in this directory:
+# - User settings in the settings/ subdirectory. They override default settings in assets/config/default_settings/
+# - User cache. Contains things like the position of the player on the map in the level select screen.
+#       Can safely be deleted with minimal repercussions.
+# - User progress / save file. Contains information on which levels the user has completed.
+#       Can be deleted to reset all user progress to the beginning.

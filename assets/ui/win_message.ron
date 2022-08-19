@@ -1,0 +1,18 @@
+#![enable(implicit_some)]
+Label(
+    transform: (
+        id: "win_msg_text",
+        anchor: Middle,
+        x: 0.,
+        y: -256.,
+        width: 512.,
+        height: 50.,
+        transparent: true,
+    ),
+    text: (
+        text: "You completed the level!",
+        font_size: 25.,
+        color: (1., 1., 1., 1.),
+        font: File("font/square.ttf", ("TTF", ())),
+    ),
+)

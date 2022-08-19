@@ -1,0 +1,199 @@
+#![enable(implicit_some)]
+Container(
+    transform: (
+        id: "background",
+        anchor: Middle,
+        stretch: XY( x_margin: 0., y_margin: 0., keep_aspect_ratio: false),
+        width: 20.,
+        height: 20.,
+    ),
+    background: SolidColor(0., 0., 0., 1.),
+    children: [
+        Label(
+            transform: (
+                id: "title",
+                x: 0.0,
+                y: -100.0,
+                z: 10.0,
+                width: 1200.0,
+                height: 150.0,
+                anchor: TopMiddle,
+                mouse_reactive: false,
+            ),
+            text: (
+                text: "Settings",
+                font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
+                font_size: 150.0,
+                color: (1., 1., 1., 1.0),
+            ),
+        ),
+        Label(
+            transform: (
+                id: "description",
+                x: 0.0,
+                y: -200.0,
+                z: 10.0,
+                width: 600.0,
+                height: 50.0,
+                anchor: TopMiddle,
+                mouse_reactive: false,
+            ),
+            text: (
+                text: "For now, restarting the game is required upon changing these settings.",
+                font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
+                font_size: 20.0,
+                color: (1., 1., 1., 1.0),
+            ),
+        ),
+        // Music volume setting:
+        Container(
+            transform: (
+                id: "music_volume",
+                x: 0.,
+                y: 100.,
+                width: 400.,
+                height: 50.,
+                anchor: Middle,
+            ),
+            //background: SolidColor(0.09, 0.02, 0.25, 1.0),
+            children: [
+                Button(
+                    transform: (
+                        id: "btn_decrease_music_volume",
+                        x: 0.0,
+                        y: 0.0,
+                        width: 50.0,
+                        height: 50.0,
+                        anchor: MiddleLeft,
+                        mouse_reactive: true,
+                    ),
+                    button: (
+                        text: "<",
+                        font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
+                        font_size: 36.0,
+                        normal_image: SolidColor(0.4, 0.4, 0.4, 1.),
+                        hover_image: SolidColor(0.5, 0.5, 0.5, 1.),
+                        press_image: SolidColor(0.2, 0.2, 0.2, 1.),
+                        normal_text_color: (0.2, 0.2, 0.2, 1.0),
+                        hover_text_color: (0.7, 0.7, 0.7, 1.0),
+                        press_text_color: (1.0, 1.0, 1.0, 1.0),
+                    )
+                ),
+                Button(
+                    transform: (
+                        id: "btn_increase_music_volume",
+                        x: 0.0,
+                        y: 0.0,
+                        width: 50.0,
+                        height: 50.0,
+                        anchor: MiddleRight,
+                        mouse_reactive: true,
+                    ),
+                    button: (
+                        text: ">",
+                        font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
+                        font_size: 36.0,
+                        normal_image: SolidColor(0.4, 0.4, 0.4, 1.),
+                        hover_image: SolidColor(0.5, 0.5, 0.5, 1.),
+                        press_image: SolidColor(0.2, 0.2, 0.2, 1.),
+                        normal_text_color: (0.2, 0.2, 0.2, 1.0),
+                        hover_text_color: (0.7, 0.7, 0.7, 1.0),
+                        press_text_color: (1.0, 1.0, 1.0, 1.0),
+                    )
+                ),
+                Label(
+                    transform: (
+                        id: "label_music_volume",
+                        x: 0.0,
+                        y: 0.0,
+                        width: 300.0,
+                        height: 50.0,
+                        anchor: Middle,
+                        mouse_reactive: false,
+                    ),
+                    text: (
+                        text: "Music volume: ??",
+                        font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
+                        font_size: 30.0,
+                        color: (1., 1., 1., 1.0),
+                    ),
+                ),
+            ]
+        ),
+        // Sound effects volume setting:
+        Container(
+            transform: (
+                id: "sfx_volume",
+                x: 0.,
+                y: 40.,
+                width: 400.,
+                height: 50.,
+                anchor: Middle,
+            ),
+            //background: SolidColor(0.09, 0.02, 0.25, 1.0),
+            children: [
+                Button(
+                    transform: (
+                        id: "btn_decrease_sfx_volume",
+                        x: 0.0,
+                        y: 0.0,
+                        width: 50.0,
+                        height: 50.0,
+                        anchor: MiddleLeft,
+                        mouse_reactive: true,
+                    ),
+                    button: (
+                        text: "<",
+                        font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
+                        font_size: 36.0,
+                        normal_image: SolidColor(0.4, 0.4, 0.4, 1.),
+                        hover_image: SolidColor(0.5, 0.5, 0.5, 1.),
+                        press_image: SolidColor(0.2, 0.2, 0.2, 1.),
+                        normal_text_color: (0.2, 0.2, 0.2, 1.0),
+                        hover_text_color: (0.7, 0.7, 0.7, 1.0),
+                        press_text_color: (1.0, 1.0, 1.0, 1.0),
+                    )
+                ),
+                Button(
+                    transform: (
+                        id: "btn_increase_sfx_volume",
+                        x: 0.0,
+                        y: 0.0,
+                        width: 50.0,
+                        height: 50.0,
+                        anchor: MiddleRight,
+                        mouse_reactive: true,
+                    ),
+                    button: (
+                        text: ">",
+                        font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
+                        font_size: 36.0,
+                        normal_image: SolidColor(0.4, 0.4, 0.4, 1.),
+                        hover_image: SolidColor(0.5, 0.5, 0.5, 1.),
+                        press_image: SolidColor(0.2, 0.2, 0.2, 1.),
+                        normal_text_color: (0.2, 0.2, 0.2, 1.0),
+                        hover_text_color: (0.7, 0.7, 0.7, 1.0),
+                        press_text_color: (1.0, 1.0, 1.0, 1.0),
+                    )
+                ),
+                Label(
+                    transform: (
+                        id: "label_sfx_volume",
+                        x: 0.0,
+                        y: 0.0,
+                        width: 300.0,
+                        height: 50.0,
+                        anchor: Middle,
+                        mouse_reactive: false,
+                    ),
+                    text: (
+                        text: "Sound effects volume: ??",
+                        font: File("font/OpenSans-Regular.ttf", ("TTF", ())),
+                        font_size: 30.0,
+                        color: (1., 1., 1., 1.0),
+                    ),
+                ),
+            ]
+        ),
+    ],
+)

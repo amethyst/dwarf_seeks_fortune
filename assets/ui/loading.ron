@@ -1,0 +1,10 @@
+#![enable(implicit_some)]
+Image(
+    transform: (
+        id: "logo",
+        width: 250.,
+        height: 250.,
+        anchor: Middle,
+    ),
+    image: Texture(File("textures/logo_transparent.png", ("IMAGE", ()))),
+)

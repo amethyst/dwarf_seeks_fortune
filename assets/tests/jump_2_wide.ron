@@ -1,0 +1,20 @@
+(
+    tiles: {
+        (
+            x: 6,
+            y: -2,
+        ): "BigBlock",
+        (
+            x: 0,
+            y: -2,
+        ): "BigBlock",
+        (
+            x: 8,
+            y: -2,
+        ): "BigBlock",
+        (
+            x: 2,
+            y: -2,
+        ): "BigBlock",
+    },
+)

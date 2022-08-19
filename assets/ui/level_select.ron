@@ -1,0 +1,44 @@
+#![enable(implicit_some)]
+Container(
+    transform: (
+        id: "level_select",
+        anchor: Middle,
+        y: 0.0,
+        width: 800.0,
+        height: 200.0,
+   ),
+    children: [
+        Label(
+            transform: (
+                id: "label_node_title",
+                anchor: Middle,
+                y: -100.,
+                width: 800.,
+                height: 50.,
+                transparent: true,
+            ),
+            text: (
+                text: "Selected: ",
+                font_size: 25.,
+                color: (1., 1., 1., 1.),
+                font: File("font/square.ttf", ("TTF", ())),
+            ),
+        ),
+        Label(
+            transform: (
+                id: "label_controls",
+                anchor: Middle,
+                y: 200.,
+                width: 800.,
+                height: 50.,
+                transparent: true,
+            ),
+            text: (
+                text: "[WASD] to move, [Enter] to play selected level",
+                font_size: 25.,
+                color: (1., 1., 1., 1.),
+                font: File("font/square.ttf", ("TTF", ())),
+            ),
+        )
+    ]
+)

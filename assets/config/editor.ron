@@ -1,0 +1,7 @@
+// Deserialises to a EditorConfig struct.
+(
+    cursor_move_high_cooldown : 0.3,
+    cursor_move_low_cooldown : 0.05,
+    cursor_blink_on_time : 0.5,
+    cursor_blink_off_time : 0.5,
+)
